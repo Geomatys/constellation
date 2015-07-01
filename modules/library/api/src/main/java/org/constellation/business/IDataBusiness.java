@@ -307,6 +307,13 @@ public interface IDataBusiness {
      */
     void updateHidden(final int dataId, boolean value);
 
+    /**
+     * Returns count of all data
+     * @param includeInvisibleData flag that indicates if the count will includes hidden data.
+     * @return int
+     */
+    Integer getCountAll(boolean includeInvisibleData);
+
     void linkDataToData(final int dataId, final int childId);
 
     List<Data> getDataLinkedData(final int dataId);

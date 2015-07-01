@@ -29,6 +29,8 @@ import java.util.List;
 public interface DataRepository {
 
     List<Data> findAll();
+
+    Integer countAll(boolean includeInvisibleData);
     
     Data fromLayer(String layerAlias, String providerId);
     

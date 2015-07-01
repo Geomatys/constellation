@@ -334,6 +334,20 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
                 .fetchInto(DataItem.class);
     }
 
+    /**
+     * Select count of data and return the result.
+     * @param includeInvisibleData flag that indicates if the count will includes hidden data.
+     * @return count of rows in table
+     */
+    @Override
+    public Integer countAll(boolean includeInvisibleData) {
+        if(includeInvisibleData) {
+            return dsl.selectCount().from(DATA).fetchOne(0,int.class);
+        } else {
+            return dsl.selectCount().from(DATA).where(DATA.HIDDEN.eq(false).and(DATA.INCLUDED.eq(true))).fetchOne(0, int.class);
+        }
+    }
+
     // -------------------------------------------------------------------------
     //  Private utility methods
     // -------------------------------------------------------------------------

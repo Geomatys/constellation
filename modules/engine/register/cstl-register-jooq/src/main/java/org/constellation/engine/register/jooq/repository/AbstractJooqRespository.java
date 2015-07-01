@@ -82,6 +82,14 @@ public abstract class AbstractJooqRespository<T extends Record, U> {
         return selectQuery.getResult().map(getDTOMapper());
     }
 
+    /**
+     * Select count of table and return the result.
+     * @return count of rows in table
+     */
+    public Integer countAll() {
+        return dsl.selectCount().from(table).fetchOne(0,int.class);
+    }
+
     protected List<U> findBy(Condition condition) {
         return dsl.select().from(table).where(condition).fetchInto(dtoClass);
     }

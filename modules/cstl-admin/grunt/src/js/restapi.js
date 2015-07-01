@@ -179,6 +179,7 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
     .factory('dataListing', function($resource) {
         return $resource('@cstl/api/1/domain/$domainId/data/list/top/:filter;jsessionid=', {}, {
             'listAll':              {method: 'GET',     isArray: true},
+            'countAll':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/count/all'},
             'listPublished':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/data;jsessionid=', isArray: true},
             'listPublishedDS':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/published/:published/dataset;jsessionid=', isArray: true},
             'listAllDS':            {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/dataset/;jsessionid=', isArray: true},
