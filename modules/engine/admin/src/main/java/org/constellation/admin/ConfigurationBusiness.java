@@ -90,24 +90,5 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
             LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
         } 
     }
-    
-  
-    
-    public static String getConfigPath() {
-        return ConfigDirectory.getConfigDirectory().getPath();
-    }
 
-    public static Properties getMetadataTemplateProperties() {
-        final File cstlDir = ConfigDirectory.getConfigDirectory();
-        final File propFile = new File(cstlDir, "metadataTemplate.properties");
-        final Properties prop = new Properties();
-        if (propFile.exists()) {
-            try {
-                prop.load(new FileReader(propFile));
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
-            }
-        }
-        return prop;
-    }
 }

@@ -100,7 +100,7 @@ public class AdminRest {
     @GET
     @Path("/configurationLocation")
     public Response configurationPath() throws CstlServiceException {
-        final String path = ConfigurationBusiness.getConfigPath();
+        final String path = configurationBusiness.getConfigurationDirectory().getPath();
         return Response.ok(new AcknowlegementType(true, path)).build();
     }
 

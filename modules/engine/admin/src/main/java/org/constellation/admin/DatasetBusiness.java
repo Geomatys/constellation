@@ -61,6 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -243,7 +244,7 @@ public class DatasetBusiness implements IDatasetBusiness {
             extractedMetadata = new DefaultMetadata();
         }
         //Update metadata
-        final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
+        final Properties prop = getMetadataTemplateProperties();
         final String metadataID = CstlMetadatas.getMetadataIdForDataset(providerId);
         prop.put("fileId", metadataID);
         prop.put("dataTitle", metadataID);
@@ -499,5 +500,19 @@ public class DatasetBusiness implements IDatasetBusiness {
     @Override
     public DatasetItemWithData getSingletonDatasetItem(DatasetItem dsItem, List<DataItem> items) {
         return new DatasetItemWithData(dsItem, items);
+    }
+
+    private Properties getMetadataTemplateProperties() {
+        final File cstlDir = ConfigDirectory.getConfigDirectory();
+        final File propFile = new File(cstlDir, "metadataTemplate.properties");
+        final Properties prop = new Properties();
+        if (propFile.exists()) {
+            try {
+                prop.load(new FileReader(propFile));
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
+            }
+        }
+        return prop;
     }
 }
