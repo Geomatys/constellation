@@ -134,7 +134,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 setupDataLazyInfo(data);
             } else {
                 selection.data = null;
-                if (!self.showSingleton && selection.dataset.dataCount === 1) {
+                if (!self.showSingleton && selection.dataset && selection.dataset.dataCount === 1) {
                     selection.dataset = null; // reset singleton dataset selection if not shown
                 }
             }
