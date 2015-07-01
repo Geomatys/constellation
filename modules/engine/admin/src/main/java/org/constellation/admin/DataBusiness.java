@@ -767,6 +767,13 @@ public class DataBusiness implements IDataBusiness {
     /**
      * {@inheritDoc}
      */
+    public Integer getCountAll(boolean includeInvisibleData) {
+        return dataRepository.countAll(includeInvisibleData);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Scheduled(cron = "1 * * * * *")
     public void updateDataStatistics() {

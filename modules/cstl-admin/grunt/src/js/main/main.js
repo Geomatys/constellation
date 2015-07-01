@@ -119,8 +119,8 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
             });
 
 
-            dataListing.listAll({}, function(response) {
-                $scope.nbdata = response.length;
+            dataListing.countAll({}, function(response) {
+                $scope.nbdata = response.count;
             }, function() {
                 $scope.nbdata = 0;
                 Growl('error', 'Error', 'Unable to count data');

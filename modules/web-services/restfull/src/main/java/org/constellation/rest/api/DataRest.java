@@ -1952,7 +1952,18 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/top")
+    @Path("count/all")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getCountAll() {
+        final Map<String,Integer> map = new HashMap<>();
+        final int count = dataBusiness.getCountAll(false);
+        map.put("count", count);
+        return Response.ok(map).build();
+    }
+
+    @GET
+    @Path("list/top")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getTopDataList(@PathParam("domainId") int domainId) {
@@ -1960,7 +1971,7 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/top/{type}")
+    @Path("list/top/{type}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getTopDataList(@PathParam("domainId") int domainId, @PathParam("type") String type) {
@@ -1995,7 +2006,7 @@ public class DataRest {
      * @return
      */
     @GET
-    @Path("/list/dataset")
+    @Path("list/dataset")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getDatasetList(@PathParam("domainId") int domainId) {
@@ -2012,7 +2023,7 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/published/{published}/data")
+    @Path("list/published/{published}/data")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getPublishedDataList(@PathParam("domainId") int domainId, @PathParam("published") boolean published) {
@@ -2043,7 +2054,7 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/published/{published}/dataset")
+    @Path("list/published/{published}/dataset")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getPublishedDatasetList(@PathParam("domainId") int domainId, @PathParam("published") boolean published) {
@@ -2075,7 +2086,7 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/observation/{sensorable}/data")
+    @Path("list/observation/{sensorable}/data")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getSensorableDataList(@PathParam("domainId") int domainId, @PathParam("sensorable") boolean sensorable) {
@@ -2107,7 +2118,7 @@ public class DataRest {
     }
 
     @GET
-    @Path("/list/observation/{sensorable}/dataset")
+    @Path("list/observation/{sensorable}/dataset")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getSensorableDatasetList(@PathParam("domainId") int domainId, @PathParam("sensorable") boolean sensorable) {
@@ -2139,7 +2150,7 @@ public class DataRest {
     }
 
     @POST
-    @Path("/include/{dataId}")
+    @Path("include/{dataId}")
     public Response includeData(final @PathParam("dataId") int dataId) {
         try {
             dataBusiness.updateDataIncluded(dataId, true);
@@ -2151,7 +2162,7 @@ public class DataRest {
     }
 
     @DELETE
-    @Path("/{dataId}")
+    @Path("{dataId}")
     public Response removeData(final @PathParam("dataId") int dataId) {
         try {
             dataBusiness.removeData(dataId);
@@ -2384,7 +2395,7 @@ public class DataRest {
 
 
     @GET
-    @Path("/{dataId}/associations")
+    @Path("{dataId}/associations")
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getAssociations(@PathParam("dataId") int dataId) {
         if (dataBusiness.existsById(dataId)) {
@@ -2398,7 +2409,7 @@ public class DataRest {
     }
 
     @DELETE
-    @Path("/{dataId}/associations/styles/{styleId}")
+    @Path("{dataId}/associations/styles/{styleId}")
     @Produces({ MediaType.APPLICATION_JSON })
     @Transactional
     public Response deleteStyleAssociation(@PathParam("dataId") int dataId, @PathParam("styleId") int styleId) {
@@ -2410,7 +2421,7 @@ public class DataRest {
     }
 
     @DELETE
-    @Path("/{dataId}/associations/sensors/{sensorId}")
+    @Path("{dataId}/associations/sensors/{sensorId}")
     @Produces({ MediaType.APPLICATION_JSON })
     @Transactional
     public Response deleteSensorAssociation(@PathParam("dataId") int dataId, @PathParam("sensorId") String sensorIdentifier) {
