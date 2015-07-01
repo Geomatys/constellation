@@ -122,7 +122,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 if (dataset.dataCount > 1) {
                     setupDatasetLazyInfo(dataset);
                 } else if (dataset.dataCount === 1 && !data) {
-                    data = dataset.data[0];
+                    data = dataset.data[0]; // auto-select the single data in singleton dataset
                 }
             } else if (!data) {
                 selection.dataset = null;
@@ -134,6 +134,9 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 setupDataLazyInfo(data);
             } else {
                 selection.data = null;
+                if (!self.showSingleton && selection.dataset && selection.dataset.dataCount === 1) {
+                    selection.dataset = null; // reset singleton dataset selection if not shown
+                }
             }
 
             // Update data preview.
@@ -193,7 +196,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 selection.data.$infoPromise.then(function() {
                     // Create layer instance.
                     var layer;
-                    if (selection.data.styles.length) {
+                    if (selection.data && selection.data.styles.length) {
                         layer = DataDashboardViewer.createLayerWithStyle(
                             $cookieStore.get('cstlUrl'),
                             layerName,
