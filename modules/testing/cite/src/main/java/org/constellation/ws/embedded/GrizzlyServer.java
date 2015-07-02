@@ -64,6 +64,7 @@ import org.constellation.provider.ProviderFactory;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.utils.TestDatabaseHandler;
 import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
@@ -166,24 +167,59 @@ public final class GrizzlyServer {
         dataBusiness.create(new QName("cite", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
         dataBusiness.create(new QName("cite", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
 
-        final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
-        getOrCreateValue(source, SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-        getOrCreateValue(source, SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+        final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
 
-        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-        final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
-        getOrCreateValue(pgconfig, DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
-        getOrCreateValue(pgconfig, HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
-        getOrCreateValue(pgconfig, SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
-        getOrCreateValue(pgconfig, USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
-        getOrCreateValue(pgconfig, PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
-        getOrCreateValue(pgconfig, NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-        
-        providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
-        
-        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+        // Defines a GML data provider
+        ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("primGMLSrc");
+
+        ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+        ParameterValueGroup pgconfig = getOrCreateGroup(choice, "GMLParameters");
+        pgconfig.parameter("identifier").setValue("gml");
+        pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/primitive"));
+        pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+        pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+        pgconfig.parameter("xsdtypename").setValue("PrimitiveGeoFeature");
+        pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+        pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+
+        providerBusiness.storeProvider("primGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "primGMLSrc", "VECTOR", false, true, null, null);
+
+
+        source = factory.getProviderDescriptor().createValue();
+        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("entGMLSrc");
+
+        choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+        pgconfig = getOrCreateGroup(choice, "GMLParameters");
+        pgconfig.parameter("identifier").setValue("gml");
+        pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/entity"));
+        pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+        pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+        pgconfig.parameter("xsdtypename").setValue("EntitéGénérique");
+        pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+        pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+        providerBusiness.storeProvider("entGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "entGMLSrc", "VECTOR", false, true, null, null);
+
+
+        source = factory.getProviderDescriptor().createValue();
+        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("aggGMLSrc");
+
+        choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+        pgconfig = getOrCreateGroup(choice, "GMLParameters");
+        pgconfig.parameter("identifier").setValue("gml");
+        pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/aggregate"));
+        pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+        pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+        pgconfig.parameter("xsdtypename").setValue("AggregateGeoFeature");
+        pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+        pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+        providerBusiness.storeProvider("aggGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+        dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "aggGMLSrc", "VECTOR", false, true, null, null);
           
         
         final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
@@ -303,9 +339,9 @@ public final class GrizzlyServer {
         
         serviceBusiness.create("wfs", "default", wfsConfig, null);
         
-        layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-        layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-        layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+        layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
+        layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
+        layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc", null, "default", "wfs", null);
         
 
         /*---------------------------------------------------------------*/

@@ -139,7 +139,8 @@
   <sch:pattern id="CRSReferencesPattern" name="CRSReferencesPattern">
     <sch:p xml:lang="en">Checks that all CRS references are valid URI values.</sch:p>
     <sch:rule id="CRSReferences" context="//wfs:DefaultSRS">
-      <sch:assert id="DefaultSRS" test="starts-with(., 'urn:x-ogc:def:crs:') or starts-with(., 'http')"
+      <!-- glegal change remove the -x   <sch:assert id="DefaultSRS" test="starts-with(., 'urn:x-ogc:def:crs:') or starts-with(., 'http')"-->
+      <sch:assert id="DefaultSRS" test="starts-with(., 'urn:ogc:def:crs:') or starts-with(., 'http')"
         diagnostics="DefaultSRS.value">
 	DefaultSRS value is not a valid URI (invalid scheme name or URN namespace identifier).
       </sch:assert>

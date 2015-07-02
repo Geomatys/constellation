@@ -19,7 +19,11 @@
 package org.constellation.cite;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,17 +54,12 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.geotoolkit.data.FeatureCollection;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
+import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.ogc.xml.v110.AndType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
@@ -135,11 +134,6 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
-            if (!TestDatabaseHandler.hasLocalDatabase()) {
-                LOGGER.warning("-- SOME TESTS WILL BE SKIPPED BECAUSE TEST DATABASE IS MISSING --");
-                initialized = true;
-                return;
-            }
             try {
 
                 layerBusiness.removeAll();
@@ -147,28 +141,62 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
 
+                final File outputDir = initDataDirectory();
+                
                 final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
 
-                // Defines a PostGis data provider
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                // Defines a GML data provider
+                ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                 source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("primGMLSrc");
 
-                final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
-                pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
-                pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
-                pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                ParameterValueGroup pgconfig = getOrCreateGroup(choice, "GMLParameters");
+                pgconfig.parameter("identifier").setValue("gml");
+                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/primitive"));
+                pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsdtypename").setValue("PrimitiveGeoFeature");
+                pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+                pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
 
-                providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
+                providerBusiness.storeProvider("primGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "primGMLSrc", "VECTOR", false, true, null, null);
+                
+                
+                source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("entGMLSrc");
 
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+                choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                pgconfig = getOrCreateGroup(choice, "GMLParameters");
+                pgconfig.parameter("identifier").setValue("gml");
+                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/entity"));
+                pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsdtypename").setValue("EntitéGénérique");
+                pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+                pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+                providerBusiness.storeProvider("entGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "entGMLSrc", "VECTOR", false, true, null, null);
+                
 
+                source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("aggGMLSrc");
+
+                choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                pgconfig = getOrCreateGroup(choice, "GMLParameters");
+                pgconfig.parameter("identifier").setValue("gml");
+                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/aggregate"));
+                pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsdtypename").setValue("AggregateGeoFeature");
+                pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+                pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+                providerBusiness.storeProvider("aggGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "aggGMLSrc", "VECTOR", false, true, null, null);
+                
 
                 DataProviders.getInstance().reload();
                 final LayerContext config = new LayerContext();
@@ -177,9 +205,9 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 config.getCustomParameters().put("transactionnal", "true");
 
                 serviceBusiness.create("wfs", "default", config, null);
-                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
+                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
+                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc", null, "default", "wfs", null);
 
                 worker = new DefaultWFSWorker("default");
                 worker.setLogLevel(Level.FINER);
@@ -206,7 +234,6 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     @Test
     public void getCapabilitiesTest() throws Exception {
-        assumeTrue(TestDatabaseHandler.hasLocalDatabase());
         worker.getCapabilities(new GetCapabilitiesType("WFS"));
     }
      /**
@@ -215,7 +242,6 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
      */
     @Test
     public void getFeatureShapeFileTest() throws Exception {
-        assumeTrue(TestDatabaseHandler.hasLocalDatabase());
 
         /**
          * Test 1 : query on typeName aggragateGeofeature
@@ -248,13 +274,36 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
          * Test 1 : query on typeName aggragateGeofeature
          */
 
-        queries = new ArrayList<QueryType>();
+        queries = new ArrayList<>();
+        QueryType query = new QueryType(null, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        
+        collection = ((FeatureCollectionWrapper)result).getFeatureCollection();
+
+        writer = new StringWriter();
+        featureWriter.write(collection, writer);
+        writer.flush();
+        xmlResult = writer.toString();
+        System.out.println(xmlResult);
+
+        assertEquals(5, collection.size());
+        
+        /**
+         * Test 1 : query on typeName aggragateGeofeature
+         */
+
+        queries = new ArrayList<>();
         BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:ogc:def:crs:EPSG:4326");
         PropertyIsEqualToType propEqual = new PropertyIsEqualToType(new LiteralType("name-f015"), new PropertyNameType("http://www.opengis.net/gml:name"), Boolean.TRUE);
         AndType and = new AndType(bbox, propEqual);
         f = new FilterType(and);
-        QueryType query = new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
-        query.setSrsName("urn:ogc:def:crs:EPSG:6.11:32629");
+        query = new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
+        //query.setSrsName("urn:ogc:def:crs:EPSG:6.11:32629");
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
@@ -273,5 +322,44 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         assertEquals(1, collection.size());
 
     }
+    
+    /**
+     * Initialises the data directory in unzipping the jar containing the resources
+     * into a temporary directory.
+     *
+     * @return The root output directory where the data are unzipped.
+     * @throws IOException
+     */
+    private static File initDataDirectory() throws IOException {
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        final String stylePath = "org/constellation/ws/embedded/wms111/styles";
+        String styleResource = classloader.getResource(stylePath).getFile();
+
+        if (styleResource.indexOf('!') != -1) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
+        if (styleResource.startsWith("file:")) {
+            styleResource = styleResource.substring(5);
+        }
+
+        File styleJar = new File(styleResource);
+        if (!styleJar.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styleJar);
+        }
+        if (styleJar.isDirectory()) {
+            styleJar = new File(styleJar.getPath().replaceAll(stylePath, ""));
+            return styleJar;
+        }
+        final InputStream in = new FileInputStream(styleJar);
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+        IOUtilities.unzip(in, outputDir);
+        in.close();
+        return outputDir;
+    }
+
     
 }
