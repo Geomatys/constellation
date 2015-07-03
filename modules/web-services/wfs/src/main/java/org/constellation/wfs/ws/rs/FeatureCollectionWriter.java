@@ -84,12 +84,8 @@ public class FeatureCollectionWriter<T extends FeatureCollectionWrapper> impleme
             }else{
                 featureWriter.write(t.getFeatureCollection(), out, t.getNbMatched());
             }
-        } catch (XMLStreamException ex) {
-            LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.SEVERE, "DataStore exception while writing the feature collection", ex);
-        } catch (FeatureStoreRuntimeException ex) {
-            LOGGER.log(Level.SEVERE, "DataStoreRuntimeException exception while writing the feature collection", ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Exception while writing the feature collection", ex);
         }
     }
 

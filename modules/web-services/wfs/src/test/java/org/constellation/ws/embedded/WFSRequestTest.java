@@ -88,13 +88,6 @@ import static org.constellation.provider.configuration.ProviderParameters.SOURCE
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
-import org.constellation.test.utils.TestDatabaseHandler;
-import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.ogc.xml.v200.ResourceIdType;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
@@ -179,13 +172,16 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
 
+    
+    private static final String WFS_GETFEATURE_CITE1 = "service=WFS&version=1.1.0&request=GetFeature&typename=sf:PrimitiveGeoFeature&namespace=xmlns%28sf=http://cite.opengeospatial.org/gmlsf%29&filter=%3Cogc:Filter%20xmlns:gml=%22http://www.opengis.net/gml%22%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%3Cogc:PropertyIsEqualTo%3E%3Cogc:PropertyName%3E//gml:description%3C/ogc:PropertyName%3E%3Cogc:Literal%3Edescription-f008%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%3C/ogc:Filter%3E";
+    
+    private static final String WFS_GETFEATURE_CITE2 = "service=WFS&version=1.1.0&request=GetFeature&typename=sf:PrimitiveGeoFeature&namespace=xmlns%28sf=http://cite.opengeospatial.org/gmlsf%29&filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%3Cogc:PropertyIsEqualTo%3E%3Cogc:PropertyName%3E*[1]%3C/ogc:PropertyName%3E%3Cogc:Literal%3Edescription-f001%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%3C/ogc:Filter%3E";
+    
     private static String EPSG_VERSION;
 
     private static boolean initialized = false;
     
     private static boolean mdweb_active = true;
-    
-    private static boolean localdb_active = true;
     
     @BeforeClass
     public static void initTestDir() {
@@ -204,44 +200,63 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
+                final File outputDir = initDataDirectory();
+                
                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
-                // PostGIS datastore
-                localdb_active = TestDatabaseHandler.hasLocalDatabase();
-                if (localdb_active) {
-                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                // Defines a GML data provider
+                ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("primGMLSrc");
 
-                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                    final ParameterValueGroup pgconfig = getOrCreateGroup(choice, "PostgresParameters");
-                    pgconfig.parameter(DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
-                    pgconfig.parameter(HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
-                    pgconfig.parameter(SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
-                    pgconfig.parameter(USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
-                    pgconfig.parameter(PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
-                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    
-                    //add a custom sql query layer
-                    final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                    getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
-                    getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
-                    getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                ParameterValueGroup pgconfig = getOrCreateGroup(choice, "GMLParameters");
+                pgconfig.parameter("identifier").setValue("gml");
+                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/primitive"));
+                pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsdtypename").setValue("PrimitiveGeoFeature");
+                pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+                pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
 
-
-                    providerBusiness.storeProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
-
-                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
-                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "CustomSQLQuery"),      "postgisSrc", "VECTOR", false, true, null, null);
-                    
-                }  else {
-                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
-                }
+                providerBusiness.storeProvider("primGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "primGMLSrc", "VECTOR", false, true, null, null);
                 
                 
-                final File outputDir = initDataDirectory();
+                source = featfactory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("entGMLSrc");
+
+                choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                pgconfig = getOrCreateGroup(choice, "GMLParameters");
+                pgconfig.parameter("identifier").setValue("gml");
+                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/entity"));
+                pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsdtypename").setValue("EntitéGénérique");
+                pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+                pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+                providerBusiness.storeProvider("entGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "entGMLSrc", "VECTOR", false, true, null, null);
+                
+
+                source = featfactory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("aggGMLSrc");
+
+                choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                pgconfig = getOrCreateGroup(choice, "GMLParameters");
+                pgconfig.parameter("identifier").setValue("gml");
+                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/aggregate"));
+                pgconfig.parameter("sparse").setValue(Boolean.TRUE);
+                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsdtypename").setValue("AggregateGeoFeature");
+                pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
+                pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
+                providerBusiness.storeProvider("aggGMLSrc", null, ProviderType.LAYER, "feature-store", source);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "aggGMLSrc", "VECTOR", false, true, null, null);
+                
+                
                 final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourcef, "id").setValue("shapeSrc");
                 getOrCreateValue(sourcef, "load_all").setValue(true);
@@ -334,12 +349,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 config.getCustomParameters().put("transactionnal", "true");
 
                 serviceBusiness.create("wfs", "default", config, null);
-                if (localdb_active) {
-                    layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                    layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                    layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                    layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
-                }
+                
+                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
+                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
+                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc", null, "default", "wfs", null);
+                
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
@@ -355,12 +369,10 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
 
                 serviceBusiness.create("wfs", "test", config, null);
-                if (localdb_active) {
-                    layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                    layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                    layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                    layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                }
+                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc",  null, "test", "wfs", null);
+                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "test", "wfs", null);
+                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc",  null, "test", "wfs", null);
+                
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
@@ -624,11 +636,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
-        if (localdb_active) {
-            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
-        } else {
-            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
-        }
+        
+        assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
 
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?" + WFS_DESCRIBE_FEATURE_TYPE_URL_V2);
@@ -642,11 +651,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("was:" + obj, obj instanceof Schema);
 
         schema = (Schema) obj;
-        if (localdb_active) {
-            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
-        } else {
-            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
-        }
+        
+        assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
+        
 
     }
 
@@ -950,11 +957,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
-        if (localdb_active) {
-            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
-        } else {
-            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
-        }
+        assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
 
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test/2.0.0/schema");
@@ -968,11 +971,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("was:" + obj, obj instanceof Schema);
 
         schema = (Schema) obj;
-        if (localdb_active) {
-            assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
-        } else {
-            assertEquals(2, schema.getIncludeOrImportOrRedefine().size());
-        }
+        
+        assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
         
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test/2.0.0/BasicPolygons.xsd");
@@ -1576,6 +1576,42 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         
         listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
         assertEquals(2, listQuery.getStoredQuery().size());
+    }
+    
+    @Test
+    @Order(order=29)
+    public void testWFSGetFeatureCITET() throws Exception {
+        waitForStart();
+        URL getfeatsUrl;
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETFEATURE_CITE1);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        Object obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof FeatureCollectionType);
+
+        FeatureCollectionType feat = (FeatureCollectionType) obj;
+        assertEquals(1, feat.getFeatureMember().size());
+        
+        try {
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETFEATURE_CITE2);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof FeatureCollectionType);
+
+        feat = (FeatureCollectionType) obj;
+        assertEquals(1, feat.getFeatureMember().size());
+        
+
     }
 
     public static void domCompare(final Object actual, final Object expected) throws Exception {

@@ -4,7 +4,7 @@
       <gml:description>description-f004</gml:description>
       <gml:name codeSpace="http://cite.opengeospatial.org/gmlsf">name-f004</gml:name>
       <sf:attribut.Géométrie>
-        <gml:Polygon gml:id="g002">
+        <gml:Polygon gml:id="g002" srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
           <gml:name>MU1</gml:name>
           <gml:exterior>
             <gml:LinearRing>

@@ -3,7 +3,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink">
       <gml:name codeSpace="http://cite.opengeospatial.org/gmlsf">name-f016</gml:name>
       <sf:multiSurfaceProperty>
-        <gml:MultiSurface>
+        <gml:MultiSurface srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
           <gml:surfaceMember>
             <gml:Polygon srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
               <gml:description>Donec vulputate leo cursus magna.</gml:description>

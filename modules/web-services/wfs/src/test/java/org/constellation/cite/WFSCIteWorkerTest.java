@@ -42,6 +42,8 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.Details;
+import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
@@ -203,8 +205,10 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
                 config.getCustomParameters().put("transactionnal", "true");
-
-                serviceBusiness.create("wfs", "default", config, null);
+                
+                Details details = new Details("default", "default", null, null, Arrays.asList("1.1.0"), null, null, true, "en");
+                         
+                serviceBusiness.create("wfs", "default", config, details);
                 layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
                 layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
                 layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc", null, "default", "wfs", null);
@@ -320,6 +324,8 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         System.out.println(xmlResult);
 
         assertEquals(1, collection.size());
+        
+        String url = "http://localhost:8180/constellation/WS/wfs/ows11?service=WFS&version=1.1.0&request=GetFeature&typename=sf:PrimitiveGeoFeature&namespace=xmlns%28sf=http://cite.opengeospatial.org/gmlsf%29&filter=%3Cogc:Filter%20xmlns:gml=%22http://www.opengis.net/gml%22%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%3Cogc:PropertyIsEqualTo%3E%3Cogc:PropertyName%3E//gml:description%3C/ogc:PropertyName%3E%3Cogc:Literal%3Edescription-f008%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%3C/ogc:Filter%3E";
 
     }
     

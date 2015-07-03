@@ -59,6 +59,9 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
+import org.constellation.dto.Details;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.provider.ProviderFactory;
 
@@ -66,12 +69,6 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.utils.TestDatabaseHandler;
-import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import static org.geotoolkit.utility.parameter.ParametersExt.*;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
@@ -337,7 +334,11 @@ public final class GrizzlyServer {
         //wfsConfig.getCustomParameters().put("requestValidationActivated", "true");
         //wfsConfig.getCustomParameters().put("requestValidationSchema", "http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
         
-        serviceBusiness.create("wfs", "default", wfsConfig, null);
+        final Contact contact = new Contact("john", "doe", "doe Inc.", "CEO", "369988", "455114", "john.doe@hotmail.com", "12 main street", "New York", "NY", "34000", "USA", "http://doe.com", "pause at lunch", "call me");
+        final AccessConstraint access = new AccessConstraint("NONE", "NONE", 24, 400, 400);
+        Details details = new Details("default", "default", Arrays.asList("kw1", "kw2"), "some description", Arrays.asList("1.1.0"), contact, access, true, "en");
+                         
+        serviceBusiness.create("wfs", "default", wfsConfig, details);
         
         layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
         layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
@@ -525,7 +526,7 @@ public final class GrizzlyServer {
          */
         @Override
         public void run() {
-            cstlServer.duration = 2*60*60*1000;
+            cstlServer.duration = 5*60*60*1000;
             cstlServer.findAvailablePort = true;
             cstlServer.runREST();
         }

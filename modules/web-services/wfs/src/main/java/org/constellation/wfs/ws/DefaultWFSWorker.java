@@ -164,10 +164,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.logging.Level;
-import org.apache.sis.metadata.iso.citation.Citations;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.wfs.ws.WFSConstants.GetXSD;
 
@@ -236,7 +233,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (isTransactionnalProp != null) {
             isTransactionnal = Boolean.parseBoolean(isTransactionnalProp);
         } else {
-            isTransactionnal = false;
+            boolean t = false;
+            try {
+                final Details details = serviceBusiness.getInstanceDetails("wfs", id, null);
+                t = details.isTransactional();
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            isTransactionnal = t;
         }
 
         // loading stored queries
@@ -1418,7 +1422,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                     final CoordinateReferenceSystem trueCrs = ((GeometryType)propertyType).getCoordinateReferenceSystem();
 
                                     value = GeometrytoJTS.toJTS((AbstractGeometryType) value);
-                                    if(!CRS.equalsIgnoreMetadata(exposedCrs, trueCrs)){
+                                    if(trueCrs != null && !CRS.equalsIgnoreMetadata(exposedCrs, trueCrs)){
                                         value = JTS.transform((Geometry)value, CRS.findMathTransform(exposedCrs, trueCrs));
                                     }
 

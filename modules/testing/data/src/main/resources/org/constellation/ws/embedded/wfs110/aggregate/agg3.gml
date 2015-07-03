@@ -4,7 +4,7 @@
       <gml:description>description-f010</gml:description>
       <gml:name codeSpace="http://cite.opengeospatial.org/gmlsf">name-f010</gml:name>
       <sf:multiSurfaceProperty>
-        <gml:MultiSurface>
+        <gml:MultiSurface srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
           <gml:surfaceMember>
 			<gml:Polygon>
                 <gml:exterior>
