@@ -337,12 +337,10 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
 
         $scope.select = function(item) {
             $scope.import.currentPath = item.path;
-            if (!item.folder) {
-                $scope.import.allowNext = true;
-            }else{
+            if(item.folder) {
                 $scope.load();
             }
-
+            $scope.import.allowNext = true;
         };
 
         $scope.startWith = function(path) {
