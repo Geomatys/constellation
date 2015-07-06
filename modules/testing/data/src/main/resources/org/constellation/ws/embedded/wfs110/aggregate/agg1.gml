@@ -6,13 +6,13 @@
       <sf:multiPointProperty>
         <gml:MultiPoint srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
           <gml:pointMember>
-            <gml:Point><gml:pos>29.86 70.83</gml:pos></gml:Point>
+            <gml:Point><gml:pos>70.83 29.86</gml:pos></gml:Point>
           </gml:pointMember>
           <gml:pointMember>
-            <gml:Point><gml:pos>31.08 68.87</gml:pos></gml:Point>
+            <gml:Point><gml:pos>68.87 31.08</gml:pos></gml:Point>
           </gml:pointMember>
           <gml:pointMember>
-            <gml:Point><gml:pos>32.19 71.96</gml:pos></gml:Point>
+            <gml:Point><gml:pos>71.96 32.19</gml:pos></gml:Point>
           </gml:pointMember>
         </gml:MultiPoint>
       </sf:multiPointProperty>

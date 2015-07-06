@@ -4,7 +4,7 @@
       <gml:name codeSpace="http://cite.opengeospatial.org/gmlsf">name-f017</gml:name>
       <sf:attribut.Géométrie>
         <gml:LineString srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
-          <gml:posList>4.899 50.174 5.466 52.652 6.899 53.891 7.780 54.382 8.879 54.982</gml:posList>
+          <gml:posList>50.174 4.899 52.652 5.466 53.891 6.899 54.382 7.780 54.982 8.879 </gml:posList>
         </gml:LineString>
       </sf:attribut.Géométrie>
       <sf:boolProperty>false</sf:boolProperty>

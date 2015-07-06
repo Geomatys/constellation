@@ -8,12 +8,12 @@
           <gml:name>MU1</gml:name>
           <gml:exterior>
             <gml:LinearRing>
-              <gml:posList>0 60.5 0 64 6.25 64 6.25 60.5 0 60.5</gml:posList>
+              <gml:posList>60.5 0 64 0 64 6.25 60.5 6.25 60.5 0</gml:posList>
             </gml:LinearRing>
           </gml:exterior>
           <gml:interior>
             <gml:LinearRing>
-              <gml:posList>2 61.5 2 62.5 4 62 2 61.5</gml:posList>
+              <gml:posList>61.5 2 62.5 2 62 4 61.5 2</gml:posList>
             </gml:LinearRing>
           </gml:interior>
         </gml:Polygon>

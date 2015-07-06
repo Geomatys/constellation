@@ -9,12 +9,12 @@
               <gml:description>Donec vulputate leo cursus magna.</gml:description>
               <gml:exterior>
                 <gml:LinearRing>
-                  <gml:posList>6.0 57.5 8.0 57.5 8.0 60.0 9.0 62.5 5.0 62.5 6.0 60.0 6.0 57.5</gml:posList>
+                  <gml:posList>57.5 6.0 57.5 8.0 60.0 8.0 62.5 9.0 62.5 5.0 60.0 6.0 57.5 6.0</gml:posList>
                 </gml:LinearRing>
               </gml:exterior>
               <gml:interior>
                 <gml:LinearRing>
-                  <gml:posList>6.5 58.0 6.5 59.0 7.0 59.0 6.5 58.0</gml:posList>
+                  <gml:posList>58.0 6.5 59.0 6.5 59.0 7.0 58.0 6.5</gml:posList>
                 </gml:LinearRing>
               </gml:interior>
             </gml:Polygon>

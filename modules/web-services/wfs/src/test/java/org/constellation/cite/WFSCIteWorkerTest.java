@@ -43,7 +43,6 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.dto.Details;
-import org.constellation.engine.register.jooq.tables.pojos.ServiceDetails;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
@@ -51,7 +50,6 @@ import static org.constellation.provider.configuration.ProviderParameters.SOURCE
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.utils.SpringTestRunner;
-import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
@@ -62,6 +60,7 @@ import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.ogc.xml.v110.AndType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
@@ -78,7 +77,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -144,6 +142,12 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 providerBusiness.removeAll();
 
                 final File outputDir = initDataDirectory();
+                String path;
+                if (outputDir.getAbsolutePath().endsWith("org/constellation/ws/embedded/wms111/styles")) {
+                    path = outputDir.getAbsolutePath().substring(0, outputDir.getAbsolutePath().indexOf("org/constellation/ws/embedded/wms111/styles"));
+                } else {
+                    path = outputDir.getAbsolutePath();
+                }
                 
                 final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
 
@@ -155,9 +159,9 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                 ParameterValueGroup pgconfig = getOrCreateGroup(choice, "GMLParameters");
                 pgconfig.parameter("identifier").setValue("gml");
-                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/primitive"));
+                pgconfig.parameter("url").setValue(new URL("file:" + path + "/org/constellation/ws/embedded/wfs110/primitive"));
                 pgconfig.parameter("sparse").setValue(Boolean.TRUE);
-                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsd").setValue("file:" + path + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
                 pgconfig.parameter("xsdtypename").setValue("PrimitiveGeoFeature");
                 pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
@@ -173,9 +177,9 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                 pgconfig = getOrCreateGroup(choice, "GMLParameters");
                 pgconfig.parameter("identifier").setValue("gml");
-                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/entity"));
+                pgconfig.parameter("url").setValue(new URL("file:" + path + "/org/constellation/ws/embedded/wfs110/entity"));
                 pgconfig.parameter("sparse").setValue(Boolean.TRUE);
-                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsd").setValue("file:" + path + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
                 pgconfig.parameter("xsdtypename").setValue("EntitéGénérique");
                 pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
@@ -190,9 +194,9 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                 pgconfig = getOrCreateGroup(choice, "GMLParameters");
                 pgconfig.parameter("identifier").setValue("gml");
-                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/aggregate"));
+                pgconfig.parameter("url").setValue(new URL("file:" + path + "/org/constellation/ws/embedded/wfs110/aggregate"));
                 pgconfig.parameter("sparse").setValue(Boolean.TRUE);
-                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsd").setValue("file:" + path + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
                 pgconfig.parameter("xsdtypename").setValue("AggregateGeoFeature");
                 pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
@@ -360,6 +364,9 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         final File outputDir = new File(tmpDir, "Constellation");
         if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }else {
+            FileUtilities.deleteDirectory(outputDir);
             outputDir.mkdir();
         }
         IOUtilities.unzip(in, outputDir);

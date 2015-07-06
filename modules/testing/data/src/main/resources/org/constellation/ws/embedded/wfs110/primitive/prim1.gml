@@ -6,7 +6,7 @@
       <sf:pointProperty>
         <gml:Point gml:id="g003" srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
           <gml:description>description-g003</gml:description>
-          <gml:pos>2.00342 39.73245</gml:pos>
+          <gml:pos>39.73245 2.00342</gml:pos>
         </gml:Point>
       </sf:pointProperty>
       <sf:intProperty>155</sf:intProperty>

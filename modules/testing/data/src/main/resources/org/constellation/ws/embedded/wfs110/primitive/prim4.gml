@@ -8,7 +8,7 @@
           <gml:name>MU3</gml:name>
           <gml:exterior>
             <gml:LinearRing>
-              <gml:posList>30.899 45.174 30.466 45.652 30.466 45.891 30.899 45.174</gml:posList>
+              <gml:posList>45.174 30.899 45.652 30.466 45.891 30.466 45.174 30.899</gml:posList>
             </gml:LinearRing>
           </gml:exterior>
         </gml:Polygon>

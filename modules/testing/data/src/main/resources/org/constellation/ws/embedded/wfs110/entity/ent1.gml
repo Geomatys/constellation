@@ -8,12 +8,12 @@
           <gml:name>MU2</gml:name>
           <gml:exterior>
             <gml:LinearRing>
-              <gml:posList>15 35 16 40 20 39 22.5 37 18 36 15 35</gml:posList>
+              <gml:posList>35 15 40 16 39 20 37 22.5 36 18 35 15</gml:posList>
             </gml:LinearRing>
           </gml:exterior>
           <gml:interior>
             <gml:LinearRing>
-              <gml:posList>17.5 37.1 17.6 37.2 17.7 37.3 17.8 37.4 17.9 37.5 17.9 37 17.5 37.1</gml:posList>
+              <gml:posList>37.1 17.5 37.2 17.6 37.3 17.7 37.4 17.8 37.5 17.9 37 17.9 37.1 17.5</gml:posList>
             </gml:LinearRing>
           </gml:interior>
         </gml:Polygon>

@@ -201,6 +201,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 providerBusiness.removeAll();
                 
                 final File outputDir = initDataDirectory();
+                String path;
+                if (outputDir.getAbsolutePath().endsWith("org/constellation/ws/embedded/wms111/styles")) {
+                    path = outputDir.getAbsolutePath().substring(0, outputDir.getAbsolutePath().indexOf("org/constellation/ws/embedded/wms111/styles"));
+                } else {
+                    path = outputDir.getAbsolutePath();
+                }
+                LOGGER.info("DATA PATH:" + path);
                 
                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
@@ -212,9 +219,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                 ParameterValueGroup pgconfig = getOrCreateGroup(choice, "GMLParameters");
                 pgconfig.parameter("identifier").setValue("gml");
-                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/primitive"));
+                pgconfig.parameter("url").setValue(new URL("file:" + path + "/org/constellation/ws/embedded/wfs110/primitive"));
                 pgconfig.parameter("sparse").setValue(Boolean.TRUE);
-                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsd").setValue("file:" + path + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
                 pgconfig.parameter("xsdtypename").setValue("PrimitiveGeoFeature");
                 pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
@@ -230,9 +237,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                 pgconfig = getOrCreateGroup(choice, "GMLParameters");
                 pgconfig.parameter("identifier").setValue("gml");
-                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/entity"));
+                pgconfig.parameter("url").setValue(new URL("file:" + path + "/org/constellation/ws/embedded/wfs110/entity"));
                 pgconfig.parameter("sparse").setValue(Boolean.TRUE);
-                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsd").setValue("file:" + path + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
                 pgconfig.parameter("xsdtypename").setValue("EntitéGénérique");
                 pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
@@ -247,9 +254,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                 pgconfig = getOrCreateGroup(choice, "GMLParameters");
                 pgconfig.parameter("identifier").setValue("gml");
-                pgconfig.parameter("url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/aggregate"));
+                pgconfig.parameter("url").setValue(new URL("file:" + path + "/org/constellation/ws/embedded/wfs110/aggregate"));
                 pgconfig.parameter("sparse").setValue(Boolean.TRUE);
-                pgconfig.parameter("xsd").setValue("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
+                pgconfig.parameter("xsd").setValue("file:" + path + "/org/constellation/ws/embedded/wfs110/cite-gmlsf0.xsd");
                 pgconfig.parameter("xsdtypename").setValue("AggregateGeoFeature");
                 pgconfig.parameter("longitudeFirst").setValue(Boolean.TRUE);
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
@@ -263,7 +270,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
                 final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
-                
+
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 

@@ -5,7 +5,7 @@
       <gml:name codeSpace="http://cite.opengeospatial.org/gmlsf">name-f003</gml:name>
       <sf:curveProperty>
         <gml:LineString srsName="urn:x-ogc:def:crs:EPSG:6.11.2:4326">
-          <gml:posList>9.799 46.074 10.466 46.652 11.021 47.114</gml:posList>
+          <gml:posList>46.074 9.799 46.652 10.466 47.114 11.021</gml:posList>
         </gml:LineString>
       </sf:curveProperty>
       <sf:intProperty>180</sf:intProperty>

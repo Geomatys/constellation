@@ -433,6 +433,9 @@ public final class GrizzlyServer {
         File outputDir = new File(tmpDir, "Constellation");
         if (!outputDir.exists()) {
             outputDir.mkdir();
+        } else {
+            FileUtilities.deleteDirectory(outputDir);
+            outputDir.mkdir();
         }
         if (styles.isDirectory()) {
             FileUtilities.copy(styles, outputDir);
@@ -526,7 +529,7 @@ public final class GrizzlyServer {
          */
         @Override
         public void run() {
-            cstlServer.duration = 5*60*60*1000;
+            cstlServer.duration = 2*60*60*1000;
             cstlServer.findAvailablePort = true;
             cstlServer.runREST();
         }

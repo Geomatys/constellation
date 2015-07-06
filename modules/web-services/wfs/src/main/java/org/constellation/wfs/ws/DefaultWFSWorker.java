@@ -175,8 +175,12 @@ import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V200;
 import static org.constellation.wfs.ws.WFSConstants.TYPE_PARAM;
 import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
 import org.geotoolkit.data.FeatureStoreRuntimeException;
+import org.geotoolkit.data.FeatureWriter;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.session.Session;
+import org.geotoolkit.feature.ComplexAttribute;
+import org.geotoolkit.feature.FeatureUtilities;
+import org.geotoolkit.feature.type.ComplexType;
 import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.feature.xml.XSDFeatureStore;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
@@ -842,7 +846,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             for (PropertyDescriptor pdesc : ft.getDescriptors()) {
                 final GenericName propName = pdesc.getName();
 
-                if (!pdesc.isNillable()) {
+                if (pdesc.getMinOccurs() > 0) {
                     if (!propertyNames.contains(propName)) {
                         propertyNames.add(propName);
                     }
@@ -1397,16 +1401,24 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         throw new CstlServiceException("Unable to find the featuretype:" + layer.getName());
                     }
 
-                    final Map<PropertyDescriptor,Object> values = new HashMap<>();
+                    final Map<String,Object> values = new HashMap<>();
 
                     // we verify that the update property are contained in the feature type
                     for (final Property updateProperty : updateRequest.getProperty()) {
-                        final String updatePropertyName = updateProperty.getLocalName();
-                        final Binding pa = Bindings.getBinding(FeatureType.class, updatePropertyName);
+                        String updatePropertyName = updateProperty.getLocalName();
+                        Binding pa = Bindings.getBinding(FeatureType.class, updatePropertyName);
                         if (pa == null || pa.get(ft, updatePropertyName, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyName, INVALID_VALUE);
                         }
-                        final PropertyType propertyType = ft.getDescriptor(updatePropertyName).getType();
+                        PropertyDescriptor propertyDesc = (PropertyDescriptor) pa.get(ft, updatePropertyName, null);
+                        PropertyType propertyType = propertyDesc.getType();
+                        if (propertyType instanceof ComplexType) {
+                            ComplexType ct = (ComplexType) propertyType;
+                            if (ct.getDescriptor("_value") != null) {
+                                 updatePropertyName = "/" + updatePropertyName + "/_value";
+                                 propertyType = ct.getDescriptor("_value").getType();
+                            }
+                        }
 
                         Object value;
                         if (updateProperty.getValue() instanceof Element) {
@@ -1431,18 +1443,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 } catch (IllegalArgumentException ex) {
                                     throw new CstlServiceException(ex);
                                 }
-                            }else if(value instanceof DirectPosition){
+                            } else if (value instanceof DirectPosition) {
                                 final DirectPosition dp = (DirectPosition) value;
                                 value = new GeometryFactory().createPoint(new Coordinate(dp.getOrdinate(0), dp.getOrdinate(1)));
-                            }else if(value instanceof String){
-                                value = featureReader.readValue((String)value, propertyType);
+                            } else if (value instanceof String) {
+                                value = featureReader.readValue((String) value, propertyType);
                             }
                             LOGGER.log(Level.FINER, ">> updating : {0} => {1}", new Object[]{updatePropertyName, value});
                             if (value != null) {
                                 LOGGER.log(Level.FINER, "type : {0}", value.getClass());
                             }
                         }
-                        values.put(ft.getDescriptor(updatePropertyName), value);
+                        values.put(updatePropertyName, value);
 
                     }
 
@@ -1455,7 +1467,19 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     queryBuilder.setFilter(cleanFilter);
                     totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
-                    layer.getStore().updateFeatures(layer.getName(), filter, values);
+                    FeatureWriter fw = layer.getStore().getFeatureWriter(layer.getName(), filter);
+                    try {
+                        while (fw.hasNext()) {
+                            Feature feat = fw.next();
+                            for (Entry<String, Object> entry : values.entrySet()) {
+                                Binding pa = Bindings.getBinding(Feature.class, entry.getKey());
+                                pa.set(feat, entry.getKey(), entry.getValue());
+                            }
+                            fw.write();
+                        }
+                    } finally {
+                        fw.close();
+                    }
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
