@@ -599,6 +599,7 @@
     "metadata.edition.sensor.system":"Sensor system",
     "metadata.edition.placeholder.uri":"Example urn:ogc:def:identifierType:OGC:value",
     "metadata.edition.content.error":"Loading content error.",
+    "metadata.edition.upload.selectimage":"Select image",
 
     "msg.add.data.style.association": "Associate a style to the selected data",
     "msg.add.data.mapcontext.association": "Associate a mapcontext to the selected data.",
@@ -792,7 +793,6 @@
     "label.users.disable":"Disabled",
 
     "settings.form.state":"State",
-    "settings.form.role":"Role",
     "settings.form.registration.date":"Registration date",
     "settings.form.address":"Address",
     "settings.form.additional.address":"Additional address",

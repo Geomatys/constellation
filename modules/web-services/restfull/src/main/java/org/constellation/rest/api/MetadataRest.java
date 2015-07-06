@@ -1,6 +1,7 @@
 package org.constellation.rest.api;
 
 import com.google.common.base.Optional;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.dto.metadata.ValidationList;
 import org.constellation.business.IMetadataBusiness;
@@ -1127,17 +1128,57 @@ public class MetadataRest {
         return Response.ok(map).build();
     }
 
+    @POST
+    @Path("/uploadGraphicOverview/{metadataId}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadGraphicOverview(@FormDataParam("graphicOverviewFileInput") InputStream imgFileIs,
+                                   @FormDataParam("graphicOverviewFileInput") FormDataContentDisposition fileMetaDetail,
+                                   @PathParam("metadataId") final Integer metadataId,
+                                   @Context HttpServletRequest request) {
+        final Map<String,Object> map = new HashMap<>();
+        final Metadata metadata = metadataBusiness.getMetadataById(metadataId);
+        if(metadata != null) {
+            final String mdIdentifierSHA1 = DigestUtils.shaHex(metadata.getMetadataId());
+            map.put("mdIdentifierSHA1",mdIdentifierSHA1);
+            try {
+                metadataBusiness.uploadMDQuickLook(metadata.getMetadataId(),imgFileIs);
+            } catch(Exception ex) {
+                LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            }
+        }
+        return Response.ok(map).build();
+    }
+
+    /**
+     * TODO will be removed after 1.1 ie : after migration of the new metadata dashboard in the project we will call uploadGraphicOverview().
+     * this is used by the old metadata page which still use string identifier instead of integer.
+     */
+    @POST
+    @Path("/uploadGraphicOverview2/{fileIdentifier}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadGraphicOverview2(@FormDataParam("graphicOverviewFileInput") InputStream imgFileIs,
+                                          @FormDataParam("graphicOverviewFileInput") FormDataContentDisposition fileMetaDetail,
+                                          @PathParam("fileIdentifier") final String fileIdentifier,
+                                          @Context HttpServletRequest request) {
+        final Map<String,Object> map = new HashMap<>();
+        final String mdIdentifierSHA1 = DigestUtils.shaHex(fileIdentifier);
+        map.put("mdIdentifierSHA1",mdIdentifierSHA1);
+        try {
+            metadataBusiness.uploadMDQuickLook(fileIdentifier,imgFileIs);
+        } catch(Exception ex) {
+            LOGGER.log(Level.WARNING,ex.getLocalizedMessage(),ex);
+        }
+        return Response.ok(map).build();
+    }
+
     /**
      * Allow to deactivate the requirement of level completion for metadata validation.
-     * Used for developement purpose.
-     * @return 
+     * Used for development purpose.
+     * @return boolean value
      */
     private boolean isLevelRequiredForValidation() {
         String value = configurationBusiness.getProperty("validation.require.level");
-        if (value != null) {
-            return Boolean.parseBoolean(value);
-        }
-        return true;
+        return value == null || Boolean.parseBoolean(value);
     }
 
 }

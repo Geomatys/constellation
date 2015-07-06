@@ -1,0 +1,33 @@
+<div>
+    <div class="fileinput fileinput-new" style="width: 270px;" data-provides="fileinput">
+        <div class="input-group">
+            <div class="form-control form-control-fix uneditable-input" data-trigger="fileinput">
+                <span class="fileinput-filename" style="max-width:150px;white-space: nowrap;"></span>
+            </div>
+            <span class="input-group-addon btn btn-default btn-file">
+                <span class="fileinput-new" translate="metadata.edition.upload.selectimage">Select file</span>
+                <span class="fileinput-exists" translate="data.modal.change">Change</span>
+                <input type="file"
+                       name="graphicOverviewFileInput"
+                       class="uploadimage"
+                       onchange="angular.element(this).scope().uploadImage(this.value,angular.element(this).scope().fieldObj.field);"/>
+            </span>
+            <a class="input-group-addon btn btn-default fileinput-exists"
+               data-dismiss="fileinput"
+               translate="data.modal.remove" id="removeFile">Remove</a>
+        </div>
+    </div>
+</div>
+<img ng-if="fieldObj.field.value && isValidUri(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index])"
+     class="img-thumbnail"
+     ng-src="{{fieldObj.field.value}}"
+     style="max-height:80px;margin-bottom: 4px;"/>
+<input type="text"
+       class="form-control form-control-fix"
+       placeholder="{{fieldObj.field.name | translate}}"
+       ng-pattern="uriRegExp"
+       ng-model="fieldObj.field.value"
+       ng-required="fieldObj.field.obligation === 'M'"
+       ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index])}"
+       dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
+       debounce="200"/>

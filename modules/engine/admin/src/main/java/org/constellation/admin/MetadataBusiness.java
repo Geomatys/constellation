@@ -20,6 +20,9 @@
 package org.constellation.admin;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +33,13 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
@@ -1153,6 +1158,30 @@ public class MetadataBusiness implements IMetadataBusiness {
             }
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void uploadMDQuickLook(final String fileIdentifier, final InputStream stream) throws ConfigurationException {
+        if( stream != null && fileIdentifier != null) {
+            final String mdIdentifierSHA1 = DigestUtils.shaHex(fileIdentifier);
+            //get metadata folder
+            final File metadataCfgDir = ConfigDirectory.getMetadataDirectory();
+            final File metadataFolder = new File(metadataCfgDir, mdIdentifierSHA1);
+            if (!metadataFolder.exists()) {
+                metadataFolder.mkdirs();
+            }
+            //try to generate the image
+            File quickLook = new File(metadataFolder, mdIdentifierSHA1);
+            //write the stream into file quicklook
+            try {
+                Files.copy(stream, quickLook.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }catch(IOException ex) {
+                throw new ConfigurationException("Error while uploading metadata quicklook file.", ex);
+            }
+        }
     }
     
     /**
