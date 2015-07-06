@@ -193,11 +193,15 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
         if (gmlPrefix != null) {
             LOGGER.log(Level.INFO, "GML Prefix found:{0}", gmlPrefix);
-            result = result.replace(gmlPrefix + ':', "gml:");
+            if (!gmlPrefix.equals("gml")) {
+                result = result.replace(gmlPrefix + ':', "gml:");
+                result = result.replace("xmlns:" + gmlPrefix + '=', "xmlns:gml=");
+                result = result.replace("xmlns:gml=\"http://www.opengis.net/gml/3.2\"", "");
+            }
         } else {
             LOGGER.info("No GML Prefix found.");
         }
-        
+
         domCompare(result, expResult);
     }
 
