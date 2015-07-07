@@ -1138,6 +1138,7 @@
     "task.status.warning":"Partial success",
     "task.status.failed":"Failed",
     "task.status.cancelled":"Cancelled",
+    "task.field.not.supported":"This parameter is not supported by the web application",
 
 
     "mapcontext.information.title":"Available map context",

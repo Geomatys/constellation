@@ -22,12 +22,13 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -41,7 +42,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.sis.util.iso.Names;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
@@ -78,7 +78,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Optional;
 import org.constellation.process.UserProcessReference;
 import org.geotoolkit.processing.chain.model.Chain;
-import org.opengis.util.GenericName;
 
 /**
  * RestFull API for task management/operations.
@@ -126,12 +125,20 @@ public class TaskRest {
     @GET
     @Path("listProcesses")
     public Response listProcess(){
-        final List<GenericName> names = processBusiness.listProcess();
-        final StringList lst = new StringList();
-        for(GenericName n : names){
-            lst.getList().add(Names.toExpandedString(n));
+
+        final Map<String, Set<String>> registryMap = processBusiness.listProcess();
+
+        final List<String> result = new ArrayList<>();
+
+        for (Map.Entry<String, Set<String>> registry : registryMap.entrySet()) {
+            final Set<String> processes = registry.getValue();
+            for (String process : processes) {
+                result.add(registry.getKey() +":"+ process);
+            }
         }
-        return Response.ok(lst).build();
+
+        final Map<String, List<String>> wrapper = Collections.singletonMap("list", result);
+        return Response.ok(wrapper).build();
     }
 
     /**
@@ -140,9 +147,14 @@ public class TaskRest {
     @GET
     @Path("countProcesses")
     public Response countAvailableProcess(){
-        final List<GenericName> names = processBusiness.listProcess();
+        final Map<String, Set<String>> registryMap = processBusiness.listProcess();
+        int count = 0;
+        for (Set<String> strings : registryMap.values()) {
+            count += strings.size();
+        }
+
         StringMap stringMap = new StringMap();
-        stringMap.getMap().put("value",""+names.size());
+        stringMap.getMap().put("value",""+count);
         return Response.ok(stringMap).build();
     }
     

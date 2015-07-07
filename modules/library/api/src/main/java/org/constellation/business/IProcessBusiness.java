@@ -19,6 +19,8 @@
 package org.constellation.business;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
@@ -44,9 +46,10 @@ public interface IProcessBusiness {
      * The returned list is a subset of what can be found with ProcessFinder.
      * But only process with simple types arguments are preserved.
      *
-     * @return List of all available process.
+     * @return Map of all available processes where key is registry name
+     * and value is list of process name registered in.
      */
-    List<GenericName> listProcess();
+    Map<String, Set<String>> listProcess();
 
     /**
      * The returned list is a subset of what can be found with ProcessFinder.
