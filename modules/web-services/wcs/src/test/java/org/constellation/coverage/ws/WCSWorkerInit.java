@@ -48,6 +48,7 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.constellation.test.utils.TestDatabaseHandler;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -97,6 +98,11 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
     
     protected static boolean localdb_active = true;
     
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WCSWorkerInit");
+    }
+    
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
@@ -106,7 +112,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigDirectory.setupTestEnvironement("WCSWorkerInit");
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
