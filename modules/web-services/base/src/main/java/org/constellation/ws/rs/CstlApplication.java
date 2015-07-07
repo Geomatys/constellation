@@ -31,7 +31,7 @@ import org.apache.sis.util.logging.Logging;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 /**
- * This class is here to initiate the webservice at startup instead of waiting for the first request to instanciate the service.
+ * This class is here to initiate the webservice at startup instead of waiting for the first request to instantiate the service.
  * @author Guilhem Legal (Geomatys)
  */
 @ApplicationPath("/")
