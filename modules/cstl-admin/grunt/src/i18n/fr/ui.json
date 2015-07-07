@@ -1114,6 +1114,7 @@
     "task.status.warning":"Succès partiel",
     "task.status.failed":"Echoué",
     "task.status.cancelled":"Annulé",
+    "task.field.not.supported":"Ce paramètre n'est pas supporter par l'application web",
 
     "mapcontext.information.title":"Compositions cartographiques disponibles",
 

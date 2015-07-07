@@ -190,10 +190,8 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
 
         // Private function
         function parseProcessDefaultName(processName) {
-            var authBegin = processName.indexOf('{')+1;
-            var authEnd = processName.indexOf('}', authBegin);
-
-            return [processName.substr(authBegin, authEnd-authBegin), processName.substr(authEnd+1)];
+            var authEnd = processName.indexOf(':');
+            return [processName.substring(0, authEnd), processName.substring(authEnd+1)];
         }
 
         function createProcesses(processesList) {
@@ -422,7 +420,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
             var enumerationList = [];
             if (enumList && Array.isArray(enumList)) {
                 enumList.forEach(function (val) {
-                    enumerationList.push(convertValue(val.value, binding));
+                    enumerationList.push(convertValue(val, binding));
                 });
             }
             return enumerationList;
@@ -457,7 +455,7 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
         $scope.task = task;
         $scope.styles = [];
 
-        $scope.processes = createProcesses(processes.Entry);
+        $scope.processes = createProcesses(processes.list);
 
         // scope functions
         $scope.close = $scope.cancel = $modalInstance.close;

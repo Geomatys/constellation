@@ -39,6 +39,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -237,21 +240,19 @@ public class ProcessBusiness implements IProcessBusiness {
      * {@inheritDoc}
      */
     @Override
-    public List<GenericName> listProcess(){
-        final List<GenericName> names = new ArrayList<>();
+    public Map<String, Set<String>> listProcess(){
+        Map<String, Set<String>> processes = new TreeMap<>();
 
         final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
         while(ite.hasNext()){
             final ProcessingRegistry factory = ite.next();
             final String authorityCode = factory.getIdentification().getCitation()
                     .getIdentifiers().iterator().next().getCode();
-
-            for(String processCode : factory.getNames()){
-                names.add(NamesExt.create(authorityCode, processCode));
-            }
+            Set<String> codes = new TreeSet<>(factory.getNames());
+            processes.put(authorityCode, codes);
         }
 
-        return names;
+        return processes;
     }
 
     /**

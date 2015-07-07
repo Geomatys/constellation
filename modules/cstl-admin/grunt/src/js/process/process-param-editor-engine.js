@@ -10,7 +10,7 @@ angular.module('processParamEditorEngine', ['ng', 'cstl-services'])
 
         var defaults = this.defaults = {
             fallback: {
-                template: '<p class="form-control-static">This field can\'t be manage in the web application</p>'
+                template: '<p class="form-control-static" translate="task.field.not.supported">This parameter is not supported by the web application</p>'
             }
         };
 
