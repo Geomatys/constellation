@@ -178,8 +178,6 @@ import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureWriter;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.session.Session;
-import org.geotoolkit.feature.ComplexAttribute;
-import org.geotoolkit.feature.FeatureUtilities;
 import org.geotoolkit.feature.type.ComplexType;
 import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.feature.xml.XSDFeatureStore;
@@ -755,7 +753,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private LinkedHashMap<String,? extends Query> extractStoredQueries(final FeatureRequest request) throws CstlServiceException {
         final List<? extends Query> queries = request.getQuery();
-        final LinkedHashMap<String,Query> result = new LinkedHashMap<String, Query>();
+        final LinkedHashMap<String,Query> result = new LinkedHashMap<>();
         for(int i=0,n=queries.size();i<n;i++){
             result.put(""+i, queries.get(i));
         }
@@ -1412,7 +1410,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                         PropertyDescriptor propertyDesc = (PropertyDescriptor) pa.get(ft, updatePropertyName, null);
                         PropertyType propertyType = propertyDesc.getType();
-                        if (propertyType instanceof ComplexType) {
+                        if (propertyType instanceof ComplexType && updateProperty.getValue() != null) {
                             ComplexType ct = (ComplexType) propertyType;
                             if (ct.getDescriptor("_value") != null) {
                                  updatePropertyName = "/" + updatePropertyName + "/_value";
@@ -1928,6 +1926,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (request.getVersion() != null) {
                 if (isSupportedVersion(request.getVersion().toString())) {
                     request.setVersion(request.getVersion().toString());
+                    
+                // for the CITE test    
+                } else if (request.getVersion().toString().isEmpty()) {
+                    request.setVersion(ServiceDef.WFS_1_1_0.version.toString());
+                    
                 } else {
                     final CodeList code;
                     if (getCapabilities) {
