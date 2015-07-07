@@ -965,11 +965,6 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>
-                <artifactId>geotk-feature-geojson</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit</groupId>
                 <artifactId>geotk-coverage-xml</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
