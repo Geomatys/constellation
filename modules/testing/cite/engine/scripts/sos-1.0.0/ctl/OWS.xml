@@ -975,14 +975,14 @@
       <param name="exceptionReportSchemaLocation" />
       <param name="exceptionReportSchemaType" />
       <assertion>In the event that a GetCapabilities request cannot be processed for any reason, the response entity shall include an exception report. The exception code must be one of those listed in Table 5.</assertion>
-      <comment>GetCapabilities with an incorrect updatesequence ('9999999999'), if higher than the update sequence on the current capabilities document give an exception.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document; (3) the ExceptionReport shall have the 'InvalidUpdateSequence' exception code.</comment>
+      <comment>GetCapabilities with an incorrect updatesequence ('9999999999999'), if higher than the update sequence on the current capabilities document give an exception.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document; (3) the ExceptionReport shall have the 'InvalidUpdateSequence' exception code.</comment>
       <link>ows-1.0.0-metadata-atc5</link>
       <link>OGC 05-008c1, 7.4.1, p.19</link>
 		<code>
-			<ctl:message>GetCapabilities with an incorrect updatesequence (9999999999), if higher than the update sequence on the current capabilities document give an exception.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document; (3) the ExceptionReport shall have the &quot;InvalidUpdateSequence&quot; exception code.</ctl:message>
+			<ctl:message>GetCapabilities with an incorrect updatesequence (9999999999999), if higher than the update sequence on the current capabilities document give an exception.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document; (3) the ExceptionReport shall have the &quot;InvalidUpdateSequence&quot; exception code.</ctl:message>
 			<ctl:message select="concat('Service parameter: ', $serviceType)"/>
 			<ctl:message select="concat('Version parameter: ', $serviceVersion)"/>
-			<ctl:message select="concat('UpdateSequence parameter: ', '9999999999')"/>
+			<ctl:message select="concat('UpdateSequence parameter: ', '9999999999999')"/>
 			<xsl:variable name="request1">
 				<request>
 					<url>
@@ -992,7 +992,7 @@
 					<param name="service"><xsl:value-of select="$serviceType" /></param>
 					<param name="version"><xsl:value-of select="$serviceVersion" /></param>
 					<param name="request">GetCapabilities</param>
-					<param name="updatesequence">9999999999</param>
+					<param name="updatesequence">9999999999999</param>
 					<parsers:XMLValidatingParser>
                         <parsers:schemas>
 							<parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
