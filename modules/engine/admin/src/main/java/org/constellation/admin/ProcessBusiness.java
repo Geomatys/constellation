@@ -72,17 +72,15 @@ import org.geotoolkit.io.DirectoryWatcher;
 import org.geotoolkit.io.PathChangeListener;
 import org.geotoolkit.io.PathChangedEvent;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessingRegistry;
+import org.geotoolkit.utility.parameter.ParametersExt;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -106,12 +104,10 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.processing.chain.ChainProcessDescriptor;
 import org.geotoolkit.processing.chain.model.Chain;
 import org.geotoolkit.processing.chain.model.ChainMarshallerPool;
 import org.geotoolkit.processing.quartz.ProcessJobDetail;
-import org.opengis.util.GenericName;
 
 /**
  *

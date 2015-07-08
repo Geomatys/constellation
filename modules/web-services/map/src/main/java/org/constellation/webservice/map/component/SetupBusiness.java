@@ -18,9 +18,9 @@
  */
 package org.constellation.webservice.map.component;
 
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.geotoolkit.utility.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_LINE_SYMBOLIZER;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_POINT_SYMBOLIZER;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_POLYGON_SYMBOLIZER;
