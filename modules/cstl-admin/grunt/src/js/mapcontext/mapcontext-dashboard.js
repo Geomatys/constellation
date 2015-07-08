@@ -222,9 +222,10 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
 
         $scope.resolveLayers = function() {
             var lays = [];
+            var styleObj;
             for (var i=0; i<$scope.selected.layers.length; i++) {
                 var lay = $scope.selected.layers[i];
-                var styleObj;
+                styleObj = undefined;
                 if(lay.externalServiceUrl){
                     if(lay.externalStyle){
                         styleObj = {"Name":lay.externalStyle.split(',')[0]};
