@@ -24,6 +24,7 @@ import org.apache.sis.util.logging.Logging;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigDirectory;
@@ -120,12 +121,20 @@ public final class LaunchTests implements Runnable {
         }
         final Runtime rt = Runtime.getRuntime();
         for (String arg : args) {
+            String basedir = "";
             String executable = "../cite/run.sh";
             if (System.getProperty(CITE_EXECUTABLE_KEY) != null) {
                 executable = System.getProperty(CITE_EXECUTABLE_KEY);
-                LOGGER.info("using system property specified executable:" + executable);
+                if (executable.endsWith("/")) {
+                    basedir = executable;
+                    executable = executable + "run.sh";
+                } else {
+                    basedir = basedir + '/';
+                    executable = executable + "/run.sh";
+                }
+                LOGGER.log(Level.INFO, "using system property specified executable:{0}", executable);
             }
-            final Process process = rt.exec(new String[]{executable, arg});
+            final Process process = rt.exec(new String[]{executable, arg, "", basedir});
             final LaunchTests lt = new LaunchTests(process);
             final Thread t = new Thread(lt);
             t.setDaemon(true);

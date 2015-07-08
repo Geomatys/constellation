@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.constellation.ws.embedded.LaunchTests.CITE_EXECUTABLE_KEY;
 
 
 /**
@@ -240,7 +241,20 @@ public final class HandleLogs {
             final String[] argValue = arg.split("-");
             final String service = argValue[0];
             final String version = argValue[1];
-            final Process process = rt.exec(new String[]{"../cite/log.sh", arg});
+            String basedir = "";
+            String executable = "../cite/log.sh";
+            if (System.getProperty(CITE_EXECUTABLE_KEY) != null) {
+                executable = System.getProperty(CITE_EXECUTABLE_KEY);
+                if (executable.endsWith("/")) {
+                    basedir = executable;
+                    executable = executable + "log.sh";
+                } else {
+                    basedir = basedir + '/';
+                    executable = executable + "/log.sh";
+                }
+                LOGGER.log(Level.INFO, "using system property specified executable:{0}", executable);
+            }
+            final Process process = rt.exec(new String[]{executable, arg, "", basedir});
             insertResult(process.getInputStream(), service, version, date);
             try {
                 process.waitFor();
