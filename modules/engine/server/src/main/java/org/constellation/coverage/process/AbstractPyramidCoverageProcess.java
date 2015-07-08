@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.measure.NumberRange;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.SpringHelper;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
@@ -38,7 +37,6 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.internal.coverage.CoverageUtilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
-import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.referencing.CRS;
@@ -50,6 +48,7 @@ import org.geotoolkit.storage.coverage.CoverageStoreFinder;
 import org.geotoolkit.storage.coverage.Pyramid;
 import org.geotoolkit.storage.coverage.PyramidSet;
 import org.geotoolkit.storage.coverage.PyramidalCoverageReference;
+import org.geotoolkit.utility.parameter.ParametersExt;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -59,8 +58,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.GenericName;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
 /**
  * @author Quentin Boileau (Geomatys)

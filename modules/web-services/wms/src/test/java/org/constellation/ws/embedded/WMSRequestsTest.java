@@ -96,9 +96,9 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.geotoolkit.feature.type.NamesExt;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.geotoolkit.utility.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

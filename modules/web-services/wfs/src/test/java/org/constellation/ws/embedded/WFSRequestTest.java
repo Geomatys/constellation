@@ -95,10 +95,9 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import org.geotoolkit.ogc.xml.v200.ResourceIdType;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.wfs.xml.v200.ActionResultsType;
 import org.geotoolkit.wfs.xml.v200.CreateStoredQueryResponseType;
 import org.geotoolkit.wfs.xml.v200.CreatedOrModifiedFeatureType;
@@ -109,7 +108,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.springframework.test.context.ActiveProfiles;
 
 // Constellation dependencies

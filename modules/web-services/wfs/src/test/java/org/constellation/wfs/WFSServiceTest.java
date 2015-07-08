@@ -62,8 +62,8 @@ import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
