@@ -19,9 +19,6 @@
 package org.constellation.wfs;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.sql.Connection;
@@ -64,6 +61,7 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import org.geotoolkit.data.FeatureCollection;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
@@ -73,7 +71,6 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
-import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
@@ -210,7 +207,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 // PostGIS datastore
                 localdb_active = TestDatabaseHandler.hasLocalDatabase();
                 if (localdb_active) {
-                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
+                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
@@ -233,7 +230,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 }
                 
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
-                final File outputDir = initDataDirectory();
+                final File outputDir = AbstractGrizzlyServer.initDataDirectory();
                 final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourcef, "id").setValue("shapeSrc");
                 getOrCreateValue(sourcef, "load_all").setValue(true);
@@ -1601,45 +1598,6 @@ public class WFSWorkerTest implements ApplicationContextAware {
         assertEquals(wrapper.getSchemaLocations(), expResult);
         
     }
-
-    /**
-     * Initialises the data directory in unzipping the jar containing the resources
-     * into a temporary directory.
-     *
-     * @return The root output directory where the data are unzipped.
-     * @throws IOException
-     */
-    private static File initDataDirectory() throws IOException {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        final String stylePath = "org/constellation/ws/embedded/wms111/styles";
-        String styleResource = classloader.getResource(stylePath).getFile();
-
-        if (styleResource.indexOf('!') != -1) {
-            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
-        }
-        if (styleResource.startsWith("file:")) {
-            styleResource = styleResource.substring(5);
-        }
-
-        File styleJar = new File(styleResource);
-        if (!styleJar.exists()) {
-            throw new IOException("Unable to find the style folder: "+ styleJar);
-        }
-        if (styleJar.isDirectory()) {
-            styleJar = new File(styleJar.getPath().replaceAll(stylePath, ""));
-            return styleJar;
-        }
-        final InputStream in = new FileInputStream(styleJar);
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File outputDir = new File(tmpDir, "Constellation");
-        if (!outputDir.exists()) {
-            outputDir.mkdir();
-        }
-        IOUtilities.unzip(in, outputDir);
-        in.close();
-        return outputDir;
-    }
-
 
     public static void domCompare(final Object actual, final Object expected) throws Exception {
 

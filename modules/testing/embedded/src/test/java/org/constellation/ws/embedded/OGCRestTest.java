@@ -184,7 +184,7 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
 
         client.services.setInstanceConfiguration(ServiceDef.Specification.CSW, "default", auto);
 
-        s = client.services.getInstanceConfiguration(ServiceDef.Specification.CSW, "default");;
+        s = client.services.getInstanceConfiguration(ServiceDef.Specification.CSW, "default");
 
         assertTrue(s instanceof Automatic);
 
@@ -212,7 +212,7 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
         srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
         srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+        final String rootDir = "whathever";
         srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
         srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
         srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");

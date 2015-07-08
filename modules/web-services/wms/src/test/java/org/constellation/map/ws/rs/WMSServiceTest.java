@@ -47,20 +47,10 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
 import org.constellation.test.utils.SpringTestRunner;
-import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
@@ -126,8 +116,6 @@ public class WMSServiceTest implements ApplicationContextAware {
 
     private static boolean initialized = false;
     
-    private static boolean localdb_active = true;
-    
     @BeforeClass
     public static void start() {
         ConfigDirectory.setupTestEnvironement("WMSServiceTest");
@@ -144,28 +132,23 @@ public class WMSServiceTest implements ApplicationContextAware {
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                // coverage-sql datastore
-                localdb_active = TestDatabaseHandler.hasLocalDatabase();
-                if (localdb_active) {
-                    final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    final ProviderFactory factory       = DataProviders.getInstance().getFactory("coverage-sql");
-                    final ParameterValueGroup source    = factory.getProviderDescriptor().createValue();
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    
-                    srcconfig.parameter(URL_DESCRIPTOR           .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_url"));
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR      .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_pass"));
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR          .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_user"));
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR        .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_schema"));
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
+                // coverage-file datastore
+                final File rootDir                  = AbstractGrizzlyServer.initDataDirectory();
+                final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
+                final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourceCF, "id").setValue("coverageTestSrc");
+                getOrCreateValue(sourceCF, "load_all").setValue(true);
+                final ParameterValueGroup choice3 = getOrCreateGroup(sourceCF, "choice");
 
-                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", "COVERAGE", false, true, null, null);
-                } else {
-                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
-                }
+                final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
+
+                getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir.getAbsolutePath() + "/org/constellation/data/SSTMDE200305.png"));
+                getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
+                getOrCreateValue(srcCFConfig, "namespace").setValue("no namespace");
+
+                providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
+                dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);
+                
 
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
                 final File outputDir = AbstractGrizzlyServer.initDataDirectory();
@@ -201,7 +184,7 @@ public class WMSServiceTest implements ApplicationContextAware {
                 config.getCustomParameters().put("shiroAccessible", "false");
 
                 serviceBusiness.create("wms", "default", config, null);
-                if (localdb_active) layerBusiness.add("SST_tests",            null,          "coverageTestSrc", null, "default", "wms", null);
+                layerBusiness.add("SSTMDE200305",                      null,          "coverageTestSrc",        null, "default", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);

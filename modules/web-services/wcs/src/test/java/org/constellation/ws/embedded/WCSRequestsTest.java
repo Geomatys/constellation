@@ -20,6 +20,7 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -168,7 +169,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                final File outputDir = initDataDirectory();
                 
                 final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
                 final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
@@ -178,7 +179,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
                 final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
 
-                getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir + "/Monde/SST/SSTMDE200305.png"));
+                getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/data/SSTMDE200305.png"));
                 getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
                 getOrCreateValue(srcCFConfig, NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
 

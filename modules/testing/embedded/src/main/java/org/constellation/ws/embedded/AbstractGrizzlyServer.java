@@ -18,13 +18,8 @@
  */
 package org.constellation.ws.embedded;
 
-// JAI dependencies
-
-// J2SE dependencies
-
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.util.Util;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.internal.io.IOUtilities;
@@ -53,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  * Launches a Grizzly server in a thread at the beginning of the testing process
@@ -63,7 +59,7 @@ import org.apache.commons.io.IOUtils;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
+public abstract class AbstractGrizzlyServer {
     
     protected static final Logger LOGGER = Logging.getLogger(AbstractGrizzlyServer.class);
     
@@ -402,20 +398,22 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             styleResource = styleResource.substring(5);
         }
         final File styleJar = new File(styleResource);
-        if (styleJar == null || !styleJar.exists()) {
+        if (!styleJar.exists()) {
             throw new IOException("Unable to find the style folder: "+ styleJar);
         }
-        if (styleJar.isDirectory()) {
-            return styleJar;
-        }
-        final InputStream in = new FileInputStream(styleJar);
+        
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File outputDir = new File(tmpDir, "Constellation");
+        File outputDir = new File(tmpDir, "Constellation");
         if (!outputDir.exists()) {
             outputDir.mkdir();
+        }    
+        if (styleJar.isDirectory()) {
+            FileUtilities.copy(styleJar, outputDir);
+        } else {
+            final InputStream in = new FileInputStream(styleJar);
+            IOUtilities.unzip(in, outputDir);
+            in.close();
         }
-        IOUtilities.unzip(in, outputDir);
-        in.close();
         return outputDir;
     }
 

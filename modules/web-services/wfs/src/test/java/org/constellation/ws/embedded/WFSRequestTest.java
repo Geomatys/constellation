@@ -248,13 +248,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
                 final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
                 final ParameterValueGroup shpconfig = getOrCreateGroup(choice2, "ShapefileParametersFolder");
-                String path;
-                if (outputDir.getAbsolutePath().endsWith("org/constellation/ws/embedded/wms111/styles")) {
-                    path = outputDir.getAbsolutePath().substring(0, outputDir.getAbsolutePath().indexOf("org/constellation/ws/embedded/wms111/styles"));
-                } else {
-                    path = outputDir.getAbsolutePath();
-                }
-                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+path + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
                 final ParameterValueGroup layer2 = getOrCreateGroup(sourcef, "Layer");

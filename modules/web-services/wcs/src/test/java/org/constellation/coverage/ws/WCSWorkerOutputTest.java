@@ -50,9 +50,32 @@ import org.springframework.test.context.ContextConfiguration;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.SpringHelper;
+import org.constellation.api.ProviderType;
+import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
+import org.constellation.business.IProviderBusiness;
+import org.constellation.business.IServiceBusiness;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.ProviderFactory;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import org.junit.AfterClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -60,7 +83,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import org.junit.BeforeClass;
+import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ActiveProfiles;
 
 
@@ -75,7 +102,107 @@ import org.springframework.test.context.ActiveProfiles;
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 @ActiveProfiles({"standard","derby"})
-public class WCSWorkerOutputTest extends WCSWorkerInit {
+public class WCSWorkerOutputTest implements ApplicationContextAware {
+    
+    private static final Logger LOGGER = Logging.getLogger(WCSWorkerOutputTest.class);
+    
+    private ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
+    /**
+     * The layer to test.
+     */
+    private static final String LAYER_TEST = "SSTMDE200305";
+
+    private static WCSWorker WORKER;
+
+    @Inject
+    private IServiceBusiness serviceBusiness;
+    
+    @Inject
+    private ILayerBusiness layerBusiness;
+    
+    @Inject
+    private IProviderBusiness providerBusiness;
+    
+    @Inject
+    private IDataBusiness dataBusiness;
+    
+    private static boolean initialized = false;
+    
+    @BeforeClass
+    public static void initTestDir() {
+        ConfigDirectory.setupTestEnvironement("WCSWorkerOutputTest");
+    }
+    
+    /**
+     * Initialisation of the worker and the PostGRID data provider before launching
+     * the different tests.
+     */
+    @PostConstruct
+    public void setUpClass() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                layerBusiness.removeAll();
+                serviceBusiness.deleteAll();
+                dataBusiness.deleteAll();
+                providerBusiness.removeAll();
+
+                // coverage-sql datastore
+                final File rootDir = AbstractGrizzlyServer.initDataDirectory();
+                
+                final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
+                final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourceCF, "id").setValue("coverageTestSrc");
+                getOrCreateValue(sourceCF, "load_all").setValue(true);
+                final ParameterValueGroup choice3 = getOrCreateGroup(sourceCF, "choice");
+
+                final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
+
+                getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir.getAbsolutePath() + "/org/constellation/data/SSTMDE200305.png"));
+                getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
+                getOrCreateValue(srcCFConfig, NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+
+                providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
+
+                dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);  
+
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("wcs", "default", config, null);
+                layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "default", "wcs", null);
+
+                serviceBusiness.create("wcs", "test", config, null);
+                layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "test",    "wcs", null);
+
+                DataProviders.getInstance().reload();
+                
+                WORKER = new DefaultWCSWorker("default");
+                // Default instanciation of the worker' servlet context and uri context.
+                WORKER.setServiceUrl("http://localhost:9090");
+                initialized = true;
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        ConfigDirectory.shutdownTestEnvironement("WCSWorkerOutputTest");
+        File derbyLog = new File("derby.log");
+        if (derbyLog.exists()) {
+            derbyLog.delete();
+        }
+    }
+    
     /**
      * Ensures that a PostGRID layer preconfigured is found in the GetCapabilities document
      * returned by the {@link WCSWorker}.
@@ -85,7 +212,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCapabilities() throws JAXBException, CstlServiceException {
-        assumeTrue(localdb_active);
 
         GetCapabilities request = new GetCapabilitiesType("1.0.0", "WCS", null, null);
         GetCapabilitiesResponse response = WORKER.getCapabilities(request);
@@ -144,7 +270,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testDescribeCoverage() throws JAXBException, CstlServiceException {
-        assumeTrue(localdb_active);
         
         final DescribeCoverage request = new DescribeCoverageType(LAYER_TEST);
         final DescribeCoverageResponse response = WORKER.describeCoverage(request);
@@ -193,7 +318,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCoverage() throws JAXBException, CstlServiceException {
-        assumeTrue(localdb_active);
 
         // Builds the GetCoverage request
         final List<String> axis = new ArrayList<>();

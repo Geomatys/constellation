@@ -23,9 +23,7 @@ import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
-import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.admin.SpringHelper;
-import org.constellation.api.ProviderType;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
@@ -63,23 +61,15 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.ConfigDirectory;
 
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.geotoolkit.feature.type.NamesExt;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeTrue;
 import org.junit.BeforeClass;
 import org.opengis.util.GenericName;
 import org.springframework.test.context.ActiveProfiles;
@@ -124,7 +114,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     /**
      * The layer to test.
      */
-    private static final GenericName LAYER_TEST = NamesExt.create("SST_tests");
+    private static final GenericName LAYER_TEST = NamesExt.create("SSTMDE200305");
 
     /**
      * Checksum value on the returned image expressed in a geographic CRS for the SST_tests layer.
@@ -165,8 +155,6 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
 
     private static boolean initialized = false;
     
-    private static boolean localdb_active = true;
-    
     @BeforeClass
     public static void startup() {
         ConfigDirectory.setupTestEnvironement("WMSAxesOrderTest");
@@ -185,28 +173,23 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 serviceBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                // coverage-sql datastore
-                localdb_active = TestDatabaseHandler.hasLocalDatabase();
-                if (localdb_active) {
-                    final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    final ProviderFactory factory       = DataProviders.getInstance().getFactory("coverage-sql");
-                    final ParameterValueGroup source    = factory.getProviderDescriptor().createValue();
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    
-                    srcconfig.parameter(URL_DESCRIPTOR           .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_url"));
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR      .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_pass"));
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR          .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_user"));
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR        .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_schema"));
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
+                // coverage-file datastore
+                final File rootDir                   = AbstractGrizzlyServer.initDataDirectory();
+                final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
+                final ParameterValueGroup sourceCF   = covFilefactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourceCF, "id").setValue("coverageTestSrc");
+                getOrCreateValue(sourceCF, "load_all").setValue(true);
+                final ParameterValueGroup choice3 = getOrCreateGroup(sourceCF, "choice");
 
-                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
-                } else {
-                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
-                }
+                final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
+
+                getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir.getAbsolutePath() + "/org/constellation/data/SSTMDE200305.png"));
+                getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
+                getOrCreateValue(srcCFConfig, "namespace").setValue("no namespace");
+
+                providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
+                dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);
+                
                 
                 DataProviders.getInstance().reload();
 
@@ -214,7 +197,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 config.getCustomParameters().put("shiroAccessible", "false");
 
                 serviceBusiness.create("wms", "default", config, null);
-                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wms", null);
+                layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "default", "wms", null);
 
 
                 final LayerContext config2 = new LayerContext();
@@ -223,7 +206,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
 
 
                 serviceBusiness.create("wms", "wms1", config2, null);
-                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "wms1", "wms", null);
+                layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "wms1", "wms", null);
 
                 initServer(null, null);
 
@@ -266,12 +249,10 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      * {@linkplain CoordinateReferenceSystem CRS} provides the same image that a GetMap
      * in version 1.3.0 on the same CRS.
      */
-    @Test
+    @Ignore
     @Order(order = 1)
     public void testGetMap111And130Projected() throws Exception {
         waitForStart();
-
-        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMap111Url, getMap130Url;
@@ -306,9 +287,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @Ignore
     @Order(order = 2)
-    public void testCRSGeographique111() throws IOException {
-        assumeTrue(localdb_active);
-
+    public void testCRSGeographique111() throws Exception {
+        waitForStart();
+        
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -332,9 +313,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @Test
     @Order(order = 3)
-    public void testGetMap111Epsg4326() throws IOException {
-        assumeTrue(localdb_active);
-
+    public void testGetMap111Epsg4326() throws Exception {
+        waitForStart();
+        
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -364,9 +345,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @Test
     @Order(order = 4)
-    public void testGetMap130Epsg4326() throws IOException {
-        assumeTrue(localdb_active);
-
+    public void testGetMap130Epsg4326() throws Exception {
+        waitForStart();
+        
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -395,9 +376,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @Test
     @Order(order = 5)
-    public void testGetMap111Crs84() throws IOException {
-        assumeTrue(localdb_active);
-
+    public void testGetMap111Crs84() throws Exception {
+        waitForStart();
+        
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -430,9 +411,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @Test
     @Order(order = 6)
-    public void testGetMap130Crs84() throws IOException {
-        assumeTrue(localdb_active);
-
+    public void testGetMap130Crs84() throws Exception {
+        waitForStart();
+        
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {

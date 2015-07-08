@@ -28,7 +28,6 @@ import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.configuration.WMSPortrayal;
-import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.provider.DataProviders;
@@ -129,9 +128,7 @@ public final class GrizzlyServer {
             return;
         }
         
-        // Initialises the postgrid testing raster.
-        CoverageSQLTestCase.init();
-
+        final File outputDir = initDataDirectory();
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSPortrayal.setEmptyExtension(true);
 
@@ -141,7 +138,6 @@ public final class GrizzlyServer {
         
         //SHAPEFILE
         final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
-        final File outputDir = initDataDirectory();
         final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
         getOrCreateValue(sourcef, "id").setValue("shapeSrc");
         getOrCreateValue(sourcef, "load_all").setValue(true);
@@ -190,7 +186,6 @@ public final class GrizzlyServer {
         dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
           
         
-        final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
         final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
         final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
         getOrCreateValue(sourceCF, "id").setValue("postgridSrc");
@@ -199,7 +194,7 @@ public final class GrizzlyServer {
 
         final ParameterValueGroup srcCFConfig = getOrCreateGroup(choice3, "FileCoverageStoreParameters");
 
-        getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + rootDir + "/Monde/SST/SSTMDE200305.png"));
+        getOrCreateValue(srcCFConfig, "path").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/data/SSTMDE200305.png"));
         getOrCreateValue(srcCFConfig, "type").setValue("AUTO");
         getOrCreateValue(srcCFConfig, NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
 
