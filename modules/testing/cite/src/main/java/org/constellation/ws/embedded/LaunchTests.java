@@ -54,6 +54,8 @@ public final class LaunchTests implements Runnable {
 
     private boolean hasCompleted = false;
     
+    public final static String CITE_EXECUTABLE_KEY = "org.constellation.cite.executable";
+    
     /**
      * Creates a new monitor for the given process.
      */
@@ -118,7 +120,12 @@ public final class LaunchTests implements Runnable {
         }
         final Runtime rt = Runtime.getRuntime();
         for (String arg : args) {
-            final Process process = rt.exec(new String[]{"../cite/run.sh", arg});
+            String executable = "../cite/run.sh";
+            if (System.getProperty(CITE_EXECUTABLE_KEY) != null) {
+                executable = System.getProperty(CITE_EXECUTABLE_KEY);
+                LOGGER.info("using system property specified executable:" + executable);
+            }
+            final Process process = rt.exec(new String[]{executable, arg});
             final LaunchTests lt = new LaunchTests(process);
             final Thread t = new Thread(lt);
             t.setDaemon(true);
