@@ -73,7 +73,7 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import static org.geotoolkit.parameter.ParametersExt.*;
+import static org.geotoolkit.utility.parameter.ParametersExt.*;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // Constellation dependencies
