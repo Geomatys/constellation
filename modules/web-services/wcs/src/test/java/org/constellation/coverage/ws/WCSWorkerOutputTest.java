@@ -73,8 +73,8 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import org.junit.AfterClass;
 
 import static org.junit.Assert.assertEquals;
