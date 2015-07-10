@@ -226,10 +226,14 @@ window.buildDataViewer = function () {
             return layer;
         },
 
-        createLayerWMS : function(cstlUrlPrefix, layerName, instance){
+        createLayerWMS : function(cstlUrlPrefix, layerName, instance, versions){
+            var version = '1.3.0';//default version
+            if(versions){
+                version = versions[versions.length-1];
+            }
             var params = {
                 'LAYERS':      layerName,
-                'VERSION':     '1.3.0',
+                'VERSION':     version,
                 'SLD_VERSION': '1.1.0',
                 'FORMAT':      'image/png',
                 'TRANSPARENT': 'true'
@@ -245,10 +249,14 @@ window.buildDataViewer = function () {
             return layer;
         },
 
-        createLayerWMSWithStyle : function(cstlUrlPrefix, layerName, instance, style){
+        createLayerWMSWithStyle : function(cstlUrlPrefix, layerName, instance, style, versions){
+            var version = '1.3.0';//default version
+            if(versions){
+                version = versions[versions.length-1];
+            }
             var params = {
                 'LAYERS':      layerName,
-                'VERSION':     '1.3.0',
+                'VERSION':     version,
                 'SLD_VERSION': '1.1.0',
                 'FORMAT':      'image/png',
                 'STYLES':      (style) ? style : '',

@@ -608,14 +608,14 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         var type = $scope.selected.Type?$scope.selected.Type.toLowerCase():null;
                         if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                             if($scope.service.type.toLowerCase() === 'wms') {
-                                layerData = LayerDashboardViewer.createLayerWMSWithStyle($scope.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name);
+                                layerData = LayerDashboardViewer.createLayerWMSWithStyle($scope.cstlUrl, layerName,$scope.service.identifier,$scope.selected.TargetStyle[0].Name,$scope.service.versions);
                             }else {
                                 layerData = LayerDashboardViewer.createLayerWithStyle($scope.cstlUrl, layerName, providerId,
                                     $scope.selected.TargetStyle[0].Name,null,null,type!=='vector');
                             }
                         } else {
                             if($scope.service.type.toLowerCase() === 'wms') {
-                                layerData = LayerDashboardViewer.createLayerWMS($scope.cstlUrl, layerName, $scope.service.identifier);
+                                layerData = LayerDashboardViewer.createLayerWMS($scope.cstlUrl, layerName, $scope.service.identifier,$scope.service.versions);
                             }else {
                                 layerData = LayerDashboardViewer.createLayer($scope.cstlUrl, layerName, providerId,null,type!=='vector');
                             }
@@ -1151,9 +1151,14 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                         DataViewer.createLayerExternalWMSWithStyle(layer.externalServiceUrl, layer.externalLayer, layer.externalStyle.split(',')[0]) :
                                         DataViewer.createLayerExternalWMS(layer.externalServiceUrl, layer.externalLayer);
                                 } else {//internal wms layer
+                                    var versions = [];
+                                    if(layer.serviceVersions){
+                                        var arry = layer.serviceVersions.split('µ');
+                                        versions.push(arry[arry.length-1]);
+                                    }
                                     layerData = (layer.styleName) ?
-                                        DataViewer.createLayerWMSWithStyle(cstlUrl, layer.Name, layer.serviceIdentifier, layer.styleName) :
-                                        DataViewer.createLayerWMS(cstlUrl, layer.Name, layer.serviceIdentifier);
+                                        DataViewer.createLayerWMSWithStyle(cstlUrl, layer.Name, layer.serviceIdentifier, layer.styleName,versions) :
+                                        DataViewer.createLayerWMS(cstlUrl, layer.Name, layer.serviceIdentifier,versions);
                                 }
                             }else {
                                 var layerName,providerId;
