@@ -257,9 +257,9 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
         List<QueryType> queries = new ArrayList<>();
         List<PointPropertyType> points = new ArrayList<>();
-        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(29.86, 70.83))));
-        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(31.08, 68.87))));
-        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(32.19, 71.96))));
+        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(70.83, 29.86))));
+        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(68.87, 31.08))));
+        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(71.96, 32.19))));
 
         EqualsType equals = new EqualsType("http://cite.opengeospatial.org/gmlsf:multiPointProperty", new MultiPointType("urn:ogc:def:crs:EPSG:4326", points));
         FilterType f = new FilterType(equals);
@@ -307,9 +307,14 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
         queries = new ArrayList<>();
         BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:ogc:def:crs:EPSG:4326");
+        
+        /* TODO restore when geotk will be updated
+        
         PropertyIsEqualToType propEqual = new PropertyIsEqualToType(new LiteralType("name-f015"), new PropertyNameType("http://www.opengis.net/gml:name"), Boolean.TRUE);
         AndType and = new AndType(bbox, propEqual);
-        f = new FilterType(and);
+        f = new FilterType(and);*/
+        f = new FilterType(bbox);
+                
         query = new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
         //query.setSrsName("urn:ogc:def:crs:EPSG:6.11:32629");
         queries.add(query);

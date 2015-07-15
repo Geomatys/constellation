@@ -56,6 +56,7 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
@@ -190,7 +191,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 
                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
-                final File outputDir = initDataDirectory();
+                final File outputDir = AbstractGrizzlyServer.initDataDirectory();
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
                 final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourcef, "id").setValue("shapeSrc");
