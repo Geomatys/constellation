@@ -334,12 +334,14 @@ public class MapContextBusiness implements IMapContextBusiness {
                     data = dataRepository.findById(dataID);
                 }
                 DefaultMetadata metadata = null;
-                try {
-                    metadata = metadataBusiness.getIsoMetadataForData(dataID);
-                } catch (ConfigurationException ex) {
-                    LOGGER.log(Level.FINE, null, ex);
+                if(dataID != null) {
+                    try {
+                        metadata = metadataBusiness.getIsoMetadataForData(dataID);
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    }
                 }
-                if(metadata == null){
+                if(metadata == null && dataID != null) {
                     //try to get dataset metadata.
                     final Dataset dataset = dataBusiness.getDatasetForData(dataID);
                     if (dataset != null) {
