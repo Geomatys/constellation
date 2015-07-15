@@ -167,10 +167,15 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                                         MapContextDashboardViewer.createLayerExternalWMS(layObj.layer.externalServiceUrl, layObj.layer.externalLayer);
                                 }else {
                                     var serviceName = (layObj.layer.serviceIdentifier) ? layObj.layer.serviceIdentifier : layObj.service.identifier;
+                                    var versions=[];
+                                    if(layObj.layer.serviceVersions) {
+                                        var arry = layObj.layer.serviceVersions.split('µ');
+                                        versions.push(arry[arry.length-1]);
+                                    }
                                     if(layObj.layer.externalStyle){
-                                        layerData = MapContextDashboardViewer.createLayerWMSWithStyle(cstlUrl, layObj.layer.Name, serviceName, layObj.layer.externalStyle.split(',')[0]);
+                                        layerData = MapContextDashboardViewer.createLayerWMSWithStyle(cstlUrl, layObj.layer.Name, serviceName, layObj.layer.externalStyle.split(',')[0],versions);
                                     }else {
-                                        layerData = MapContextDashboardViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName);
+                                        layerData = MapContextDashboardViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName,versions);
                                     }
                                 }
                             } else {//internal data layer

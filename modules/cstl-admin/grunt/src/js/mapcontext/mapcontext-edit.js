@@ -564,19 +564,25 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                 }
                             }else {//internal wms layer
                                 var serviceName = (layObj.layer.serviceIdentifier) ? layObj.layer.serviceIdentifier : layObj.service.identifier;
+                                var versions=[];
+                                if(layObj.service && layObj.service.versions) {
+                                    var arry = layObj.service.versions.split('µ');
+                                    versions.push(arry[arry.length-1]);
+                                }
+
                                 if(layerStyleObj && layerStyleObj.layer.layer.Name === layObj.layer.Name){
                                     if(layerStyleObj.style && layerStyleObj.style.Name){
                                         layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, layObj.layer.Name, serviceName,
-                                            layerStyleObj.style.Name);
+                                            layerStyleObj.style.Name,versions);
                                     }else {
-                                        layerData = DataViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName);
+                                        layerData = DataViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName,versions);
                                     }
                                 }else {
                                     if(layObj.styleObj || layObj.layer.externalStyle){
                                         layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, layObj.layer.Name, serviceName,
-                                            layObj.styleObj?layObj.styleObj.Name:layObj.layer.externalStyle.split(',')[0]);
+                                            layObj.styleObj?layObj.styleObj.Name:layObj.layer.externalStyle.split(',')[0],versions);
                                     }else {
-                                        layerData = DataViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName);
+                                        layerData = DataViewer.createLayerWMS(cstlUrl, layObj.layer.Name, serviceName,versions);
                                     }
                                 }
                             }
@@ -830,10 +836,15 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
             if($scope.selection.layer && $scope.selection.service){
                 var cstlUrl = $cookieStore.get('cstlUrl');
                 var serviceName = ($scope.selection.layer.serviceIdentifier) ? $scope.selection.layer.serviceIdentifier : $scope.selection.service.identifier;
+                var versions = [];
+                if($scope.selection.service.versions){
+                    var arry = $scope.selection.service.versions.split('µ');
+                    versions.push(arry[arry.length-1]);
+                }
                 if ($scope.selection.layer.TargetStyle && $scope.selection.layer.TargetStyle.length > 0) {
-                    layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, $scope.selection.layer.Name, serviceName, $scope.selection.layer.TargetStyle[0].Name);
+                    layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, $scope.selection.layer.Name, serviceName, $scope.selection.layer.TargetStyle[0].Name,versions);
                 } else {
-                    layerData = DataViewer.createLayerWMS(cstlUrl, $scope.selection.layer.Name, serviceName);
+                    layerData = DataViewer.createLayerWMS(cstlUrl, $scope.selection.layer.Name, serviceName,versions);
                 }
                 //to force the browser cache reloading styled layer.
                 layerData.get('params').ts=new Date().getTime();
