@@ -19,6 +19,7 @@
 package org.constellation.business;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
@@ -497,4 +498,14 @@ public interface IMetadataBusiness {
     boolean isSpecialMetadataFormat(File metadataFile);
     
     DefaultMetadata getMetadataFromSpecialFormat(File metadataFile) throws ConfigurationException;
+
+    /**
+     * Proceed to upload metadata quicklook image used for graphicOverview field.
+     *
+     * @param fileIdentifier metadata fileIdentifier
+     * @param stream given stream of the image file
+     * @throws ConfigurationException
+     */
+    void uploadMDQuickLook(final String fileIdentifier, final InputStream stream) throws ConfigurationException;
+
 }

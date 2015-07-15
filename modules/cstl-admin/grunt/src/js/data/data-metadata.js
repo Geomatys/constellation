@@ -20,7 +20,7 @@
 
 angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl) {
+    .controller('EditMetadataController', function ($scope, $routeParams,dataListing, $location, $translate, Growl,$cookieStore,$rootScope) {
         $scope.provider = $scope.provider || $routeParams.provider;
         $scope.identifier = $scope.identifier || $routeParams.identifier;
 
@@ -541,6 +541,46 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                         }
                     );
                 }
+            }
+        };
+
+        $scope.uploadImage = $scope.uploadImage || function(value,field) {
+            var cstlUrl = $cookieStore.get('cstlUrl');
+            if(value) {
+                var $form = $('#metadataform');
+                var fileInput = $form.find('.uploadimage');
+                if(!fileInput || !fileInput.get(0).files || fileInput.get(0).files.length===0){
+                    return;
+                }
+                var fileSize = fileInput.get(0).files[0].size/1000000;
+                if(fileSize > 2){
+                    Growl('error', 'Error', 'The image size exceed the limitation of 2Mo.');
+                    return;
+                }
+                var formData = new FormData($form[0]);
+                $.ajax({
+                    headers: {
+                        'access_token': $rootScope.access_token
+                    },
+                    url: cstlUrl + "api/1/metadata/uploadGraphicOverview2/"+$scope.identifier,
+                    type: 'POST',
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $scope.$apply(function() {
+                            if(response.mdIdentifierSHA1) {
+                                field.value = cstlUrl+'spring/resolveImage/'+response.mdIdentifierSHA1+'?t=' + new Date().getTime();
+                            }
+                        });
+                    },
+                    error: function(){
+                        Growl('error', 'Error', 'error while uploading image');
+                    }
+                });
+            } else {
+                field.value = "";
             }
         };
 

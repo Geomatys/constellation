@@ -27,7 +27,7 @@
     "metadata.field.dateType":"Type de date",
     "metadata.field.maintenanceAndUpdateFrequency":"Fréquence de mise à jour de la donnée",
     "metadata.field.language":"Langue de la donnée",
-    "metadata.field.graphicOverViewFileName":"Aperçu de la ressource",
+    "metadata.field.graphicOverViewFileName":"Fichier aperçu de la ressource",
     "metadata.field.rsIdentifier":"Identifiant unique de la donnée",
     "metadata.field.report.specification.title":"Spécification employée pour l'évaluation de la conformité",
     "metadata.field.report.specification.date":"Date de référence de la spécification",

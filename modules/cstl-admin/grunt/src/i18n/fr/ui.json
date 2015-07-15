@@ -644,6 +644,7 @@
     "metadata.edition.sensor.system":"Capteur système",
     "metadata.edition.placeholder.uri":"Example urn:ogc:def:identifierType:OGC:value",
     "metadata.edition.content.error":"Erreur de chargement du contenu.",
+    "metadata.edition.upload.selectimage":"Choisir une image",
 
     "metrics.jvm.rungc": "Lancer le ramasse miette",
     "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",
@@ -864,7 +865,6 @@
 
 
     "settings.form.state":"Etat",
-    "settings.form.role":"Role",
     "settings.form.registration.date":"Date d'inscription",
     "settings.form.address":"Adresse",
     "settings.form.additional.address":"Adresse additionnelle",
@@ -879,7 +879,7 @@
     "settings.form.lastname": "Nom",
     "settings.form.password": "Mot de passe",
     "settings.form.login":"Identifiant",
-    "settings.form.role": "Role",
+    "settings.form.role": "Rôle",
     "settings.form.role.admin":"Administrateur",
     "settings.form.role.data":"Gestionnaire de ressources",
     "settings.form.role.publish":"Publicateur",

@@ -144,12 +144,6 @@
             dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index">
         <option value="">-----</option>
     </select>
-    <input ng-if="fieldObj.field.render === 'UPLOADIMAGE.text'"
-           type="text"
-           class="form-control form-control-fix"
-           ng-class="{'col-xs-8-important':fieldObj.field.multiplicity>1}"
-           placeholder="{{fieldObj.field.name | translate}}"
-           ng-model="fieldObj.field.value"/>
     <select ng-if="fieldObj.field.render === 'INSPIRE_ISO.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
@@ -389,6 +383,9 @@
            ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index]),'col-xs-8-important':fieldObj.field.multiplicity>1}"
            dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"
            debounce="200"/>
+    <div ng-if="fieldObj.field.render === 'UPLOADIMAGE.text'"
+         ng-include="'views/parts/metadata-uploadimage.html'">
+    </div>
     <span ng-if="fieldObj.field.render === 'readonly'"
           class="data"
           style="word-wrap: break-word;">{{fieldObj.field.value}}</span>
