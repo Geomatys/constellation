@@ -54,7 +54,7 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.AbstractWebService;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import static org.geotoolkit.utility.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
@@ -214,7 +214,7 @@ public class WMSServiceTest implements ApplicationContextAware {
     
     public void setFields() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
         //do not use this in real code, just for testing
-        Field privateStringField = WebService.class.getDeclaredField("uriContext");
+        Field privateStringField = AbstractWebService.class.getDeclaredField("uriContext");
         privateStringField.setAccessible(true);
         privateStringField.set(service, info);
         

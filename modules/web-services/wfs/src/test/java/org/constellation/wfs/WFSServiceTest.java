@@ -35,7 +35,7 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.WFSService;
-import org.constellation.ws.rs.WebService;
+import org.constellation.ws.rs.AbstractWebService;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
@@ -156,7 +156,7 @@ public class WFSServiceTest implements ApplicationContextAware {
                 DataProviders.getInstance().reload();
                 service = new WFSService();
 
-                Field privateStringField = WebService.class.getDeclaredField("uriContext");
+                Field privateStringField = AbstractWebService.class.getDeclaredField("uriContext");
                 privateStringField.setAccessible(true);
                 privateStringField.set(service, info);
 
