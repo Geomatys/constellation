@@ -93,7 +93,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED
  * @version 0.9
  * @since 0.3
  */
-public abstract class OGCWebService<W extends Worker> extends WebService {
+public abstract class OGCWebService<W extends Worker> extends AbstractWebService {
 
     private final String serviceName;
     
