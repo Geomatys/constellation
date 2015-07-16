@@ -33,8 +33,8 @@ import java.util.List;
  * @since 0.3
  */
 public enum ServiceDef {
-    // WMS service definitions
 
+    // WMS service definitions
     WMS_1_0_0(Specification.WMS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", false, false),
     WMS_1_1_1(Specification.WMS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.1", false, true),
     WMS_1_3_0(Specification.WMS, Organization.OGC, "1.3.0", Profile.NONE, "1.3.0", false, true),
@@ -71,8 +71,10 @@ public enum ServiceDef {
     THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false, true),
 
     //WPS services definitions
-    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true, true);
+    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true, true),
 
+    // OSGEO TMS service definitions
+    TMS(Specification.TMS, Organization.NONE, "1.0.0", Profile.NONE, null, false, true);
 
     /**
      * Name of the specification.
@@ -216,6 +218,7 @@ public enum ServiceDef {
         PDP("Policy Decision Point"),
         MDW("MDWeb"),
         THW("Thesaurus"),
+        TMS("Tile Map Service"),
         WEBDAV("Webdav");
 
         public final String fullName;
@@ -249,6 +252,8 @@ public enum ServiceDef {
                 return MDW;
             } else if (THW.name().equalsIgnoreCase(shortName)) {
                 return THW;
+            } else if (TMS.name().equalsIgnoreCase(shortName)) {
+                return TMS;
             } else if (WEBDAV.name().equalsIgnoreCase(shortName)) {
                 return WEBDAV;
             }
