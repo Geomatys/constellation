@@ -1557,6 +1557,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+        comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
         comparator.compare();
     }
     
