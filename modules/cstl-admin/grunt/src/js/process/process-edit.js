@@ -559,8 +559,8 @@ angular.module('cstl-process-edit', ['cstl-restapi', 'cstl-services', 'ui.bootst
                     var parameter = {};
                     parameter.name = elem.name;
                     parameter.id = idPrefix != null ? idPrefix+'_'+elem.name : elem.name;
-                    parameter.minOccurs = elem.minOccurs || 1;
-                    parameter.maxOccurs = elem.maxOccurs || 1;
+                    parameter.minOccurs = elem.minOccurs !== undefined ? elem.minOccurs : 1;
+                    parameter.maxOccurs = elem.maxOccurs !== undefined ? elem.maxOccurs : 1;
                     parameter.mandatory = parameter.minOccurs > 0;
                     parameter.description = elem.description;
 
