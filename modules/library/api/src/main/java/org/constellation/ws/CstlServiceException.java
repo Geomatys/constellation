@@ -52,6 +52,16 @@ public class CstlServiceException extends Exception {
     }
 
     /**
+     * Creates an exception with the specified details message.
+     *
+     * @param message The detail message.
+     * @param cause The cause of this exception.
+     */
+    public CstlServiceException(final String message, Exception cause) {
+        this(message, cause, ExceptionCode.NO_APPLICABLE_CODE);
+    }
+
+    /**
      * Creates an exception with the specified details message and the exceptionCode chosen.
      *
      * @param message The detail message.
