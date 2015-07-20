@@ -32,7 +32,7 @@ public class TemplateTreeTest {
         final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null, false);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, null, spec, "metadata.field.report.specification.title", "elementary");
         final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null, false);
-        final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.text", 0, null, specDate, "metadata.field.report.specification.date", "elementary");
+        final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.readonly", 0, null, specDate, "metadata.field.report.specification.date", "elementary");
         final ValueNode specDateT   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, null, specDate,  "metadata.field.dateType", "elementary");
         
         final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality, null, false);
@@ -78,7 +78,7 @@ public class TemplateTreeTest {
         final ValueNode spec        = new ValueNode("metadata.dataQualityInfo.report.result.specification", null, 0, resultN, null, false);
         final ValueNode specTitle   = new ValueNode("metadata.dataQualityInfo.report.result.specification.title", null, null, "Specification.codelist", 0, "some title", spec, "metadata.field.report.specification.title", "elementary");
         final ValueNode specDate    = new ValueNode("metadata.dataQualityInfo.report.result.specification.date", null, 0, spec, null, false);
-        final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.text", 0, "1970-05-10", specDate, "metadata.field.report.specification.date", "elementary");
+        final ValueNode specDateD   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.date", null, null, "DATE.readonly", 0, "1970-05-10 00:00:03", specDate, "metadata.field.report.specification.date", "elementary");
         final ValueNode specDateT   = new ValueNode("metadata.dataQualityInfo.report.result.specification.date.dateType", null, "CI_DateTypeCode.publication", "CODELIST.readonly", 0, "CI_DateTypeCode.creation", specDate,  "metadata.field.dateType", "elementary");
         
         final ValueNode scope       = new ValueNode("metadata.dataQualityInfo.scope", null, 0, dataQuality, null, false);

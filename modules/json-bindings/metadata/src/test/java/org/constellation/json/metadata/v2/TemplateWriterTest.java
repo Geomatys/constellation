@@ -67,7 +67,7 @@ public class TemplateWriterTest {
         final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");
-        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145603000L), DateType.CREATION);
         cit.setDates(Arrays.asList(date));
         final DefaultConformanceResult result = new DefaultConformanceResult(cit, "some explanation", true);
         report.setResults(Arrays.asList(result));
