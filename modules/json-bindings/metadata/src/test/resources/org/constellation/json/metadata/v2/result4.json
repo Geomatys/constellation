@@ -46,7 +46,7 @@
                 "help" : "metadata.field.report.specification.date_help",
                 "path" : "metadata[0].dataQualityInfo[0].report[0].result[0].specification[0].date[0].date[0]",
                 "type" : null,
-                "render" : "DATE.text",
+                "render" : "DATE.readonly",
                 "defaultValue" : null,
                 "value" : null,
                 "obligation" : "M",

@@ -35,7 +35,7 @@
                                             "multiplicity": 1,
                                             "help": "metadata.field.report.specification.date_help",
                                             "path": "metadata.dataQualityInfo.report.result.specification.date.date",
-                                            "render": "DATE.text",
+                                            "render": "DATE.readonly",
                                             "obligation": "M",
                                             "defaultValue": null,
                                             "value": null,

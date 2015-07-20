@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import org.apache.sis.metadata.MetadataStandard;
-import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
@@ -112,7 +111,7 @@ public class TeamplateReaderUpdateTest {
         final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");
-        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145603000L), DateType.CREATION);
         cit.setDates(Arrays.asList(date));
         final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
         report.setResults(Arrays.asList(confResult));
@@ -196,7 +195,7 @@ public class TeamplateReaderUpdateTest {
         final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");
-        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145603000L), DateType.CREATION);
         cit.setDates(Arrays.asList(date));
         final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
         report.setResults(Arrays.asList(confResult));
@@ -293,7 +292,7 @@ public class TeamplateReaderUpdateTest {
         final DefaultDataQuality quality = new DefaultDataQuality(new DefaultScope(ScopeCode.DATASET));
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");
-        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145603000L), DateType.CREATION);
         cit.setDates(Arrays.asList(date));
         final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
         report.setResults(Arrays.asList(confResult));
@@ -390,7 +389,7 @@ public class TeamplateReaderUpdateTest {
         
         final DefaultDomainConsistency report = new DefaultDomainConsistency();
         final DefaultCitation cit = new DefaultCitation("some title");
-        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145600000L), DateType.CREATION);
+        final DefaultCitationDate date = new DefaultCitationDate(new Date(11145603000L), DateType.CREATION);
         cit.setDates(Arrays.asList(date));
         final DefaultConformanceResult confResult = new DefaultConformanceResult(cit, "some explanation", true);
         report.setResults(Arrays.asList(confResult));

@@ -483,8 +483,14 @@ public class TemplateReader extends AbstractTemplateHandler {
             throw new ParseException("Illegal date: " + value + " (property:" + identifier +")", e);
         }
         try {
-            synchronized (JsonMetadataConstants.DATE_FORMAT) {
-                return JsonMetadataConstants.DATE_FORMAT.parse((String) value);
+            if (t.indexOf(':') < 0) {
+                synchronized (JsonMetadataConstants.DATE_FORMAT) {
+                    return JsonMetadataConstants.DATE_FORMAT.parse((String) value);
+                }
+            } else {
+                synchronized (JsonMetadataConstants.DATE_HOUR_FORMAT) {
+                    return JsonMetadataConstants.DATE_HOUR_FORMAT.parse((String) value);
+                }
             }
         } catch (java.text.ParseException e) {
             throw new ParseException("Illegal date: " + value + " (property:" + identifier +")", e);
