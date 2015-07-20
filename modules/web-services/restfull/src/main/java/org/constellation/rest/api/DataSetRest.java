@@ -269,7 +269,6 @@ public class DataSetRest {
      * @return the {@link Page} of {@link DatasetItem}s.
      */
     @POST
-    @Path("/")
     public Response searchDatasets(DatasetSearch search) {
         PageRequest pageRequest = new PageRequest(search.getPage(), search.getSize());
 
