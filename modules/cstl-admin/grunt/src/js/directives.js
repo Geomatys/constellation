@@ -301,8 +301,10 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
         return {
             restrict: 'A',
             link: function(scope, $element, attrs) {
+                var value = scope.$eval(attrs.datetimepicker);
                 $element.datetimepicker({
                     format: 'yyyy-mm-dd hh:ii:ss',
+                    language: value.language || 'fr',
                     autoclose: true
                 });
 

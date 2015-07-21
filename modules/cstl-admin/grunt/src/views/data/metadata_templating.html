@@ -108,6 +108,20 @@
             <i class="glyphicon glyphicon-th"></i>
         </span>
     </div>
+    <div ng-if="fieldObj.field.render === 'DATETIME.text'"
+         class="col-xs-5 col-sm-5 col-md-5 col-lg-5 input-group date"
+         style="padding-left:0;"
+         datetimepicker="{'language':getCurrentLang()}">
+        <input type="text"
+               class="form-control form-control-fix"
+               ng-model="fieldObj.field.value"
+               ng-required="fieldObj.field.obligation === 'M'"
+               ng-class="{'highlight-invalid':!isValidField(metadataform[blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index])}"
+               dynamic-name="blockObj.block.name+'_'+blockIndex+'_'+fieldObj.field.name+'_'+$index"/>
+        <span class="input-group-addon">
+            <i class="glyphicon glyphicon-th"></i>
+        </span>
+    </div>
     <select ng-if="fieldObj.field.render === 'DATE.codelist'"
             class="form-control form-control-fix"
             ng-model="fieldObj.field.value"
