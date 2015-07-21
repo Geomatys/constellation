@@ -290,9 +290,11 @@ public class QuartzJobListener implements JobListener {
          * @param event ProcessEvent
          */
         private void roundProgression(ProcessEvent event) {
-            BigDecimal progress = new BigDecimal(event.getProgress());
-            progress = progress.setScale(ROUND_SCALE, BigDecimal.ROUND_HALF_UP);
-            taskEntity.setProgress(progress.doubleValue());
+            if (!Float.isNaN(event.getProgress()) && !Float.isInfinite(event.getProgress())) {
+                BigDecimal progress = new BigDecimal(event.getProgress());
+                progress = progress.setScale(ROUND_SCALE, BigDecimal.ROUND_HALF_UP);
+                taskEntity.setProgress(progress.doubleValue());
+            }
         }
 
         private String toString(InternationalString str){
