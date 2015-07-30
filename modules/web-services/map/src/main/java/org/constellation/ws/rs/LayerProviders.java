@@ -38,7 +38,6 @@ import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
-import org.constellation.provider.ObservationData;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -70,28 +69,12 @@ import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.geotoolkit.style.function.InterpolationPoint;
-import org.geotoolkit.style.function.Method;
-import org.geotoolkit.style.function.Mode;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Function;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.style.ChannelSelection;
-import org.opengis.style.ColorMap;
-import org.opengis.style.ContrastEnhancement;
-import org.opengis.style.ContrastMethod;
-import org.opengis.style.Description;
-import org.opengis.style.OverlapBehavior;
-import org.opengis.style.RasterSymbolizer;
-import org.opengis.style.ShadedRelief;
-import org.opengis.style.Symbolizer;
 import org.opengis.util.FactoryException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.awt.*;
@@ -107,11 +90,6 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
 import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.storage.coverage.CoverageReference;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
-import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 import org.opengis.util.GenericName;
 
 /**
@@ -405,12 +383,8 @@ public final class LayerProviders {
                     style = new StyleXmlIO().readStyle(reader, Specification.SymbologyEncoding.SLD_1_0_0);
                 }
             } else {
-                // Fallback to a default/auto-generated style.
-                if (layer instanceof FeatureData || layer instanceof ObservationData) {
-                    style = null; // Let portrayal process apply is own style.
-                } else {
-                    style = generateCoverageStyle(layer);
-                }
+                //let portrayal process to apply its own style
+                style= null;
             }
 
             // Map context.
@@ -436,7 +410,7 @@ public final class LayerProviders {
             // Create response.
             return new PortrayalResponse(canvasDef, sceneDef, viewDef, outputDef);
 
-        } catch (FactoryException | JAXBException | PortrayalException | DataStoreException | IOException ex) {
+        } catch (FactoryException | JAXBException | PortrayalException ex) {
             throw new CstlServiceException(ex.getLocalizedMessage());
         }
     }
@@ -570,74 +544,6 @@ public final class LayerProviders {
         fillGeographicDescription(envelope, description);
 
         return description;
-    }
-
-    /**
-     * Analyzes a "coverage" layer first band values (statistics) to generate a
-     * {@link MutableStyle} instance.
-     *
-     * @param layer the layer to analyze
-     * @return a {@link MutableStyle} instance
-     * @throws IOException if an error occurred while acquiring coverage statistics
-     * @throws DataStoreException if an error occurred while acquiring coverage statistics
-     */
-    private static MutableStyle generateCoverageStyle(final Data layer) throws DataStoreException, IOException {
-        // Acquire coverage data.
-        final CoverageReference ref = (CoverageReference) layer.getOrigin();
-        if (ref == null) {
-            return null;
-        }
-        final GridCoverageReader reader = ref.acquireReader();
-        final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
-        ref.recycle(reader);
-
-        // Determine if we should apply this palette (should be applied only for geophysics data!)
-        // HACK: normally we should test if the view types set contains photographic, but this is not working here
-        // because all coverage readers seems to have it ... so just test the number of sample dimensions.
-        // It won't work for all cases ...
-        // TODO: fix netcdf reader, should not add photographic in the view types possibilities
-        final int nbSamples = (dims==null) ? 0 : dims.size();
-        if (nbSamples==0 || nbSamples==3 || nbSamples==4) {
-            // should be RGB, no need to apply a palette, let the renderer display this image unchanged
-            return null;
-        }
-
-        // Extract first band statistics.
-        double min = dims.get(0).getMinimumValue();
-        double max = dims.get(0).getMaximumValue();
-
-        if (Double.isInfinite(min) || Double.isInfinite(max)) {
-            return null;
-        }
-
-        double average = (max + min) / 2;
-
-        // Generate a color map from band statistics.
-        final List<InterpolationPoint> values = new ArrayList<>();
-        values.add(SF.interpolationPoint(Float.NaN, SF.literal(new Color(0, 0, 0, 0))));
-        values.add(SF.interpolationPoint(min, SF.literal(new Color(0, 54, 204, 255))));
-        values.add(SF.interpolationPoint(average, SF.literal(new Color(255, 254, 162, 255))));
-        values.add(SF.interpolationPoint(max, SF.literal(new Color(199, 8, 30, 255))));
-        final Function function = SF.interpolateFunction(DEFAULT_CATEGORIZE_LOOKUP, values, Method.COLOR, Mode.LINEAR, DEFAULT_FALLBACK);
-        final ColorMap colorMap = SF.colorMap(function);
-
-        // Select the first band.
-        final ChannelSelection selection = SF.channelSelection(SF.selectedChannelType("0", (ContrastEnhancement) null));
-
-        // Create final style.
-        final Expression opacity = LITERAL_ONE_FLOAT;
-        final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
-        final ContrastEnhancement enhance = SF.contrastEnhancement(LITERAL_ONE_FLOAT, ContrastMethod.NONE);
-        final ShadedRelief relief = SF.shadedRelief(LITERAL_ONE_FLOAT);
-        final Unit uom = NonSI.PIXEL;
-        final String geom = DEFAULT_GEOM;
-        final String name = "raster symbol name";
-        final Description desc = DEFAULT_DESCRIPTION;
-        final Symbolizer outline = null;
-        final RasterSymbolizer symbol = SF.rasterSymbolizer(name, geom, desc, uom, opacity, selection, overlap, colorMap, enhance, relief, outline);
-        final MutableStyle style = SF.style(symbol);
-        style.setDefaultSpecification(symbol);
-        return style;
     }
 
     /**
