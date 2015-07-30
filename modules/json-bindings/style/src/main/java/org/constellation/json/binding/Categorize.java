@@ -123,46 +123,20 @@ public class Categorize implements Function {
 
         // create first threshold map to create first categorize function.
         Map<Expression, Expression> values = new HashMap<>(0);
-        values.put(StyleConstants.CATEGORIZE_LESS_INFINITY, new DefaultLiteral<Color>(Color.GRAY));
-        for (final InterpolationPoint ip : points) {
-            values.put(new DefaultLiteral<Double>(ip.getData().doubleValue()), new DefaultLiteral<String>(ip.getColor()));
-        }
-        final org.geotoolkit.style.function.Categorize categorize = SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, values, ThreshholdsBelongTo.PRECEDING, StyleConstants.DEFAULT_FALLBACK);
-
-        // Iteration to find min and max values
-        Double min = null, max = null;
-        for (final InterpolationPoint ip : points) {
-            if (min == null && max == null) {
-                min = ip.getData().doubleValue();
-                max = ip.getData().doubleValue();
-            }
-            min = Math.min(min, ip.getData().doubleValue());
-            max = Math.max(max, ip.getData().doubleValue());
-        }
-
-        //init final threshold map and coefficient
-        final Map<Expression, Expression> valuesRecompute = new HashMap<>();
         if (nanColor != null) {
-            valuesRecompute.put(new DefaultLiteral<Double>(Double.NaN), new DefaultLiteral<Color>(Color.decode(nanColor)));
+            values.put(new DefaultLiteral<Double>(Double.NaN),
+                    new DefaultLiteral<Color>(Color.decode(nanColor)));
         }
-
-        if (min != null && max != null) {
-            valuesRecompute.put(StyleConstants.CATEGORIZE_LESS_INFINITY, new DefaultLiteral<Color>(categorize.evaluate(min, Color.class)));
-            double coefficient = max - min;
-            if (interval != null) {
-                if (coefficient != 1) {
-                    coefficient = coefficient / (interval - 1);
-                }
-                // Loop to create values with new point evaluation
-                for (int i = 0; i < interval; i++) {
-                    double val = min + (coefficient * i);
-                    Color color = categorize.evaluate(val, Color.class);
-                    valuesRecompute.put(new DefaultLiteral<Double>(val), new DefaultLiteral<Color>(color));
-                }
-            }
+        values.put(StyleConstants.CATEGORIZE_LESS_INFINITY,
+                new DefaultLiteral<Color>(Color.GRAY));
+        for (final InterpolationPoint ip : points) {
+            values.put(new DefaultLiteral<Double>(ip.getData().doubleValue()),
+                    new DefaultLiteral<String>(ip.getColor()));
         }
-
-        return SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, valuesRecompute, ThreshholdsBelongTo.PRECEDING, StyleConstants.DEFAULT_FALLBACK);
+        return SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP,
+                values,
+                ThreshholdsBelongTo.PRECEDING,
+                StyleConstants.DEFAULT_FALLBACK);
 
     }
 }

@@ -25,7 +25,7 @@ import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,30 +40,32 @@ import static org.constellation.json.util.StyleUtilities.listType;
  */
 public final class Interpolate implements Function {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private List<InterpolationPoint> points = new ArrayList<InterpolationPoint>();
+    private List<InterpolationPoint> points = new ArrayList<InterpolationPoint>();
 
-	private Double interval;
-	
-	private String nanColor;
-	
+    private Double interval;
+
+    private String nanColor;
+
     public Interpolate() {
     }
 
     public Interpolate(final org.geotoolkit.style.function.Interpolate interpolate) {
         ensureNonNull("interpolate", interpolate);
-        if(interpolate.getInterpolationPoints() != null){
+        if (interpolate.getInterpolationPoints() != null) {
             for (final org.geotoolkit.style.function.InterpolationPoint point : interpolate.getInterpolationPoints()) {
                 this.points.add(new InterpolationPoint(point));
-                if(nanColor == null && point.getData() instanceof Double && Double.isNaN((double) point.getData())){
-                    if(point.getValue() instanceof DefaultLiteral){
-                        final Object colorHex = ((DefaultLiteral)point.getValue()).getValue();
-                        nanColor = StyleUtilities.toHex(((Color)colorHex));
+                if (nanColor == null &&
+                        point.getData() instanceof Double &&
+                        Double.isNaN((double) point.getData())) {
+                    if (point.getValue() instanceof DefaultLiteral) {
+                        final Object colorHex = ((DefaultLiteral) point.getValue()).getValue();
+                        nanColor = StyleUtilities.toHex(((Color) colorHex));
                     }
                 }
             }
-            this.interval = (double)interpolate.getInterpolationPoints().size();
+            this.interval = (double) interpolate.getInterpolationPoints().size();
         }
     }
 
@@ -75,79 +77,46 @@ public final class Interpolate implements Function {
         this.points = points;
     }
 
-        
-    public double getInterval() {
-		return interval;
-	}
 
-	public void setInterval(Double interval) {
-		this.interval = interval;
-	}
-	
+    public double getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Double interval) {
+        this.interval = interval;
+    }
+
 
     public String getNanColor() {
-		return nanColor;
-	}
+        return nanColor;
+    }
 
-	public void setNanColor(String nanColor) {
-		this.nanColor = nanColor;
-	}
+    public void setNanColor(String nanColor) {
+        this.nanColor = nanColor;
+    }
 
-	public org.opengis.filter.expression.Function toType() {
+    public org.opengis.filter.expression.Function toType() {
 
         //remove nan point if exists because it is added later, and it cause error for max/min values
         final List<InterpolationPoint> nullPoints = new ArrayList<>();
         for (final InterpolationPoint ip : points) {
-            if(ip.getData() == null){
+            if (ip.getData() == null) {
                 nullPoints.add(ip);
             }
         }
         points.removeAll(nullPoints);
-
-        final org.geotoolkit.style.function.Interpolate inter =  SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(points), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
-        
-        Double min = null, max= null;
-        
-        // Iteration to find min and max values
-        for (final InterpolationPoint ip : points) {
-            if(min==null && max==null){
-				min = ip.getData().doubleValue();
-				max = ip.getData().doubleValue();
-			}
-			min = Math.min(min,ip.getData().doubleValue());
-			max = Math.max(max,ip.getData().doubleValue());
-		}
-        
-        //init final InterpolationPoint list and coefficient
-        final List<InterpolationPoint> recomputePoints = new ArrayList<>();
-
-        if(nanColor !=null){
+        if (nanColor != null) {
             final InterpolationPoint nanPoint = new InterpolationPoint();
             nanPoint.setColor(nanColor);
             nanPoint.setData(Double.NaN);
-            recomputePoints.add(nanPoint);
+            points.add(nanPoint);
         }
+        return SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP,
+                listType(points),
+                Method.COLOR,
+                Mode.LINEAR,
+                StyleConstants.DEFAULT_FALLBACK);
 
-        if(max !=null && min != null){
-            double coefficient = max-min;
-            if(interval!=null){
-                if(coefficient!=1){
-                    coefficient = coefficient/(interval-1);
-                }
-                // Loop to create points with new point evaluation
-                for (int i = 0; i < interval; i++) {
-                    final double val = min + (coefficient * i);
-                    final Color color = inter.evaluate(val, Color.class);
-                    final InterpolationPoint point = new InterpolationPoint();
-                    point.setColor(StyleUtilities.toHex((color)));
-                    point.setData(val);
-                    recomputePoints.add(point);
-                }
-            }
-        }
-        
-        return SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(recomputePoints), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
-        
     }
 
 }
