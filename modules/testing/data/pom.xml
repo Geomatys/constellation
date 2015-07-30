@@ -79,6 +79,7 @@
       <groupId>org.apache.sis.core</groupId>
       <artifactId>sis-utility</artifactId>
       <type>test-jar</type>
+      <scope>compile</scope>
       <version>${sis.version}</version>
     </dependency>
     <dependency>
