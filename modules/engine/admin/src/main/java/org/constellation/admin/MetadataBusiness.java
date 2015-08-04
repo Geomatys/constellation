@@ -661,7 +661,9 @@ public class MetadataBusiness implements IMetadataBusiness {
                         configurer.removeFromIndex(service.getIdentifier(), identifierToRemove);
                         configurer.addToIndex(service.getIdentifier(), identifierToUpdate);
                         final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", service.getIdentifier());
-                        worker.refresh();
+                        if (worker != null) {
+                            worker.refresh();
+                        }
                     }
                 }
             }
