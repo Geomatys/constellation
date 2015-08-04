@@ -71,7 +71,9 @@ public class AddMetadaProcess extends AbstractCstlProcess {
             configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
             if (refresh) {
                 final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", serviceID);
-                worker.refresh();
+                if (worker != null) {
+                    worker.refresh();
+                }
             }
         } catch (ConfigurationException | CstlServiceException ex) {
             throw new ProcessException(null, this, ex);
