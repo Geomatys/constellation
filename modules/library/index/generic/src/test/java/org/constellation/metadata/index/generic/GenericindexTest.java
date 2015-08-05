@@ -68,6 +68,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.util.XpathUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -252,7 +253,51 @@ public class GenericindexTest {
         expectedResult.add("40510_145_19930221211500");
 
         assertEquals(expectedResult, result);
+        
+         /**
+         * Test 7 simple search: TopicCategory = oceans
+         */
+        spatialQuery = new SpatialQuery("TopicCategory:\"oceans\"", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "SimpleSearch 7:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("CTDF02");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
+
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 8 simple search: TopicCategory = environment
+         */
+        spatialQuery = new SpatialQuery("TopicCategory:\"environment\"", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "SimpleSearch 8:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<>();
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
+
+        assertEquals(expectedResult, result);
     }
+    
 
      /**
      * Test simple lucene search.
@@ -1049,6 +1094,20 @@ public class GenericindexTest {
         List<Object> result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
         assertEquals(Arrays.asList("20081101000000"), result);
     }
+    
+    @Test
+    @Order(order = 11)
+    public void extractValuesTest3() throws Exception {
+        Unmarshaller unmarshaller  = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+        DefaultMetadata meta4      = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
+        
+        List<String> paths  = XpathUtils.xpathToMDPath(Arrays.asList("/gmd:MD_Metadata/gmd:identificationInfo/*/gmd:topicCategory/gmd:MD_TopicCategoryCode"));
+        List<Object> result = GenericIndexer.extractValues(meta4, paths);
+        assertEquals(Arrays.asList("ENVIRONMENT"), result);
+        
+        CSWMarshallerPool.getInstance().recycle(unmarshaller);
+    }
+    
 
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result = new ArrayList<>();

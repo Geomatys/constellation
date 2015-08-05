@@ -245,6 +245,49 @@ public class GenericNodeindexTest {
         expectedResult.add("40510_145_19930221211500");
 
         assertEquals(expectedResult, result);
+        
+         /**
+         * Test 7 simple search: TopicCategory = oceans
+         */
+        spatialQuery = new SpatialQuery("TopicCategory:\"oceans\"", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "SimpleSearch 7:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("CTDF02");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        expectedResult.add("meta_NaN_id");
+
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 8 simple search: TopicCategory = environment
+         */
+        spatialQuery = new SpatialQuery("TopicCategory:\"environment\"", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "SimpleSearch 8:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<>();
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
+
+        assertEquals(expectedResult, result);
     }
 
      /**
@@ -1018,6 +1061,16 @@ public class GenericNodeindexTest {
         meta4.setIdentificationInfo(Arrays.asList(ident4));
         List<Object> result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
         assertEquals(Arrays.asList("20081101000000"), result);*/
+    }
+    
+    @Test
+    @Order(order = 11)
+    public void extractValuesTest3() throws Exception {
+        Node n = getOriginalMetadata("org/constellation/xml/metadata/meta7.xml");
+        
+        List<Object> result = NodeUtilities.extractValues(n, CSWQueryable.ISO_QUERYABLE.get("TopicCategory"));
+        assertEquals(Arrays.asList("environment"), result);
+        
     }
 
     public static List<Node> fillTestData() throws Exception {

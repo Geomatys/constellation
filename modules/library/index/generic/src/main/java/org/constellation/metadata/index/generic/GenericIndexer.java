@@ -449,6 +449,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 result.add(Util.LUCENE_DATE_FORMAT.format((Date)obj));
             }
 
+        } else if (obj instanceof Enum) {
+            result.add(((Enum)obj).name());
+
         } else {
             throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
         }
