@@ -490,6 +490,20 @@ public final class ReflectionUtilities {
                 occurenceType++;
             }
         }
+        
+        // look for private method
+        if (getter == null) {
+            Class superC = rootClass;
+            while (superC != null) {
+                try { getter = superC.getDeclaredMethod(methodName);} catch (NoSuchMethodException ex) {}
+                if (getter == null) {
+                    superC = superC.getSuperclass();
+                } else {
+                    getter.setAccessible(true);
+                    break;
+                }
+            }
+        }
         return getter;
     }
 
