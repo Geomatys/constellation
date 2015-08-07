@@ -58,6 +58,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
@@ -73,6 +76,8 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
+import org.geotoolkit.image.jai.Registry;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import org.junit.AfterClass;
@@ -187,6 +192,19 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
                 // Default instanciation of the worker' servlet context and uri context.
                 WORKER.setServiceUrl("http://localhost:9090");
                 initialized = true;
+                
+                WorldFileImageReader.Spi.registerDefaults(null);
+
+                //reset values, only allow pure java readers
+                for(String jn : ImageIO.getReaderFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+                }
+
+                //reset values, only allow pure java writers
+                for(String jn : ImageIO.getWriterFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+                }
+                
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
