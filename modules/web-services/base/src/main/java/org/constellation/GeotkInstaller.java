@@ -22,10 +22,12 @@ import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.internal.io.Installation;
 import org.geotoolkit.lang.Setup;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,7 +67,15 @@ public final class GeotkInstaller implements ServletContextListener{
                 throw new AssertionError(e);
             }
 
-            Setup.initialize(null);
+            final Properties properties = new Properties();
+            properties.put("platform", "server");
+            Setup.initialize(properties);
+
+            //Removal of jul log handlers.
+            if (!SLF4JBridgeHandler.isInstalled()) {
+                SLF4JBridgeHandler.removeHandlersForRootLogger();
+                SLF4JBridgeHandler.install();
+            }
 
             try {
                 Class.forName("javax.media.jai.JAI");
