@@ -58,14 +58,6 @@ public class MDCFilter implements Filter {
     private String servletPath;
 
     /**
-     * Removal of jul log handlers.
-     */
-    static {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
-
-    /**
      * Init filter configuration to match the proper URL (/WS/* by default).
      */
     @Override

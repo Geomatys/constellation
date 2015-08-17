@@ -41,8 +41,8 @@
       <key>ogcServicePath</key>
       <defaultValue>unknown</defaultValue>
     </discriminator>
-    <sift>
 
+    <sift>
       <appender name="BY_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${cstl.log.dir}/${ogcServicePath}-service.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -63,6 +63,7 @@
 
   <logger name="org.constellation" level="INFO" />
   <logger name="org.geotoolkit" level="INFO" />
+  <logger name="org.jooq" level="WARN" />
 
   <root level="WARN">
     <appender-ref ref="STDOUT" />
