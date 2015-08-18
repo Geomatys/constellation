@@ -533,6 +533,7 @@ public class StyleBusiness implements IStyleBusiness {
         final Style s = styleRepository.findByNameAndProvider(provider.getId(), styleName);
         if (s != null) {
             s.setBody(sw.toString());
+            s.setType(getTypeFromMutableStyle(style));
             return styleRepository.save(s);
         } else {
             Integer userId = userRepository.findOne(securityManager.getCurrentUserLogin()).transform(new com.google.common.base.Function<CstlUser, Integer>() {
