@@ -1813,7 +1813,8 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         //show palette
                         style.paletteStyle({provider: 'sld_temp',
                                             name : $scope.newStyle.name,
-                                            ruleName : $scope.optionsSLD.selectedRule.name},
+                                            ruleName : $scope.optionsSLD.selectedRule.name,
+                                            interval : $scope.optionsSLD.rasterPalette.palette.intervalsCount},
                             function(response) {
                                 if(response.points){
                                     $scope.optionsSLD.selectedRule.symbolizers[0].colorMap.function.points = response.points;

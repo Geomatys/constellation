@@ -194,21 +194,24 @@ public final class StyleRest {
      * @see StyleBusiness#getFunctionColorMap(String, String, String)
      */
     @GET
-    @Path("{id}/style/{styleId}/{ruleName}")
-    public Response getPaletteStyle(@PathParam("id") String id, @PathParam("styleId") String styleId, @PathParam("ruleName") String ruleName) throws Exception{
-    	Function function = styleBusiness.getFunctionColorMap(id, styleId, ruleName);
-    	if(function instanceof Categorize){
+    @Path("{id}/style/{styleId}/{ruleName}/{interval}")
+    public Response getPaletteStyle(@PathParam("id") String id,
+                                    @PathParam("styleId") String styleId,
+                                    @PathParam("ruleName") String ruleName,
+                                    @PathParam("interval") Integer interval) throws Exception{
+        Function function = styleBusiness.getFunctionColorMap(id, styleId, ruleName);
+        if(function instanceof Categorize){
             final Categorize categ = (Categorize) function;
             final org.constellation.json.binding.Categorize categorize = new org.constellation.json.binding.Categorize(categ);
-            final List<InterpolationPoint> points = categorize.getPoints();
-    		return ok(new RepartitionDTO(points));
-    	}else if(function instanceof Interpolate){
+            final List<InterpolationPoint> points = categorize.reComputePoints(interval);
+            return ok(new RepartitionDTO(points));
+        }else if(function instanceof Interpolate){
             final Interpolate interpolateFunc = (Interpolate) function;
             final org.constellation.json.binding.Interpolate interpolate =new org.constellation.json.binding.Interpolate(interpolateFunc);
-            final List<InterpolationPoint> points = interpolate.getPoints();
-    		return ok(new RepartitionDTO(points));
-    	}
-    	return ok(new AcknowlegementType("Failure", "cannot get interpolation palette because the function of colormap is unrecognized."));
+            final List<InterpolationPoint> points = interpolate.reComputePoints(interval);
+            return ok(new RepartitionDTO(points));
+        }
+        return ok(new AcknowlegementType("Failure", "cannot get interpolation palette because the function of colormap is unrecognized."));
     }
 
     /**

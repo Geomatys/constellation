@@ -262,17 +262,17 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         return $resource('@cstl/api/1/SP/:provider/style/available;jsessionid=', {}, {
 
             'listAll':                  {method: 'GET',    isArray: true },
-            'get':                      {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
-            'createjson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
-            'updatejson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},
-            'delete':                   {method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
-            'link':                     {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
-            'unlink':                   {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
-            'generateAutoIntervalStyle':{method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoInterval;jsessionid='},
-            'generateAutoUniqueStyle':  {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoUnique;jsessionid='},
-            'getChartDataJson':         {method: 'POST',   url: '@cstl/api/1/SP/getChartDataJson;jsessionid='},
-            'paletteStyle':             {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid='},
-            'statistics':               {method: 'POST',   url: '@cstl/api/1/SP/statistics;jsessionid='}
+            'get':                      {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name'},
+            'createjson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create'},
+            'updatejson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update'},
+            'delete':                   {method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name'},
+            'link':                     {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData'},
+            'unlink':                   {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData'},
+            'generateAutoIntervalStyle':{method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'},
+            'generateAutoUniqueStyle':  {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'},
+            'getChartDataJson':         {method: 'POST',   url: '@cstl/api/1/SP/getChartDataJson'},
+            'paletteStyle':             {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName/:interval'},
+            'statistics':               {method: 'POST',   url: '@cstl/api/1/SP/statistics'}
         });
     })
 
