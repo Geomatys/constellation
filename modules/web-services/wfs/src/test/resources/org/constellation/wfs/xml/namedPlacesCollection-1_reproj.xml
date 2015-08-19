@@ -2,8 +2,8 @@
 <wfs:FeatureCollection gml:id="id" numberOfFeatures="2" timeStamp="" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582">
-            <gml:lowerCorner>250685.50549803657 -3541133.4007908404</gml:lowerCorner>
-            <gml:upperCorner>251219.3300443582 -3540716.186112495</gml:upperCorner>
+            <gml:lowerCorner>250685.5054980364 -3541133.400790846</gml:lowerCorner>
+            <gml:upperCorner>251219.33004435804 -3540716.1861125007</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
@@ -14,7 +14,7 @@
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582">
                             <gml:exterior>
                                 <gml:LinearRing>
-                                    <gml:posList>251209.63301375904 -3541050.5913909804 251219.3300443582 -3540724.1764852703 250950.4672208384 -3540716.186112495 250938.11598495784 -3541131.624557527 250997.86537744408 -3541133.4007908404 251209.63301375904 -3541050.5913909804</gml:posList>
+                                    <gml:posList>251209.63301375887 -3541050.591390986 251219.33004435804 -3540724.176485276 250950.4672208383 -3540716.1861125007 250938.11598495778 -3541131.6245575305 250997.8653774439 -3541133.400790846 251209.63301375887 -3541050.591390986</gml:posList>
                                 </gml:LinearRing>
                             </gml:exterior>
                         </gml:Polygon>
@@ -33,7 +33,7 @@
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:7.9:27582">
                             <gml:exterior>
                                 <gml:LinearRing>
-                                    <gml:posList>250685.50549803657 -3541079.560237253 250760.19190888596 -3541081.7820883207 250763.72267679335 -3540963.084393669 250689.0370210139 -3540960.8625650574 250685.50549803657 -3541079.560237253</gml:posList>
+                                    <gml:posList>250685.5054980364 -3541079.5602372587 250760.19190888584 -3541081.7820883226 250763.7226767933 -3540963.0843936726 250689.0370210138 -3540960.862565059 250685.5054980364 -3541079.5602372587</gml:posList>
                                 </gml:LinearRing>
                             </gml:exterior>
                         </gml:Polygon>
