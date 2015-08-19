@@ -77,6 +77,62 @@ public final class Interpolate implements Function {
         this.points = points;
     }
 
+    /**
+     * Calculate points for palette and return the list of interpolation points.
+     * @return {@code List<InterpolationPoint>}
+     */
+    public List<InterpolationPoint> reComputePoints(final Integer nbPoints) {
+        //remove nan point if exists because it is added later, and it cause error for max/min values
+        final List<InterpolationPoint> nullPoints = new ArrayList<>();
+        for (final InterpolationPoint ip : points) {
+            if(ip.getData() == null){
+                nullPoints.add(ip);
+            }
+        }
+        points.removeAll(nullPoints);
+        final org.geotoolkit.style.function.Interpolate inter =  SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP,
+                listType(points),
+                Method.COLOR,
+                Mode.LINEAR,
+                StyleConstants.DEFAULT_FALLBACK);
+        Double min = null, max= null;
+        // Iteration to find min and max values
+        for (final InterpolationPoint ip : points) {
+            if(min==null && max==null){
+                min = ip.getData().doubleValue();
+                max = ip.getData().doubleValue();
+            }
+            min = Math.min(min,ip.getData().doubleValue());
+            max = Math.max(max,ip.getData().doubleValue());
+        }
+        //init final InterpolationPoint list and coefficient
+        final List<InterpolationPoint> recomputePoints = new ArrayList<>();
+        if(nanColor !=null){
+            final InterpolationPoint nanPoint = new InterpolationPoint();
+            nanPoint.setColor(nanColor);
+            nanPoint.setData(Double.NaN);
+            recomputePoints.add(nanPoint);
+        }
+        if(max !=null && min != null){
+            double coefficient = max-min;
+            if(nbPoints!=null){
+                if(coefficient!=1){
+                    coefficient = coefficient/(nbPoints-1);
+                }
+                // Loop to create points with new point evaluation
+                for (int i = 0; i < nbPoints; i++) {
+                    final double val = min + (coefficient * i);
+                    final Color color = inter.evaluate(val, Color.class);
+                    final InterpolationPoint point = new InterpolationPoint();
+                    point.setColor(StyleUtilities.toHex(color));
+                    point.setData(val);
+                    recomputePoints.add(point);
+                }
+            }
+        }
+        return recomputePoints;
+    }
+
 
     public double getInterval() {
         return interval;

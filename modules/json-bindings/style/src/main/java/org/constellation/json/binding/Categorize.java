@@ -25,9 +25,12 @@ import org.geotoolkit.filter.DefaultLiteral;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.ThreshholdsBelongTo;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +97,76 @@ public class Categorize implements Function {
         this.points = points;
     }
 
+    public List<InterpolationPoint> reComputePoints(final Integer nbPoints) {
+        //remove nan point if exists because it is added later, and it cause error for max/min values
+        final List<InterpolationPoint> nullPoints = new ArrayList<>();
+        for (final InterpolationPoint ip : points) {
+            if (ip.getData() == null) {
+                nullPoints.add(ip);
+            }
+        }
+        points.removeAll(nullPoints);
+        final Map<Expression, Expression> values = new HashMap<>();
+        values.put(StyleConstants.CATEGORIZE_LESS_INFINITY, new DefaultLiteral<Color>(Color.GRAY));
+        for (final InterpolationPoint ip : points) {
+            values.put(new DefaultLiteral<Double>(ip.getData().doubleValue()),
+                       new DefaultLiteral<String>(ip.getColor()));
+        }
+        final org.geotoolkit.style.function.Categorize categorize = SF.categorizeFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP,
+                values,
+                ThreshholdsBelongTo.PRECEDING,
+                StyleConstants.DEFAULT_FALLBACK);
+
+        // Iteration to find min and max values
+        Double min = null, max = null;
+        for (final InterpolationPoint ip : points) {
+            if (min == null && max == null) {
+                min = ip.getData().doubleValue();
+                max = ip.getData().doubleValue();
+            }
+            min = Math.min(min, ip.getData().doubleValue());
+            max = Math.max(max, ip.getData().doubleValue());
+        }
+
+        //init final threshold map and coefficient
+        final Map<Expression, Expression> valuesRecompute = new HashMap<>();
+        if (nanColor != null) {
+            valuesRecompute.put(new DefaultLiteral<Double>(Double.NaN),
+                                new DefaultLiteral<Color>(Color.decode(nanColor)));
+        }
+
+        if (min != null && max != null) {
+            double coefficient = max - min;
+            if (nbPoints != null) {
+                if (coefficient != 1) {
+                    coefficient = coefficient / (nbPoints - 1);
+                }
+                // Loop to create values with new point evaluation
+                for (int i = 0; i < nbPoints; i++) {
+                    double val = min + (coefficient * i);
+                    Color color = categorize.evaluate(val, Color.class);
+                    valuesRecompute.put(new DefaultLiteral<Double>(val), new DefaultLiteral<Color>(color));
+                }
+            }
+        }
+
+        final List<InterpolationPoint> recomputePoints = new ArrayList<>();
+        for(final Map.Entry<Expression,Expression> entry : valuesRecompute.entrySet()) {
+            final Literal value = (Literal)entry.getKey();
+            final Literal color = (Literal)entry.getValue();
+
+            final Color colorObj = (Color) color.getValue();
+            final Double valueObj = (Double) value.getValue();
+            final InterpolationPoint point = new InterpolationPoint();
+            point.setColor(StyleUtilities.toHex(colorObj));
+            point.setData(valueObj);
+            recomputePoints.add(point);
+        }
+        //sort recomputePoints
+        Collections.sort(recomputePoints,new InterpolationPointComparator());
+        return recomputePoints;
+    }
+
     public double getInterval() {
         return interval;
     }
@@ -125,10 +198,9 @@ public class Categorize implements Function {
         Map<Expression, Expression> values = new HashMap<>(0);
         if (nanColor != null) {
             values.put(new DefaultLiteral<Double>(Double.NaN),
-                    new DefaultLiteral<Color>(Color.decode(nanColor)));
+                    new DefaultLiteral<String>(nanColor));
         }
-        values.put(StyleConstants.CATEGORIZE_LESS_INFINITY,
-                new DefaultLiteral<Color>(Color.GRAY));
+        values.put(StyleConstants.CATEGORIZE_LESS_INFINITY,new DefaultLiteral<String>("#00ffffff"));
         for (final InterpolationPoint ip : points) {
             values.put(new DefaultLiteral<Double>(ip.getData().doubleValue()),
                     new DefaultLiteral<String>(ip.getColor()));
@@ -138,5 +210,12 @@ public class Categorize implements Function {
                 ThreshholdsBelongTo.PRECEDING,
                 StyleConstants.DEFAULT_FALLBACK);
 
+    }
+
+    private static class InterpolationPointComparator implements Comparator<InterpolationPoint> {
+        @Override
+        public int compare(InterpolationPoint o1, InterpolationPoint o2) {
+            return Double.compare((Double)o1.getData(), (Double)o2.getData());
+        }
     }
 }
