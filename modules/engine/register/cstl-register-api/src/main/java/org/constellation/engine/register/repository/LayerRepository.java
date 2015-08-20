@@ -60,7 +60,25 @@ public interface LayerRepository {
 
     void updateLayerTitle(LayerSummary layerId);
 
+    /**
+     * Retrieve all layers linked to a given style id.
+     *
+     * @param styleId style id candidate
+     * @return list of {@link Layer}
+     */
     List<Layer> getLayersByLinkedStyle(final int styleId);
+
+    /**
+     * Retrieve all layer reference linked to a given style id.
+     * Output Layer object only contain fields :
+     * <ul>
+     *     <li>id</li>
+     *     <li>name</li>
+     * </ul>
+     * @param styleId style id candidate
+     * @return list of lighten {@link Layer}
+     */
+    List<Layer> getLayersRefsByLinkedStyle(final int styleId);
 
     int getDataSet(String layer);
 }

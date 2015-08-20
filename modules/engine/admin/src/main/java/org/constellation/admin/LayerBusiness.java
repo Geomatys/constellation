@@ -41,7 +41,6 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerSummary;
-import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
@@ -238,6 +237,25 @@ public class LayerBusiness implements ILayerBusiness {
         return layerRepository.getLayersByLinkedStyle(styleId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<LayerSummary> getLayerRefFromStyleId(final Integer styleId) {
+        final List<LayerSummary> sumLayers = new ArrayList<>();
+        final List<Layer> layers = layerRepository.getLayersRefsByLinkedStyle(styleId);
+        for(final Layer lay : layers) {
+            final LayerSummary layerSummary = new LayerSummary();
+            layerSummary.setId(lay.getId());
+            layerSummary.setName(lay.getName());
+            sumLayers.add(layerSummary);
+        }
+        return sumLayers;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<LayerSummary> getLayerSummaryFromStyleId(final Integer styleId) {
         final List<LayerSummary> sumLayers = new ArrayList<>();
@@ -257,19 +275,6 @@ public class LayerBusiness implements ILayerBusiness {
             layerSummary.setDate(new Date(lay.getDate()));
             layerSummary.setOwner(db.getOwner());
             layerSummary.setProvider(db.getProvider());
-            final List<Style> styles = styleRepository.findByLayer(lay);
-            final List<StyleBrief> styleBriefs = new ArrayList<>();
-            if(styles!=null) {
-                for (final Style style : styles) {
-                    final Provider styleProv = providerRepository.findOne(style.getProvider());
-                    final StyleBrief sb = new StyleBrief();
-                    sb.setProvider(styleProv.getIdentifier());
-                    sb.setName(style.getName());
-                    sb.setTitle(style.getName());
-                    styleBriefs.add(sb);
-                }
-            }
-            layerSummary.setTargetStyle(styleBriefs);
             sumLayers.add(layerSummary);
         }
         return sumLayers;

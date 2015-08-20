@@ -230,6 +230,23 @@ public interface IDataBusiness {
      */
     List<DataBrief> getDataBriefsFromStyleId(final Integer styleId);
 
+    /**
+     * Returns a list of light {@link DataBrief} for given style id.
+     * Output DataBrief contain only :
+     * <ul>
+     *     <li>id</li>
+     *     <li>name</li>
+     *     <li>namespace</li>
+     *     <li>provider</li>
+     *     <li>type</li>
+     *     <li>subtype</li>
+     * </ul>
+     *
+     * @param styleId the given style id.
+     * @return the list of light {@link DataBrief}.
+     */
+    List<DataBrief> getDataRefsFromStyleId(final Integer styleId);
+
     ParameterValues getVectorDataColumns(int id) throws DataStoreException;
 
     /**

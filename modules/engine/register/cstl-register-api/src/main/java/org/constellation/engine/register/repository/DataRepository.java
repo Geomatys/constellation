@@ -83,7 +83,31 @@ public interface DataRepository {
      */
     void removeLinkedData(final int dataId);
 
-    List<Data> getDataByLinkedStyle(final int styleId);
+    /**
+     * Retrieve all Data linked to given style id.
+     * Returned data objects are complete (view of Data table)
+     *
+     * @param styleId style id candidate
+     * @return a list of full {@link Data}
+     */
+    List<Data> getFullDataByLinkedStyle(final int styleId);
+
+    /**
+     * Retrieve all Data linked to given style id.
+     * Returned data objects are lighten view of Data table with only :
+     * <ul>
+     *     <li>id</li>
+     *     <li>name</li>
+     *     <li>namespace</li>
+     *     <li>provider</li>
+     *     <li>type</li>
+     *     <li>subtype</li>
+     * </ul>
+     *
+     * @param styleId style id candidate
+     * @return a list of full {@link Data}
+     */
+    List<Data> getRefDataByLinkedStyle(final int styleId);
 
     boolean existsById(int dataId);
 

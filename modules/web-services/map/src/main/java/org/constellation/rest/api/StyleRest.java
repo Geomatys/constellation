@@ -570,14 +570,9 @@ public final class StyleRest {
      */
     @GET
     @Path("{id}/style/available")
+    @Produces("application/json")
     public Response getAvailableStyles(final @PathParam("id") String id) throws Exception {
-        final List<StyleBrief> briefsList = styleBusiness.getAvailableStyles(id, null);
-        for(final StyleBrief sb : briefsList) {
-            //set linked layers
-            final List<LayerSummary> layersList = layerBusiness.getLayerSummaryFromStyleId(sb.getId());
-            sb.setLayersList(layersList);
-        }
-        return ok(briefsList);
+        return ok(styleBusiness.getAvailableStyles(id, null));
     }
 
     /**

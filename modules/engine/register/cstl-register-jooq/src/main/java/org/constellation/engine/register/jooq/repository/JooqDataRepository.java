@@ -82,6 +82,16 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
             countSensors(DATA.ID).asField("sensor_count"),
             selectConformPyramidProviderIdentifier(DATA.ID).asField("pyramid_provider_identifier")};
 
+    /**
+     * Field list use to return a lighten reference to Data object
+     */
+    public static final Field[] REF_FIELDS = new Field[]{
+            DATA.ID,
+            DATA.NAMESPACE,
+            DATA.NAME,
+            DATA.TYPE,
+            DATA.SUBTYPE,
+            DATA.PROVIDER};
 
     public JooqDataRepository() {
         super(Data.class, DATA);
@@ -299,9 +309,22 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         dsl.delete(DATA_X_DATA).where(DATA_X_DATA.DATA_ID.eq(dataId)).execute();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<Data> getDataByLinkedStyle(final int styleId) {
+    public List<Data> getFullDataByLinkedStyle(final int styleId) {
         return dsl.select(DATA.fields()).from(DATA)
+                .join(STYLED_DATA).onKey(STYLED_DATA.DATA)
+                .where(STYLED_DATA.STYLE.eq(styleId)).fetchInto(Data.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Data> getRefDataByLinkedStyle(final int styleId) {
+        return dsl.select(REF_FIELDS).from(DATA)
                 .join(STYLED_DATA).onKey(STYLED_DATA.DATA)
                 .where(STYLED_DATA.STYLE.eq(styleId)).fetchInto(Data.class);
     }

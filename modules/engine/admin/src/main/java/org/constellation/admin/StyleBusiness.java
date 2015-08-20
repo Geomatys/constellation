@@ -23,12 +23,9 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
+import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IStyleBusiness;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.configuration.StyleReport;
-import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.configuration.*;
 import org.constellation.dto.StyleBean;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
 import org.constellation.engine.register.jooq.tables.pojos.Data;
@@ -115,6 +112,9 @@ public class StyleBusiness implements IStyleBusiness {
 
     @Inject
     private IDataBusiness dataBusiness;
+
+    @Inject
+    private ILayerBusiness layerBusiness;
 
     @Inject
     private org.constellation.security.SecurityManager securityManager;
@@ -286,9 +286,13 @@ public class StyleBusiness implements IStyleBusiness {
                 }
             }
             bean.setDate(new Date(style.getDate()));
-            //get linked data
-            final List<DataBrief> dataList = dataBusiness.getDataBriefsFromStyleId(styleId);
+            //get linked data references
+            final List<DataBrief> dataList = dataBusiness.getDataRefsFromStyleId(styleId);
             bean.setDataList(dataList);
+
+            // get linked layers references
+            final List<LayerSummary> layersList = layerBusiness.getLayerSummaryFromStyleId(styleId);
+            bean.setLayersList(layersList);
             beans.add(bean);
         }
         return beans;
