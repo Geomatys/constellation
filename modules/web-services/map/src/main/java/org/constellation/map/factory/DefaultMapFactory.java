@@ -19,8 +19,9 @@
 package org.constellation.map.factory;
 
 import org.constellation.configuration.DataSourceType;
-import org.constellation.map.security.LayerSecurityFilter;
+import org.constellation.ws.LayerSecurityFilter;
 import org.constellation.map.security.NoLayerSecurityFilter;
+import org.constellation.ws.MapFactory;
 
 /**
  *

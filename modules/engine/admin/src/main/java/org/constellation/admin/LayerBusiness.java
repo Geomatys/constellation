@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.map.configuration;
+package org.constellation.admin;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -33,6 +33,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import com.google.common.base.Optional;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -57,8 +58,8 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.map.factory.MapFactory;
-import org.constellation.map.security.LayerSecurityFilter;
+import org.constellation.ws.MapFactory;
+import org.constellation.ws.LayerSecurityFilter;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
@@ -68,7 +69,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
 
 /**
  *
