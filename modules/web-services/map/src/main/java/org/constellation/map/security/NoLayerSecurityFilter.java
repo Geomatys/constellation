@@ -18,6 +18,8 @@
  */
 package org.constellation.map.security;
 
+import org.constellation.ws.LayerSecurityFilter;
+
 import javax.xml.namespace.QName;
 
 /**

@@ -21,6 +21,7 @@ package org.constellation.business;
 import java.util.List;
 
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerSummary;
 import org.constellation.dto.AddLayer;
@@ -48,6 +49,30 @@ public interface ILayerBusiness {
 
     List<org.constellation.engine.register.jooq.tables.pojos.Layer> findByStyleId(final Integer styleId);
 
+    /**
+     * Return all layer mapped in {@link LayerSummary} using given style.
+     * Returned {@link LayerSummary} will not have {@code targetStyle} field filled.
+     *
+     * @param styleId
+     * @return list of {@link LayerSummary} without {@code targetStyle} field
+     */
     List<LayerSummary> getLayerSummaryFromStyleId(final Integer styleId);
+
+    /**
+     * Returns a list of light {@link LayerSummary} for given style id.
+     * Output LayerSummary contain only :
+     * <ul>
+     *     <li>id</li>
+     *     <li>name</li>
+     *     <li>namespace</li>
+     *     <li>provider</li>
+     *     <li>type</li>
+     *     <li>subtype</li>
+     * </ul>
+     *
+     * @param styleId the given style id.
+     * @return the list of light {@link DataBrief}.
+     */
+    List<LayerSummary> getLayerRefFromStyleId(final Integer styleId);
 
 }

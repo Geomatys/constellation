@@ -278,7 +278,7 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     public DataBrief getDataBrief(QName dataName,Integer providerId) throws ConstellationException {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderId(dataName.getLocalPart(),dataName.getNamespaceURI(), providerId);
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderId(dataName.getLocalPart(), dataName.getNamespaceURI(), providerId);
         final List<Data> datas = new ArrayList<>();
         datas.add(data);
         final List<DataBrief> dataBriefs = getDataBriefFrom(datas);
@@ -353,7 +353,7 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     public List<Data> findByStyleId(final Integer styleId) {
-        return dataRepository.getDataByLinkedStyle(styleId);
+        return dataRepository.getFullDataByLinkedStyle(styleId);
     }
 
     /**
@@ -361,9 +361,25 @@ public class DataBusiness implements IDataBusiness {
      */
     @Override
     public List<DataBrief> getDataBriefsFromStyleId(final Integer styleId) {
-        final List<Data> dataList = findByStyleId(styleId);
-        return getDataBriefFrom(dataList);
+        final List<Data> dataList = dataRepository.getRefDataByLinkedStyle(styleId);
+        if (dataList != null) {
+            return getDataBriefFrom(dataList);
+        }
+        return new ArrayList<>();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DataBrief> getDataRefsFromStyleId(final Integer styleId) {
+        final List<Data> dataList = dataRepository.getRefDataByLinkedStyle(styleId);
+        if (dataList != null) {
+            return toDataRef(dataList);
+        }
+        return new ArrayList<>();
+    }
+
 
     /**
      * Returns a list of {@link Data} for given metadata identifier.
@@ -383,6 +399,36 @@ public class DataBusiness implements IDataBusiness {
             dataResult.add(data);
         }
         return dataResult;
+    }
+
+    /**
+     * Convert a Data to DataBrief using only fields :
+     * <ul>
+     *     <li>id</li>
+     *     <li>name</li>
+     *     <li>namespace</li>
+     *     <li>provider</li>
+     *     <li>type</li>
+     *     <li>subtype</li>
+     * </ul>
+     * @param dataList data to convert
+     * @return
+     */
+    protected List<DataBrief> toDataRef(List<Data> dataList) {
+        final List<DataBrief> dataBriefs = new ArrayList<>();
+
+        for (final Data data : dataList) {
+            final String providerId = getProviderIdentifier(data.getProvider());
+            final DataBrief db = new DataBrief();
+            db.setId(data.getId());
+            db.setName(data.getName());
+            db.setNamespace(data.getNamespace());
+            db.setProvider(providerId);
+            db.setType(data.getType());
+            db.setSubtype(data.getSubtype());
+            dataBriefs.add(db);
+        }
+        return dataBriefs;
     }
 
     /**

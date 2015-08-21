@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.map.configuration;
+package org.constellation.admin;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -33,6 +33,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import com.google.common.base.Optional;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -40,7 +41,6 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerSummary;
-import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
@@ -57,8 +57,8 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.map.factory.MapFactory;
-import org.constellation.map.security.LayerSecurityFilter;
+import org.constellation.ws.MapFactory;
+import org.constellation.ws.LayerSecurityFilter;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
@@ -68,7 +68,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
 
 /**
  *
@@ -238,6 +237,25 @@ public class LayerBusiness implements ILayerBusiness {
         return layerRepository.getLayersByLinkedStyle(styleId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<LayerSummary> getLayerRefFromStyleId(final Integer styleId) {
+        final List<LayerSummary> sumLayers = new ArrayList<>();
+        final List<Layer> layers = layerRepository.getLayersRefsByLinkedStyle(styleId);
+        for(final Layer lay : layers) {
+            final LayerSummary layerSummary = new LayerSummary();
+            layerSummary.setId(lay.getId());
+            layerSummary.setName(lay.getName());
+            sumLayers.add(layerSummary);
+        }
+        return sumLayers;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<LayerSummary> getLayerSummaryFromStyleId(final Integer styleId) {
         final List<LayerSummary> sumLayers = new ArrayList<>();
@@ -257,19 +275,6 @@ public class LayerBusiness implements ILayerBusiness {
             layerSummary.setDate(new Date(lay.getDate()));
             layerSummary.setOwner(db.getOwner());
             layerSummary.setProvider(db.getProvider());
-            final List<Style> styles = styleRepository.findByLayer(lay);
-            final List<StyleBrief> styleBriefs = new ArrayList<>();
-            if(styles!=null) {
-                for (final Style style : styles) {
-                    final Provider styleProv = providerRepository.findOne(style.getProvider());
-                    final StyleBrief sb = new StyleBrief();
-                    sb.setProvider(styleProv.getIdentifier());
-                    sb.setName(style.getName());
-                    sb.setTitle(style.getName());
-                    styleBriefs.add(sb);
-                }
-            }
-            layerSummary.setTargetStyle(styleBriefs);
             sumLayers.add(layerSummary);
         }
         return sumLayers;

@@ -33,6 +33,7 @@ import org.constellation.engine.register.jooq.tables.pojos.Service;
 import org.constellation.engine.register.jooq.tables.records.LayerRecord;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.jooq.DeleteConditionStep;
+import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, Layer> implements LayerRepository {
+
+    /**
+     * Fields use to select a lighten Layer reference objects
+     */
+    public static final Field[] REF_FIELDS = new Field[]{
+            LAYER.ID,
+            LAYER.NAME};
 
     public JooqLayerRepository() {
 
@@ -136,6 +144,12 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     @Override
     public List<Layer> getLayersByLinkedStyle(final int styleId) {
         return dsl.select(LAYER.fields()).from(LAYER).join(STYLED_LAYER).onKey(STYLED_LAYER.LAYER).where(STYLED_LAYER.STYLE.eq(styleId))
+                .fetchInto(Layer.class);
+    }
+
+    @Override
+    public List<Layer> getLayersRefsByLinkedStyle(final int styleId) {
+        return dsl.select(REF_FIELDS).from(LAYER).join(STYLED_LAYER).onKey(STYLED_LAYER.LAYER).where(STYLED_LAYER.STYLE.eq(styleId))
                 .fetchInto(Layer.class);
     }
 

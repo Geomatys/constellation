@@ -16,16 +16,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.map.security;
+package org.constellation.ws;
 
-import javax.xml.namespace.QName;
-
+import org.constellation.configuration.DataSourceType;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface LayerSecurityFilter {
+public interface MapFactory {
+
+    boolean factoryMatchType(final DataSourceType type);
     
-    boolean allowed(final String login, final QName layerName);
+    LayerSecurityFilter getSecurityFilter();
 }

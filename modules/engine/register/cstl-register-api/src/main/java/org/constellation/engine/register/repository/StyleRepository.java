@@ -31,7 +31,7 @@ public interface StyleRepository {
     int create(Style style);
     
     List<Style> findAll();
-    
+
     List<Style> findByType(final String type);
     
     List<Style> findByTypeAndProvider(final int providerId, final String type);
