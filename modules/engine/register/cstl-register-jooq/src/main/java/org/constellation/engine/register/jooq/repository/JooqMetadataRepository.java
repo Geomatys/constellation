@@ -50,6 +50,8 @@ import org.jooq.SortField;
 import org.jooq.UpdateSetFirstStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -63,6 +65,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public Metadata update(MetadataComplete metadata) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.METADATA_ID, metadata.getMetadataId());
@@ -109,6 +112,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int create(MetadataComplete metadata) {
         MetadataRecord metadataRecord = dsl.newRecord(METADATA);
         metadataRecord.setMetadataId(metadata.getMetadataId());
@@ -543,30 +547,41 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public int delete(final int id) {
         dsl.delete(METADATA_BBOX).where(METADATA_BBOX.METADATA_ID.eq(id)).execute();
         return dsl.delete(METADATA).where(METADATA.ID.eq(id)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void deleteAll() {
+        dsl.delete(METADATA).execute();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void changeOwner(final int id, final int owner) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.OWNER, owner).where(METADATA.ID.eq(id)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void changeValidation(int id, boolean validated) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.IS_VALIDATED, validated).where(METADATA.ID.eq(id)).execute();
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void changePublication(int id, boolean published) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.IS_PUBLISHED, published).where(METADATA.ID.eq(id)).execute();
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void changeProfile(int id, String newProfile) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.PROFILE, newProfile).where(METADATA.ID.eq(id)).execute();
@@ -685,6 +700,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void setValidationRequired(int id, String state, String validationState) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.VALIDATION_REQUIRED, state)
@@ -692,6 +708,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void denyValidation(int id, String comment) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.VALIDATION_REQUIRED, "REJECTED")

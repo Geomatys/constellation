@@ -140,6 +140,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     }
     
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public MetadataXCsw addDatasetToCSW(final int serviceID, final int datasetID) {
         final Metadata metadata = dsl.select().from(METADATA).where(METADATA.DATASET_ID.eq(datasetID)).fetchOneInto(Metadata.class);
         if (metadata != null) {

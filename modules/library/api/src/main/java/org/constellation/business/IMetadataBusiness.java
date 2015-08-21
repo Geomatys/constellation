@@ -320,7 +320,13 @@ public interface IMetadataBusiness {
      * @throws org.constellation.configuration.ConfigurationException 
      */
     void deleteMetadata(final List<Integer> ids) throws ConfigurationException;
-    
+
+    /**
+     * Delete all metadata in database
+     * @throws ConfigurationException
+     */
+    void deleteAllMetadata() throws ConfigurationException;
+
     /**
      * Return a percentage of the metadata completion (related to the profile linked to the metadata pojo).
      * The metadata pojo is retrieve from the linked specified data.

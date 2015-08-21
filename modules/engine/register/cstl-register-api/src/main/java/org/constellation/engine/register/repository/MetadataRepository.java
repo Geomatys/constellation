@@ -51,6 +51,8 @@ public interface MetadataRepository {
     List<MetadataBbox> getBboxes(int id);
     
     int delete(int id);
+
+    void deleteAll();
     
     List<Metadata> findByCswId(Integer id);
     
