@@ -390,6 +390,15 @@ public class DatasetBusiness implements IDatasetBusiness {
         removeDataset(datasetRepository.findByIdentifier(datasetIdentifier));
     }
 
+    @Transactional
+    @Override
+    public void removeAllDatasets() throws ConfigurationException {
+        final List<Dataset> all = datasetRepository.findAll();
+        for (Dataset dataset : all) {
+            removeDataset(dataset.getId());
+        }
+    }
+
     private void removeDataset(Dataset ds) throws ConfigurationException {
         if (ds != null) {
             final Set<Integer> involvedProvider = new HashSet<>();

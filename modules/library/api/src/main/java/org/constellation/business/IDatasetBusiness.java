@@ -81,6 +81,8 @@ public interface IDatasetBusiness {
 
     void removeDataset(final String datasetIdentifier) throws ConfigurationException;
 
+    void removeAllDatasets() throws ConfigurationException;
+
     /**
      * Get dataset for given identifier.
      *
