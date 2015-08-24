@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DATA;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
 import static org.constellation.engine.register.jooq.Tables.METADATA;
 import static org.constellation.engine.register.jooq.Tables.METADATA_X_CSW;
@@ -254,9 +256,23 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public List<ServiceReference> fetchByDataId(int dataId) {
-        return dsl.select(REFERENCE_FIELDS).from(SERVICE)
-                .join(LAYER).on(LAYER.SERVICE.eq(SERVICE.ID))
-                .where(LAYER.DATA.eq(dataId))
-                .fetchInto(ServiceReference.class);
+        List<ServiceReference> services = new ArrayList<>();
+
+        // "Layer" services.
+        services.addAll(dsl.select(REFERENCE_FIELDS).from(SERVICE)
+                .join(LAYER).on(LAYER.SERVICE.eq(SERVICE.ID)) // service -> layer
+                .leftOuterJoin(DATA_X_DATA).on(DATA_X_DATA.CHILD_ID.eq(LAYER.DATA)) // layer -> data_x_data (child_id)
+                .where(LAYER.DATA.eq(dataId).or(DATA_X_DATA.DATA_ID.eq(dataId)))
+                .fetchInto(ServiceReference.class));
+
+        // "Metadata" services.
+        services.addAll(dsl.select(REFERENCE_FIELDS).from(DATA)
+                .join(METADATA).on(METADATA.DATASET_ID.eq(DATA.DATASET_ID)) // data -> metadata
+                .join(METADATA_X_CSW).on(METADATA_X_CSW.METADATA_ID.eq(METADATA.ID)) // metadata -> metadata_x_csw
+                .join(SERVICE).on(SERVICE.ID.eq(METADATA_X_CSW.CSW_ID)) // metadata_x_csw -> service
+                .where(DATA.ID.eq(dataId))
+                .fetchInto(ServiceReference.class));
+
+        return services;
     }
 }
