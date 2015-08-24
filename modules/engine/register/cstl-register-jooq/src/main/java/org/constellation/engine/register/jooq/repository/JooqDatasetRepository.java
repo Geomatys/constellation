@@ -32,8 +32,6 @@ import org.constellation.engine.register.pojo.DatasetItem;
 import org.constellation.engine.register.repository.DatasetRepository;
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
@@ -65,7 +63,7 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
             DATASET.DATE.as("creation_date"),
             DATASET.OWNER.as("owner_id"),
             CSTL_USER.LOGIN.as("owner_login"),
-            countData(DATASET.ID).asField("data_count")};
+            countData(DATASET.ID).as("data_count")};
 
  
     public JooqDatasetRepository() {
@@ -205,22 +203,22 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
                     .or(DATA.NAME.likeIgnoreCase('%' + termFilter + '%')));
         }
         if (excludeEmpty) {
-            condition = condition.and(countData(DATASET.ID).asField().greaterThan(0));
+            condition = condition.and(countData(DATASET.ID).greaterThan(0));
         }
         if (hasVectorData != null) {
-            Field<Integer> countVectorData = countDataOfType(DATASET.ID, "VECTOR").asField();
+            Field<Integer> countVectorData = countDataOfType(DATASET.ID, "VECTOR");
             condition = condition.and(hasVectorData ? countVectorData.greaterThan(0) : countVectorData.eq(0));
         }
         if (hasCoverageData != null) {
-            Field<Integer> countCoverageData = countDataOfType(DATASET.ID, "COVERAGE").asField();
+            Field<Integer> countCoverageData = countDataOfType(DATASET.ID, "COVERAGE");
             condition = condition.and(hasCoverageData ? countCoverageData.greaterThan(0) : countCoverageData.eq(0));
         }
         if (hasLayerData != null) {
-            Field<Integer> countLayerData = countLayerData(DATASET.ID).asField();
+            Field<Integer> countLayerData = countLayerData(DATASET.ID);
             condition = condition.and(hasLayerData ? countLayerData.greaterThan(0) : countLayerData.eq(0));
         }
         if (hasSensorData != null) {
-            Field<Integer> countSensorData = countSensorData(DATASET.ID).asField();
+            Field<Integer> countSensorData = countSensorData(DATASET.ID);
             condition = condition.and(hasSensorData ? countSensorData.greaterThan(0) : countSensorData.eq(0));
         }
 
@@ -248,31 +246,35 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     //  Private utility methods
     // -------------------------------------------------------------------------
 
-    private static SelectConditionStep<Record1<Integer>> countData(Field<Integer> datasetId) {
-        return DSL.selectCount().from(DATA)
-                .where(DATA.DATASET_ID.eq(datasetId))
-                .and(isIncludedAndNotHidden(DATA));
-    }
-
-    private static SelectConditionStep<Record1<Integer>> countDataOfType(Field<Integer> datasetId, String type) {
+    private static Field<Integer> countData(Field<Integer> datasetId) {
         return DSL.selectCount().from(DATA)
                 .where(DATA.DATASET_ID.eq(datasetId))
                 .and(isIncludedAndNotHidden(DATA))
-                .and(DATA.TYPE.eq(type));
+                .asField();
     }
 
-    private static SelectConditionStep<Record1<Integer>> countLayerData(Field<Integer> datasetId) {
+    private static Field<Integer> countDataOfType(Field<Integer> datasetId, String type) {
+        return DSL.selectCount().from(DATA)
+                .where(DATA.DATASET_ID.eq(datasetId))
+                .and(isIncludedAndNotHidden(DATA))
+                .and(DATA.TYPE.eq(type))
+                .asField();
+    }
+
+    private static Field<Integer> countLayerData(Field<Integer> datasetId) {
         return DSL.selectCount().from(LAYER)
                 .join(DATA).on(LAYER.DATA.eq(DATA.ID)) // layer -> data
                 .where(DATA.DATASET_ID.eq(datasetId))
-                .and(isIncludedAndNotHidden(DATA));
+                .and(isIncludedAndNotHidden(DATA))
+                .asField();
     }
 
-    private static SelectConditionStep<Record1<Integer>> countSensorData(Field<Integer> datasetId) {
+    private static Field<Integer> countSensorData(Field<Integer> datasetId) {
         return DSL.selectCount().from(SENSORED_DATA)
                 .join(DATA).on(SENSORED_DATA.DATA.eq(DATA.ID)) // sensored_data -> data
                 .where(DATA.DATASET_ID.eq(datasetId))
-                .and(isIncludedAndNotHidden(DATA));
+                .and(isIncludedAndNotHidden(DATA))
+                .asField();
     }
 
     private static Condition isIncludedAndNotHidden(Data dataTable) {
