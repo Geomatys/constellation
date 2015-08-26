@@ -571,7 +571,7 @@ public class GenericNodeindexTest {
         /**
          * Test 4 date search: date = 26/01/2009
          */
-        spatialQuery = new SpatialQuery("date:\"20090126122224\"", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("date:\"20090126112224\"", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {

@@ -32,6 +32,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,6 +68,9 @@ public final class Util {
     private static final Logger LOGGER = Logging.getLogger("org.constellation.util");
 
     public static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+    static {
+        LUCENE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     private Util() {}
 
