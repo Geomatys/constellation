@@ -90,6 +90,10 @@
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.jcip</groupId>
+      <artifactId>jcip-annotations</artifactId>
+    </dependency>
 
     <!-- test dependencies -->
 

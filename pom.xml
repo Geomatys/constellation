@@ -408,6 +408,21 @@
                 <artifactId>commons-collections</artifactId>
                 <version>3.2.1</version>
             </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>net.jcip</groupId>
+                <artifactId>jcip-annotations</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.ucar</groupId>
+                <artifactId>udunits</artifactId>
+                <version>4.3.21</version>
+            </dependency>
             <!--mail commons-->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1112,6 +1127,10 @@
         <repository>
             <id>dev</id>
             <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>geomatys</id>
+            <url>http://maven.geomatys.com/</url>
         </repository>
     </repositories>
     <pluginRepositories>

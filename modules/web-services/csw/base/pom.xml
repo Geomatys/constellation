@@ -124,6 +124,10 @@
       <artifactId>geotk-provided</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>net.jcip</groupId>
+      <artifactId>jcip-annotations</artifactId>
+    </dependency>
 
     <!-- Mailing API -->
     <dependency>

@@ -103,6 +103,10 @@
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>woodstox-core-lgpl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.jcip</groupId>
+      <artifactId>jcip-annotations</artifactId>
+    </dependency>
 
     <!-- Test dependencies -->
     <!--<dependency>-->

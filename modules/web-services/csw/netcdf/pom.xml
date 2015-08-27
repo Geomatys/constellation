@@ -99,6 +99,23 @@
         <version>${project.version}</version>
         <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>edu.ucar</groupId>
+          <artifactId>udunits</artifactId>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
+
+    <!-- ==================================================================
+           UCAR repository from which to download the NetCDF library.
+           the repository is declared here for this module only
+       ================================================================== -->
+    <repositories>
+        <repository>
+            <id>UCAR</id>
+            <name>UCAR repository</name>
+            <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+        </repository>
+    </repositories>
 
 </project>
