@@ -328,7 +328,7 @@ public class NodeUtilities {
                            typeName.equals("position") || typeName.equals("beginPosition") ||
                            typeName.equals("endPosition")) {
                     try {
-                        final Date d = TemporalUtilities.parseDate(s, true);
+                        final Date d = TemporalUtilities.getDateFromString(s);
                         synchronized (Util.LUCENE_DATE_FORMAT) {
                             result.add(Util.LUCENE_DATE_FORMAT.format(d));
                         }

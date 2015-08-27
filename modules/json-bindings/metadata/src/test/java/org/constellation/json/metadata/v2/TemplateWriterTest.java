@@ -33,6 +33,7 @@ import org.apache.sis.metadata.iso.quality.DefaultQuantitativeResult;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.json.metadata.binding.RootObj;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.util.FileUtilities;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -611,7 +612,7 @@ public class TemplateWriterTest {
         
         final DefaultExtent ex = new DefaultExtent();
         final DefaultTemporalExtent tex = new DefaultTemporalExtent();
-        tex.setBounds(new Date(11142000000L), new Date(1325372400000L));
+        tex.setExtent(new TimePeriodType(null, "1970-05-10", "2012-01-01"));
         ex.setTemporalElements(Arrays.asList(tex));
         dataIdent.setExtents(Arrays.asList(ex));
         metadata.setIdentificationInfo(Arrays.asList(dataIdent));

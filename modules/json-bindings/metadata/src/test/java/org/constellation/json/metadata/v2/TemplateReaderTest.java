@@ -28,6 +28,9 @@ import org.apache.sis.metadata.iso.quality.DefaultDomainConsistency;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.test.utils.MetadataUtilities;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.metadata.citation.DateType;
@@ -254,7 +257,7 @@ public class TemplateReaderTest {
     }
     
     @Test
-    public void testReadFromFilledTemplateSpecialType() throws IOException, FactoryException {
+    public void testReadFromFilledTemplateSpecialType() throws Exception {
         InputStream stream = TemplateReaderTest.class.getResourceAsStream("result_special_type.json");
         RootObj root       =  objectMapper.readValue(stream, RootObj.class);
         
@@ -273,7 +276,7 @@ public class TemplateReaderTest {
         final DefaultExtent ex = new DefaultExtent();
         final DefaultTemporalExtent tex = new DefaultTemporalExtent();
                                                        
-        tex.setBounds(new Date(11142000000L), new Date(1325372400000L));
+        tex.setExtent(new TimePeriodType(null, "1970-05-10", "2012-01-01"));
         ex.setTemporalElements(Arrays.asList(tex));
         dataIdent.setExtents(Arrays.asList(ex));
         expResult.setIdentificationInfo(Arrays.asList(dataIdent));
