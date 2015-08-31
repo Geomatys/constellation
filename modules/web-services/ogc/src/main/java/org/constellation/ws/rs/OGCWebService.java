@@ -113,7 +113,7 @@ public abstract class OGCWebService<W extends Worker> extends AbstractWebService
         SpringHelper.injectDependencies(this);
         this.serviceName = specification.name();
 
-        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
+        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.", serviceName);
         WSEngine.registerService(serviceName, "REST", getWorkerClass(), getConfigurerClass());
 
         /*

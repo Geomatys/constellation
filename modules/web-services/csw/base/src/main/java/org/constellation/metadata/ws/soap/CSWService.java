@@ -89,7 +89,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      */
     public CSWService() {
       super(Specification.CSW);
-      LOGGER.log(Level.INFO, "CSW SOAP service running ({0} instances)\n", getWorkerMapSize());
+      LOGGER.log(Level.INFO, "CSW SOAP service running ({0} instances)", getWorkerMapSize());
     }
 
     /**

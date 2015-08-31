@@ -43,6 +43,12 @@ public final class GeotkInstaller implements ServletContextListener{
     @Override
     public synchronized void contextInitialized(ServletContextEvent sce) {
 
+        //Removal of jul log handlers.
+        if (!SLF4JBridgeHandler.isInstalled()) {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+        }
+
         LOGGER.log(Level.INFO, "=== Starting GeotoolKit ===");
 
         try{
@@ -70,12 +76,6 @@ public final class GeotkInstaller implements ServletContextListener{
             final Properties properties = new Properties();
             properties.put("platform", "server");
             Setup.initialize(properties);
-
-            //Removal of jul log handlers.
-            if (!SLF4JBridgeHandler.isInstalled()) {
-                SLF4JBridgeHandler.removeHandlersForRootLogger();
-                SLF4JBridgeHandler.install();
-            }
 
             try {
                 Class.forName("javax.media.jai.JAI");

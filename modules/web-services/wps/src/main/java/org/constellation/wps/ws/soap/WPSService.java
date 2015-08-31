@@ -67,7 +67,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      */
     public WPSService() throws CstlServiceException {
        super(Specification.WPS);
-       LOGGER.log(Level.INFO, "WPS SOAP service running ({0} instances)\n", getWorkerMapSize());
+       LOGGER.log(Level.INFO, "WPS SOAP service running ({0} instances)", getWorkerMapSize());
     }
 
     /**
