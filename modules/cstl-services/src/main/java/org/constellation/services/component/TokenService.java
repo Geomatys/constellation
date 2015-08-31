@@ -1,5 +1,7 @@
 package org.constellation.services.component;
 
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.token.TokenExtender;
 import org.constellation.token.TokenUtils;
 import org.slf4j.Logger;
@@ -23,7 +25,7 @@ public class TokenService implements TokenExtender {
 
     @PostConstruct
     public void init() {
-        secret = env.getProperty("cstl.secret", UUID.randomUUID().toString());
+        secret = Application.getProperty(AppProperty.CSTL_TOKEN_SECRET, UUID.randomUUID().toString());
     }
     
     public String createToken(String username) {

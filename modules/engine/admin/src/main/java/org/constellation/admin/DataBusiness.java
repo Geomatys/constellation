@@ -48,16 +48,9 @@ import org.constellation.admin.listener.DefaultDataBusinessListener;
 import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.ImageStatisticDeserializer;
 import org.constellation.api.DataType;
-import org.constellation.api.PropertyConstants;
-import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.ServiceProtocol;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.configuration.*;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
@@ -175,12 +168,6 @@ public class DataBusiness implements IDataBusiness {
      */
     @Inject
     private IDataCoverageJob dataCoverageJob;
-
-    /**
-     * Injected configuration business
-     */
-    @Inject
-    private IConfigurationBusiness configurationBusiness;
 
     @Autowired(required = false)
     private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
@@ -823,7 +810,7 @@ public class DataBusiness implements IDataBusiness {
     @Override
     @Scheduled(cron = "1 * * * * *")
     public void updateDataStatistics() {
-        String propertyValue = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
+        String propertyValue = Application.getProperty(AppProperty.DATA_AUTO_ANALYSE);
         boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
         if (doAnalysis) {
             computeEmptyDataStatistics(false);

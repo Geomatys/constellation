@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 
 public class TokenUtils {
 
@@ -40,7 +42,7 @@ public class TokenUtils {
     }
 
     public static long getTokenLife() {
-        String tokenLifeInMinutesAsString = System.getProperty("cstl.token.life", "60");
+        String tokenLifeInMinutesAsString = Application.getProperty(AppProperty.CSTL_TOKEN_LIFE, "60");
         long tokenLifeInMinutes;
         try {
             tokenLifeInMinutes = Long.parseLong(tokenLifeInMinutesAsString);

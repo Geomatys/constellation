@@ -19,6 +19,8 @@
 package org.constellation.admin.web.controller;
 
 import org.constellation.admin.security.CstlAdminLoginConfigurationService;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.token.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +74,7 @@ public class ConfigController {
         final ServletContext servletCtxt = request.getServletContext();
         Properties properties = new Properties();
         String context;
-        final String cstlConfUrl = env.getProperty("cstl.url");
+        final String cstlConfUrl = Application.getProperty(AppProperty.CSTL_URL);
         //first check against variable if defined to override cstl url
         if (cstlConfUrl != null) {
             context = cstlConfUrl;

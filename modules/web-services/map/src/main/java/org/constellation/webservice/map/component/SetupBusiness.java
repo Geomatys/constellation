@@ -49,8 +49,6 @@ import javax.inject.Named;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.SpringHelper;
-import org.constellation.api.PropertyConstants;
-import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -98,9 +96,6 @@ public class SetupBusiness {
 
     @Inject
     private IStyleBusiness styleBusiness;
-
-    @Inject
-    private IConfigurationBusiness configurationBusiness;
 
     @PostConstruct
     public void contextInitialized() {
@@ -494,11 +489,7 @@ public class SetupBusiness {
          * Initialize default properties values if not exist.
          */
         private void initializeDefaultProperties() {
-            String dataAnalyse = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
-            if (dataAnalyse == null) {
-                LOGGER.log(Level.FINE, "Property " + PropertyConstants.DATA_ANALYSE_KEY + "set as : true");
-                configurationBusiness.setProperty(PropertyConstants.DATA_ANALYSE_KEY, "true");
-            }
+            //nothing to do for now
         }
     }
 

@@ -42,20 +42,19 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.DataType;
-import org.constellation.api.PropertyConstants;
 import org.constellation.api.ProviderType;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
-import org.constellation.business.IDataCoverageJob;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IStyleBusiness;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.engine.register.jooq.tables.pojos.Dataset;
 import org.constellation.engine.register.jooq.tables.pojos.Style;
 import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -107,12 +106,6 @@ public final class DefaultConfigurator implements Configurator {
 
     @Autowired
     private IStyleBusiness styleBusiness;
-
-    @Autowired
-    private IDataCoverageJob dataCoverageJob;
-
-    @Autowired
-    private PropertyRepository propertyRepository;
 
     @Autowired
     private DatasetRepository datasetRepository;
@@ -257,7 +250,7 @@ public final class DefaultConfigurator implements Configurator {
             }
 
             //check if layer analysis is required
-            String propertyValue = propertyRepository.getValue(PropertyConstants.DATA_ANALYSE_KEY, null);
+            String propertyValue = Application.getProperty(AppProperty.DATA_AUTO_ANALYSE);
             boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
 
             // Add new layer.

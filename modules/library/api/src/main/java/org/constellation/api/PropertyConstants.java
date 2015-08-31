@@ -23,12 +23,16 @@ package org.constellation.api;
  * {@link org.constellation.engine.register.repository.PropertyRepository}
  *
  * @author Quentin Boileau (Geomatys)
+ * @deprecated see {@link org.constellation.configuration.AppProperty}
  */
+@Deprecated
 public class PropertyConstants {
 
     /**
      * Service URL property key
+     * @deprecated see {@link org.constellation.configuration.AppProperty#CSTL_SERVICE_URL}
      */
+    @Deprecated
     public static final String SERVICES_URL_KEY = "services.url";
 
     /**
@@ -36,7 +40,9 @@ public class PropertyConstants {
      * This property define a flag that enable/disable data analysing at
      * creation or during application startup. This analyse contains
      * coverage histogram.
+     * @deprecated see {@link org.constellation.configuration.AppProperty#DATA_AUTO_ANALYSE}
      */
+    @Deprecated
     public static final String DATA_ANALYSE_KEY = "data.auto.analyse";
 
 }

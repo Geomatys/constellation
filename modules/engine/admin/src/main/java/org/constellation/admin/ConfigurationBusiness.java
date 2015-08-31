@@ -1,10 +1,7 @@
 package org.constellation.admin;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,8 +10,8 @@ import javax.xml.bind.JAXBException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.MetadataUtilities;
-import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
+import org.constellation.configuration.AppProperty;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.engine.register.MetadataComplete;
 import org.constellation.engine.register.MetadataIOUtils;
@@ -64,11 +61,14 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
     @Override
     @Transactional
     public void setProperty(final String key, final String value) {
+        System.setProperty(key, value);
+        // FIXME continue to save in database ?
+        // create/update external configuration file to save preferences ?
         propertyRepository.save(new Property(key, value));
         // update metadata when service URL key is updated
-            if (PropertyConstants.SERVICES_URL_KEY.equals(key)) {
-                updateServiceUrlForMetadata(value);
-            }
+        if (AppProperty.CSTL_SERVICE_URL.getKey().equals(key)) {
+            updateServiceUrlForMetadata(value);
+        }
     }
     
     private void updateServiceUrlForMetadata(final String url) {

@@ -22,12 +22,11 @@ package org.constellation.admin.mail;
 import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.Property;
-import org.constellation.engine.register.repository.PropertyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -51,15 +50,13 @@ public class MailServiceImpl implements MailService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    private PropertyRepository propertyRepository;
-
     private static final String FROM_KEY = "email.smtp.from";
     private static final String HOST_KEY = "email.smtp.host";
     private static final String PORT_KEY = "email.smtp.port";
     private static final String USERNAME_KEY = "email.smtp.username";
     private static final String PASSWORD_KEY = "email.smtp.password";
-    private final static List<String> SMTP_PROPS = Arrays.asList(FROM_KEY, HOST_KEY, PORT_KEY, USERNAME_KEY, PASSWORD_KEY);
+    private static final String USE_SSL_KEY = "email.smtp.ssl";
+    private final static List<String> SMTP_PROPS = Arrays.asList(FROM_KEY, HOST_KEY, PORT_KEY, USERNAME_KEY, PASSWORD_KEY, USE_SSL_KEY);
 
     private volatile Map<String, Object> emailConfiguration = null;
 
@@ -80,7 +77,7 @@ public class MailServiceImpl implements MailService {
     public void send(String subject, String htmlMsg, List<String> recipients, File attachment) throws EmailException {
 
         //For debugging purposes, we can disable mail sender by passing system property.
-        final String mailEnabled = System.getProperty("cstl.mail.enabled", "true");
+        final String mailEnabled = Application.getProperty(AppProperty.CSTL_MAIL_ENABLE, "true");
         if(!Boolean.valueOf(mailEnabled)) {
             LOGGER.info("Mail service is disabled, run the server with option -Dcstl.mail.enabled=true to enable it.");
             return;
@@ -130,6 +127,9 @@ public class MailServiceImpl implements MailService {
             htmlEmail.send();
         } catch (ConfigurationException ex) {
             throw new EmailException("Unable to create a new mail from configuration.", ex);
+        } catch (EmailException ex) {
+            LOGGER.warn("Unable to send email : "+ex.getMessage(), ex);
+            throw ex;
         }
     }
 
@@ -143,11 +143,12 @@ public class MailServiceImpl implements MailService {
         htmlEmail.setHostName((String) emailConfiguration.get(HOST_KEY));
         htmlEmail.setSmtpPort((int) emailConfiguration.get(PORT_KEY));
         htmlEmail.setAuthentication((String) emailConfiguration.get(USERNAME_KEY), (String) emailConfiguration.get(PASSWORD_KEY));
+        htmlEmail.setSSL((Boolean) emailConfiguration.get(USE_SSL_KEY));
         return htmlEmail;
     }
 
     /**
-     * Lazy loading configuration from database.
+     * Lazy loading configuration.
      *
      * @throws ConfigurationException
      */
@@ -155,17 +156,13 @@ public class MailServiceImpl implements MailService {
         if (emailConfiguration == null) {
 
             emailConfiguration = new HashMap<>();
-            final List<? extends Property> repositoryProperties = propertyRepository.findIn(SMTP_PROPS);
-            for (Property repositoryProperty : repositoryProperties) {
-                final String name = repositoryProperty.getName();
-                final String stringValue = repositoryProperty.getValue();
 
-                Object value = stringValue;
-                if (PORT_KEY.equals(name)) {
-                    value = Integer.valueOf(stringValue);
-                }
-                emailConfiguration.put(name, value);
-            }
+            emailConfiguration.put(USERNAME_KEY, Application.getProperty(AppProperty.CSTL_MAIL_SMTP_USER));
+            emailConfiguration.put(PASSWORD_KEY, Application.getProperty(AppProperty.CSTL_MAIL_SMTP_PASSWD));
+            emailConfiguration.put(FROM_KEY, Application.getProperty(AppProperty.CSTL_MAIL_SMTP_FROM));
+            emailConfiguration.put(HOST_KEY, Application.getProperty(AppProperty.CSTL_MAIL_SMTP_HOST));
+            emailConfiguration.put(PORT_KEY, Integer.valueOf(Application.getProperty(AppProperty.CSTL_MAIL_SMTP_PORT)));
+            emailConfiguration.put(USE_SSL_KEY, Boolean.valueOf(Application.getProperty(AppProperty.CSTL_MAIL_SMTP_USE_SSL, "false")));
 
             //test non missing parameters
             for (String expectedKey : SMTP_PROPS) {
