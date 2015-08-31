@@ -109,7 +109,7 @@ window.buildWmtsViewer = function () {
             // Zoom on specified extent
             this.map.updateSize();
             var size = this.map.getSize();
-            this.map.getView().fitExtent(reprojExtent, size);
+            this.map.getView().fit(reprojExtent, size);
         },
 
         isNotNumber : function(n) {
@@ -141,7 +141,7 @@ window.buildWmtsViewer = function () {
             if(reprojExtent[3]>this.maxExtent[3]){
                 reprojExtent[3] = this.maxExtent[3];
             }
-            this.map.getView().fitExtent(reprojExtent, size);
+            this.map.getView().fit(reprojExtent, size);
             this.map.getView().setZoom(this.map.getView().getZoom()+1);
         },
 

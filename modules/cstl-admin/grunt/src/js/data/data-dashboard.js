@@ -874,14 +874,21 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                                     stroke: stroke
                                 })
                             ];
-                            overlay = new ol.FeatureOverlay({
-                                features : [extentFeature],
-                                style : styles
+                            DataDashboardViewer.initMap('metadataPreviewMap');
+                            var collection = new ol.Collection();
+                            overlay = new ol.layer.Vector({
+                                map: DataDashboardViewer.map,
+                                source: new ol.source.Vector({
+                                    features: collection,
+                                    useSpatialIndex: false // optional, might improve performance
+                                }),
+                                style: styles,
+                                updateWhileAnimating: true, // optional, for instant visual feedback
+                                updateWhileInteracting: true // optional, for instant visual feedback
                             });
-                        }
-                        DataDashboardViewer.initMap('metadataPreviewMap');
-                        if(overlay) {
-                            DataDashboardViewer.map.addOverlay(overlay);
+                            overlay.getSource().addFeature(extentFeature);
+                        } else {
+                            DataDashboardViewer.initMap('metadataPreviewMap');
                         }
                     }, function() {//error
                         // failed to find a metadata, just load the full map

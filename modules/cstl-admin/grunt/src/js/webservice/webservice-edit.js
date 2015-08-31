@@ -585,7 +585,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                         var layerwmts = WmtsLayerDashboardViewer.createLayer(wmtslayerName, $scope.service.identifier, wmtsValues);
                                         WmtsLayerDashboardViewer.layers = [layerwmts];
                                         WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
-                                        WmtsLayerDashboardViewer.map.getView().fitExtent(wmtsValues.dataExtent,WmtsLayerDashboardViewer.map.getSize());
+                                        WmtsLayerDashboardViewer.map.getView().fit(wmtsValues.dataExtent,WmtsLayerDashboardViewer.map.getSize());
                                     });
                             });
                     }else {
