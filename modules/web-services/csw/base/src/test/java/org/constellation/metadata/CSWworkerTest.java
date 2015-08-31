@@ -151,8 +151,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (geomatys)
  */
 @Ignore
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class CSWworkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

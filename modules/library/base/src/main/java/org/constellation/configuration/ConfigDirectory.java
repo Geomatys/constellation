@@ -409,9 +409,14 @@ public final class ConfigDirectory {
         }
     }
 
+    /**
+     *
+     * @return service URL found in configuration or null
+     * @deprecated use {@link Application#getProperty(AppProperty#CSTL_SERVICE_URL)} instead
+     */
+    @Deprecated
     public static String getServiceURL() {
-        final String cstlURL = Application.getProperty(AppProperty.CSTL_URL);
-        return Application.getProperty(AppProperty.CSTL_SERVICE_URL, cstlURL+"/WS");
+        return Application.getProperty(AppProperty.CSTL_SERVICE_URL, null);
     }
 
     public static File getInstanceDirectory(String type, String id) {

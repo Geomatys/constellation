@@ -34,12 +34,14 @@ import org.constellation.test.utils.CstlDOMComparator;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileWriter;
@@ -67,9 +69,11 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class SOSSoapRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("org.constellation.ws.embedded");
 
     protected ApplicationContext applicationContext;
     
@@ -100,9 +104,11 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         if (!initialized) {
             try {
                 try {
-                    serviceBusiness.delete("sos", "default");
-                } catch (ConfigurationException ex) {}
-                
+                    serviceBusiness.deleteAll();
+                } catch (Exception ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
+
                 final File dataDirectory = new File(configDirectory, "dataSos");
                 dataDirectory.mkdir();
 
@@ -141,13 +147,18 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 initServer(null, map);
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(SOSSoapRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+               LOGGER.error(ex.getMessage(), ex);
             }
         }
     }
 
     @AfterClass
     public static void shutDown() {
+        try {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
         ConfigDirectory.shutdownTestEnvironement("SOSSoapRequestTest");
         if (ds != null) {
             ds.shutdown();
@@ -192,7 +203,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         }
 
         if (gmlPrefix != null) {
-            LOGGER.log(Level.INFO, "GML Prefix found:{0}", gmlPrefix);
+            LOGGER.info("GML Prefix found:{0}", gmlPrefix);
             if (!gmlPrefix.equals("gml")) {
                 result = result.replace(gmlPrefix + ':', "gml:");
                 result = result.replace("xmlns:" + gmlPrefix + '=', "xmlns:gml=");

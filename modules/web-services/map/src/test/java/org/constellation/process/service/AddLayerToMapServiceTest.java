@@ -336,17 +336,18 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(layers.size() == 2);
         assertTrue(outputLayer.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
 
-
-        final Layer outLayer = layers.get(0);
-        assertNotNull(outLayer);
-        assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
-        assertEquals("Europe-costlines" ,outLayer.getAlias());
-        assertNotNull(outLayer.getFilter());
-        assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
+         for (Layer outLayer : layers) {
+             assertNotNull(outLayer);
+             if (COUNTRIES_DATA_REF.getLayerId().tip().toString().equals(outLayer.getName().getLocalPart())) {
+                 assertEquals("Europe-costlines", outLayer.getAlias());
+                 assertNotNull(outLayer.getFilter());
+                 assertEquals(STYLE_DATA_REF, outLayer.getStyles().get(0));
+             }
+         }
 
         //assertTrue(outSource.isExcludedLayer(new QName("http://custom-namespace/", "city")));
-        
-        
+
+
         assertTrue(checkInstanceExist("addLayer5"));
         deleteInstance(serviceBusiness, layerBusiness, "addLayer5");
 

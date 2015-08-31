@@ -28,8 +28,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.security.SecurityManagerHolder;
 import org.springframework.stereotype.Component;
 

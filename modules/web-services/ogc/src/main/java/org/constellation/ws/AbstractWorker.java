@@ -48,7 +48,7 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Details;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.database.api.jooq.tables.pojos.Service;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;

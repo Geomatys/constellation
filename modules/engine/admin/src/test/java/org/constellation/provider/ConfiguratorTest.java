@@ -57,7 +57,7 @@ import static org.junit.Assert.assertTrue;
  */
 @Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
 public class ConfiguratorTest implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;

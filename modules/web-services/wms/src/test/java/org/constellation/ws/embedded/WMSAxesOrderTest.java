@@ -24,10 +24,7 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.configuration.Language;
-import org.constellation.configuration.Languages;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.WMSPortrayal;
+import org.constellation.configuration.*;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.test.ImageTesting;
@@ -48,6 +45,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
@@ -61,7 +59,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.api.ProviderType;
-import org.constellation.configuration.ConfigDirectory;
 
 import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
@@ -87,8 +84,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @since 0.3
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
@@ -167,11 +164,13 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                layerBusiness.removeAll();
-                dataBusiness.deleteAll();
-                serviceBusiness.deleteAll();
-                providerBusiness.removeAll();
-                
+                try {
+                    layerBusiness.removeAll();
+                    dataBusiness.deleteAll();
+                    serviceBusiness.deleteAll();
+                    providerBusiness.removeAll();
+                }catch (Exception ex) {}
+
                 // coverage-file datastore
                 final File rootDir                   = AbstractGrizzlyServer.initDataDirectory();
                 final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
@@ -235,6 +234,14 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @AfterClass
     public static void shutDown() {
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (ConfigurationException ex) {
+            Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
+        }
         ConfigDirectory.shutdownTestEnvironement("WMSAxesOrderTest");
         File f = new File("derby.log");
         if (f.exists()) {

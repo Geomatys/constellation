@@ -20,7 +20,7 @@ package org.constellation.api;
 
 /**
  * List of all property keys that can be stored in
- * {@link org.constellation.engine.register.repository.PropertyRepository}
+ * {@link org.constellation.database.api.repository.PropertyRepository}
  *
  * @author Quentin Boileau (Geomatys)
  * @deprecated see {@link org.constellation.configuration.AppProperty}

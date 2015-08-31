@@ -93,6 +93,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.database</groupId>
+      <artifactId>cstl-database-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-ebrim</artifactId>
     </dependency>

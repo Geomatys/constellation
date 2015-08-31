@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- ========================= DATASOURCE DEFINITION ========================= -->
+
+    <!--
+    Example of bean declaration to use another database by default
+    org.constellation.engine.register.configuration.PostgreSQLConfiguration bean is used.
+    MyDatabaseConfiguration implement org.constellation.database.configuration.IDatabaseConfiguration
+
+    <bean id="myDatabase" class="MyDatabaseConfiguration"/>
+     -->
+
+    <!-- Register all database related beans -->
+    <bean id="database-registerer" class="org.constellation.database.configuration.DatabaseRegister"/>
+
+    <!-- Install/Initialize EPSG database -->
+    <bean id="epsg-database-initer" depends-on="database-registerer"
+          class="org.constellation.database.configuration.EPSGDatabaseIniter">
+        <property name="dataSource" ref="epsgDataSource"/>
+    </bean>
+
+    <!-- Initialize/Update database -->
+    <bean id="database-initer" depends-on="epsg-database-initer" class="org.constellation.database.configuration.FlywaySpring"/>
+
+</beans>
+

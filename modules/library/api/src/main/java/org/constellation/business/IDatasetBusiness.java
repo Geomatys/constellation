@@ -23,16 +23,16 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
 
 import java.io.IOException;
 import java.util.List;
-import org.constellation.engine.register.domain.Page;
-import org.constellation.engine.register.domain.Pageable;
-import org.constellation.engine.register.pojo.DataItem;
-import org.constellation.engine.register.pojo.DatasetItemWithData;
-import org.constellation.engine.register.pojo.DatasetItem;
+import org.constellation.database.api.domain.Page;
+import org.constellation.database.api.domain.Pageable;
+import org.constellation.database.api.pojo.DataItem;
+import org.constellation.database.api.pojo.DatasetItemWithData;
+import org.constellation.database.api.pojo.DatasetItem;
 
 /**
  * @author Cédric Briançon (Geomatys)

@@ -76,8 +76,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WFSServiceTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

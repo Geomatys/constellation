@@ -39,8 +39,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
-import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.database.api.jooq.tables.pojos.Service;
+import org.constellation.database.api.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.test.utils.SpringTestRunner;
@@ -66,8 +66,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({ "standard", "derby" })
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({ "standard"})
 public class CSWorkerInitialisationTest implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;

@@ -29,8 +29,8 @@ import org.constellation.admin.dto.metadata.OwnerStatBrief;
 import org.constellation.admin.dto.metadata.User;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
-import org.constellation.engine.register.MetadataWithState;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.database.api.MetadataWithState;
+import org.constellation.database.api.jooq.tables.pojos.Metadata;
 
 /**
  * @author Cédric Briançon (Geomatys)

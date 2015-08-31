@@ -76,7 +76,7 @@ import java.util.logging.Logger;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
 import org.apache.sis.metadata.ValueExistencePolicy;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
+import org.constellation.database.api.jooq.tables.pojos.MetadataBbox;
 import org.geotoolkit.processing.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.processing.metadata.merge.MergeDescriptor;
 import org.geotoolkit.storage.coverage.CoverageReference;

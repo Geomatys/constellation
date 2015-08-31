@@ -1,0 +1,36 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+  <context:component-scan base-package="
+  org.constellation.database.api.jooq,
+  org.constellation.database.impl.repository,
+  org.constellation.admin,
+  org.constellation.map.configuration,
+  org.constellation.ws.rs" />
+
+  <tx:annotation-driven transaction-manager="transactionManager" />
+
+  <bean id="securityManager" class="org.constellation.security.spring.SpringSecurityManager"></bean>
+
+  <task:executor id="cstlExecutor" pool-size="5" />
+  <task:scheduler id="cstlScheduler" pool-size="5" />
+  <task:annotation-driven executor="cstlExecutor" scheduler="cstlScheduler" />
+
+    <!-- Guava event bus -->
+  <bean id="eventBus" class="com.google.common.eventbus.AsyncEventBus">
+    <constructor-arg ref="cstlExecutor" />
+  </bean>
+
+
+  <bean class="org.constellation.database.configuration.TestingDBConfiguration" />
+  <import resource="cstl-ds.xml"/>
+  <import resource="cstl-tx.xml" />
+
+</beans>
+

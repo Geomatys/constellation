@@ -27,7 +27,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Details;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.database.api.jooq.tables.pojos.Service;
 
 /**
  * @author Cédric Briançon (Geomatys)

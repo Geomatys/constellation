@@ -39,12 +39,12 @@ import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
-import org.constellation.engine.register.jooq.tables.pojos.Style;
-import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.jooq.tables.pojos.Provider;
+import org.constellation.database.api.jooq.tables.pojos.Style;
+import org.constellation.database.api.jooq.tables.pojos.TaskParameter;
+import org.constellation.database.api.repository.ProviderRepository;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
@@ -187,7 +187,7 @@ public class ProviderBusiness implements IProviderBusiness {
 
 
     @Override
-    public List<org.constellation.engine.register.jooq.tables.pojos.Data> getDatasFromProviderId(Integer id) {
+    public List<org.constellation.database.api.jooq.tables.pojos.Data> getDatasFromProviderId(Integer id) {
         return providerRepository.findDatasByProviderId(id);
     }
 

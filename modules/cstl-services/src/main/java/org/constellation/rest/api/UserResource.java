@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.constellation.auth.transfer.UserTransfer;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.services.web.controller.AuthController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

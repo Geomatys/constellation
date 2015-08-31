@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -37,8 +38,10 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.database.api.repository.MetadataRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
@@ -63,9 +66,14 @@ public class InternalCSWworkerTest extends CSWworkerTest {
     private IServiceBusiness serviceBusiness;
 
     @Inject
+    private IProviderBusiness providerBusiness;
+
+    @Inject
     private IMetadataBusiness metadataBusiness;
-    
+
     private static File configDirectory;
+
+    private static boolean initialized = false;
     
     @BeforeClass
     public static void initTestDir() {
@@ -77,7 +85,10 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         onlyIso = true;
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+            if (!initialized) {
+                serviceBusiness.deleteAll();
+                providerBusiness.removeAll();
+                metadataBusiness.deleteAllMetadata();
 
                 pool = EBRIMMarshallerPool.getInstance();
                 fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -109,27 +120,23 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);
+                initialized = true;
             }
         } catch (Exception ex) {
             Logger.getLogger(InternalCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+            SpringHelper.getBean(IMetadataBusiness.class).deleteAllMetadata();
+
         if (worker != null) {
             worker.destroy();
         }
         ConfigDirectory.shutdownTestEnvironement("InternalCSWWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     /**

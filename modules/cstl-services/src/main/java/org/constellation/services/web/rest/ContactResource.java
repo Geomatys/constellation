@@ -28,8 +28,8 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
-import org.constellation.engine.register.jooq.tables.pojos.Property;
-import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.database.api.jooq.tables.pojos.Property;
+import org.constellation.database.api.repository.PropertyRepository;
 import org.constellation.utils.JSonUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;

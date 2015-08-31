@@ -2,8 +2,8 @@ package org.constellation.coverage.process;
 
 import java.io.File;
 
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.provider.ProviderDescriptorConstant;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;

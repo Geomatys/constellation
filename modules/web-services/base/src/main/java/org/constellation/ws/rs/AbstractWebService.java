@@ -61,8 +61,8 @@ import org.constellation.api.PropertyConstants;
 import org.constellation.configuration.AppProperty;
 import org.constellation.configuration.Application;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.jooq.tables.pojos.Property;
-import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.database.api.jooq.tables.pojos.Property;
+import org.constellation.database.api.repository.PropertyRepository;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.WebServiceUtilities;
@@ -644,7 +644,12 @@ public abstract class AbstractWebService implements WebService{
      * @return the service uURL.
      */
     protected String getServiceURL() {
-        return PROPERTIES_URL;
+        String result = Application.getProperty(AppProperty.CSTL_SERVICE_URL);
+
+        if (result == null) {
+            result = getUriContext().getBaseUri().toString();
+        }
+        return result;
     }
 
     /**

@@ -23,16 +23,9 @@ import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.*;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.Language;
-import org.constellation.configuration.Languages;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Details;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -77,8 +70,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class AdminRequestTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
@@ -190,6 +183,14 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
     @AfterClass
     public static void shutDown() {
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (ConfigurationException ex) {
+            Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
+        }
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

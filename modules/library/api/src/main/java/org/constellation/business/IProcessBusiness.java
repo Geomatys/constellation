@@ -24,9 +24,9 @@ import java.util.Set;
 
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.ChainProcess;
-import org.constellation.engine.register.jooq.tables.pojos.Task;
-import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
+import org.constellation.database.api.jooq.tables.pojos.ChainProcess;
+import org.constellation.database.api.jooq.tables.pojos.Task;
+import org.constellation.database.api.jooq.tables.pojos.TaskParameter;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.processing.chain.model.Chain;

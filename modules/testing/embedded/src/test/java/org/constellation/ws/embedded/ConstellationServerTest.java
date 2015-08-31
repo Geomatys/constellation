@@ -34,12 +34,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import java.io.File;
@@ -61,9 +63,11 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @Ignore //issue with Spring security filter and grizzly
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class ConstellationServerTest extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("org.constellation.ws.embedded");
 
     protected ApplicationContext applicationContext;
     
@@ -89,12 +93,13 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                
+                //clean services
                 try {
-                    serviceBusiness.delete("csw", "default");
-                    serviceBusiness.delete("csw", "csw2");
-                } catch (ConfigurationException ex) {}
-                
+                    serviceBusiness.deleteAll();
+                } catch (Exception ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
+
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
 
@@ -144,13 +149,18 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
                         + "org.geotoolkit.ows.xml.v100"), null);
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(ConstellationServerTest.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error(ex.getMessage(), ex);
             }
         }
     }
 
     @AfterClass
     public static void shutDown() {
+        try {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

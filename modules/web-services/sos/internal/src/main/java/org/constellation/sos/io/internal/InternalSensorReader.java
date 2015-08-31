@@ -44,7 +44,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SensorBusiness;
-import org.constellation.engine.register.jooq.tables.pojos.Sensor;
+import org.constellation.database.api.jooq.tables.pojos.Sensor;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.SensorReader;

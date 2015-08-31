@@ -48,7 +48,7 @@ public class ConfigController {
     private CstlAdminLoginConfigurationService cstlAdminLoginConfigurationService;
 
     public ConfigController() {
-        LOGGER.info("***** ConfigController construct *****");
+        LOGGER.debug("ConfigController construct");
     }
 
     @Inject

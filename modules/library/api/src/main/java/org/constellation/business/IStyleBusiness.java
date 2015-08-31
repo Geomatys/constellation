@@ -23,7 +23,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.jooq.tables.pojos.Style;
+import org.constellation.database.api.jooq.tables.pojos.Style;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.filter.expression.Function;
 

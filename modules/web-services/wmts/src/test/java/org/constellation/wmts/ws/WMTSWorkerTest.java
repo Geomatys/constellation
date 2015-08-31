@@ -44,6 +44,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -64,8 +65,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WMTSWorkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
@@ -90,10 +91,14 @@ public class WMTSWorkerTest implements ApplicationContextAware {
     public void setUpClass(){
         SpringHelper.setApplicationContext(applicationContext);
         try {
+
+            try {
+                serviceBusiness.delete("wmts", "default");
+            } catch (ConfigurationException ex) {}
+
             pool = WMTSMarshallerPool.getInstance();
             
             serviceBusiness.create("wmts", "default", new LayerContext(), null);
-
 
             worker = new DefaultWMTSWorker("default");
             worker.setLogLevel(Level.FINER);
@@ -106,6 +111,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        SpringHelper.getBean(IServiceBusiness.class).deleteAll();
         ConfigDirectory.shutdownTestEnvironement("WMTSWorkerTest");
     }
 

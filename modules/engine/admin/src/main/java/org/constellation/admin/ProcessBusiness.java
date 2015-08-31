@@ -59,12 +59,12 @@ import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.ChainProcess;
-import org.constellation.engine.register.jooq.tables.pojos.Task;
-import org.constellation.engine.register.jooq.tables.pojos.TaskParameter;
-import org.constellation.engine.register.repository.ChainProcessRepository;
-import org.constellation.engine.register.repository.TaskParameterRepository;
-import org.constellation.engine.register.repository.TaskRepository;
+import org.constellation.database.api.jooq.tables.pojos.ChainProcess;
+import org.constellation.database.api.jooq.tables.pojos.Task;
+import org.constellation.database.api.jooq.tables.pojos.TaskParameter;
+import org.constellation.database.api.repository.ChainProcessRepository;
+import org.constellation.database.api.repository.TaskParameterRepository;
+import org.constellation.database.api.repository.TaskRepository;
 import org.constellation.scheduler.QuartzJobListener;
 import org.constellation.scheduler.QuartzTask;
 import org.constellation.util.ParamUtilities;
@@ -152,7 +152,7 @@ public class ProcessBusiness implements IProcessBusiness {
             }
         });
 
-        LOGGER.info("=== Starting Constellation Scheduler ===");
+        LOGGER.info("Starting Constellation Scheduler");
         /*
             Quartz scheduler
          */
@@ -178,15 +178,15 @@ public class ProcessBusiness implements IProcessBusiness {
             quartzScheduler.getListenerManager().addJobListener(new QuartzJobListener(), allJobs());
 
         } catch (SchedulerException ex) {
-            LOGGER.error("=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);
+            LOGGER.error("Failed to start quartz scheduler\n"+ex.getLocalizedMessage(), ex);
             return;
         }
-        LOGGER.info("=== Constellation Scheduler successfully started ===");
+        LOGGER.info("Constellation Scheduler successfully started");
 
         /*
             DirectoryWatcher
          */
-        LOGGER.info("=== Starting directory watcher ===");
+        LOGGER.info("Starting directory watcher");
         try {
             directoryWatcher = new DirectoryWatcher(true);
 
@@ -214,10 +214,10 @@ public class ProcessBusiness implements IProcessBusiness {
             directoryWatcher.start();
 
         } catch (IOException ex) {
-            LOGGER.error("=== Failed to start directory watcher ===\n"+ex.getLocalizedMessage(), ex);
+            LOGGER.error("Failed to start directory watcher\n"+ex.getLocalizedMessage(), ex);
             return;
         }
-        LOGGER.info("=== Directory watcher successfully started ===");
+        LOGGER.info("Directory watcher successfully started");
 
         /*
           Re-programme taskParameters with trigger in scheduler.

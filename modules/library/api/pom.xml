@@ -48,8 +48,8 @@
           <artifactId>sis-utility</artifactId>
       </dependency>
       <dependency>
-          <groupId>org.constellation.engine.register</groupId>
-          <artifactId>cstl-register-api</artifactId>
+          <groupId>org.constellation.database</groupId>
+          <artifactId>cstl-database-api</artifactId>
           <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -188,6 +188,9 @@
         <selenium.version>2.42.2</selenium.version>
         <jackson.version>2.3.2</jackson.version>
         <joda.version>2.2</joda.version>
+        <postgresql.version>9.3-1101-jdbc41</postgresql.version>
+        <jooq.version>3.5.3</jooq.version>
+
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
@@ -976,9 +979,20 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.3-1101-jdbc41</version>
+                <version>${postgresql.version}</version>
                 <scope>runtime</scope>
             </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP-java6</artifactId>
+                <version>2.3.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+
             <dependency>
                 <groupId>ojdbc</groupId>
                 <artifactId>ojdbc</artifactId>

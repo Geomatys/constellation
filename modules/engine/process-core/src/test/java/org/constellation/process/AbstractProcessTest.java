@@ -41,8 +41,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Quentin Boileau (Geomatys)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public abstract class AbstractProcessTest implements ApplicationContextAware {
 
     protected static final Logger LOGGER = Logging.getLogger(AbstractProcessTest.class);

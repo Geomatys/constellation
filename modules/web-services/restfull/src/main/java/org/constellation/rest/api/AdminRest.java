@@ -29,7 +29,7 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.*;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.database.api.repository.LayerRepository;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ICSWConfigurer;

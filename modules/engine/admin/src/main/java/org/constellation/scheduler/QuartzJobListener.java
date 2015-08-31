@@ -33,7 +33,7 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
-import org.constellation.engine.register.jooq.tables.pojos.Task;
+import org.constellation.database.api.jooq.tables.pojos.Task;
 import org.constellation.util.ParamUtilities;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;

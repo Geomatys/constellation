@@ -23,13 +23,9 @@ import org.constellation.business.IDataBusiness;
 import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.*;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
-import org.constellation.configuration.Language;
-import org.constellation.configuration.Languages;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.WMSPortrayal;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
@@ -64,6 +60,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
@@ -110,8 +107,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @since 0.3
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WMSRequestsTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
@@ -216,11 +213,13 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                
-                layerBusiness.removeAll();
-                serviceBusiness.deleteAll();
-                dataBusiness.deleteAll();
-                providerBusiness.removeAll();
+
+                try {
+                    layerBusiness.removeAll();
+                    serviceBusiness.deleteAll();
+                    dataBusiness.deleteAll();
+                    providerBusiness.removeAll();
+                } catch (Exception ex) {}
                 
                 // coverage-file datastore
                 final File rootDir                   = AbstractGrizzlyServer.initDataDirectory();
@@ -382,6 +381,14 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     @AfterClass
     public static void shutDown() throws JAXBException {
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (Exception ex) {
+            Logger.getLogger(WMSRequestsTest.class.getName()).log(Level.WARNING, ex.getMessage());
+        }
         ConfigDirectory.shutdownTestEnvironement("WMSRequestTest");
         finish();
     }

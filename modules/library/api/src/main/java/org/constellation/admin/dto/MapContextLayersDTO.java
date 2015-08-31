@@ -20,7 +20,7 @@ package org.constellation.admin.dto;
 
 import java.util.List;
 
-import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
+import org.constellation.database.api.jooq.tables.pojos.Mapcontext;
 
 public class MapContextLayersDTO extends Mapcontext {
     private List<MapContextStyledLayerDTO> layers;

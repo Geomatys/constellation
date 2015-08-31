@@ -63,7 +63,7 @@
 
   <logger name="org.constellation" level="INFO" />
   <logger name="org.geotoolkit" level="INFO" />
-  <logger name="org.jooq" level="WARN" />
+  <logger name="org.flywaydb" level="INFO" />
 
   <root level="WARN">
     <appender-ref ref="STDOUT" />
