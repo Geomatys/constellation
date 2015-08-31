@@ -37,9 +37,6 @@ import java.util.Properties;
 @ComponentScan(basePackages = {
         "org.constellation.admin.service",
         "org.constellation.admin.security"})
-@Import(value = {
-       
-        AsyncConfiguration.class})
 public class ApplicationConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(ApplicationConfiguration.class);

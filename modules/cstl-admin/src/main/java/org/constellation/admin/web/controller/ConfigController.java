@@ -38,7 +38,6 @@ import java.util.Properties;
 @Controller
 public class ConfigController {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigController.class);
 
     private static long TOKEN_LIFE = TokenUtils.getTokenLife();
@@ -50,29 +49,25 @@ public class ConfigController {
         LOGGER.info("***** ConfigController construct *****");
     }
 
-
     @Inject
     @Named("build")
     private Properties buildProperties;
 
     @Inject
     private Environment env;
-
     /**
      * Resolve the Constellation service webapp context.
      * It will return:
      * <ul>
-     * <li>-Dcstl.url</li>
-     * <li>/constellation</li>
+     *   <li>-Dcstl.url</li>
+     *   <li>/constellation</li>
      * </ul>
      * Current webapp context if running the same webapp (cstl-uberwar)
-     *
      * @param request {@code HttpServletRequest}
      * @return Map
      */
-    @RequestMapping(value = "/conf", method = RequestMethod.GET)
-    public
-    @ResponseBody
+    @RequestMapping(value = "/conf", method=RequestMethod.GET)
+    public @ResponseBody
     Map<Object, Object> get(final HttpServletRequest request) {
         final ServletContext servletCtxt = request.getServletContext();
         Properties properties = new Properties();
@@ -102,13 +97,10 @@ public class ConfigController {
         return properties;
     }
 
-
-    @RequestMapping(value = "/build", method = RequestMethod.GET)
-    public
-    @ResponseBody
+    @RequestMapping(value = "/build", method=RequestMethod.GET)
+    public @ResponseBody
     Properties getBuildInfo(final HttpServletRequest request) {
         return buildProperties;
     }
-
 
 }
