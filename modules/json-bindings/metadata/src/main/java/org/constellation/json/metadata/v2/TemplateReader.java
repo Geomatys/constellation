@@ -434,6 +434,8 @@ public class TemplateReader extends AbstractTemplateHandler {
                     text = text.substring(text.indexOf('.') + 1).trim();
                     if (isCodeList) {
                         value = Types.forCodeName(type.asSubclass(CodeList.class), text, false);
+                    } else if (type.isEnum()){
+                        value = Types.forEnumName(type.asSubclass(Enum.class), text);
                     } else {
                         value = text;
                     }
