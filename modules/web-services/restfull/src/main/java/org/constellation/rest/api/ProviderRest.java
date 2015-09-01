@@ -113,7 +113,7 @@ public class ProviderRest {
             final Set<GenericName> names = providerBusiness.test(providerIdentifier, configuration);
             if (names.isEmpty()){
                 LOGGER.warning("non data found for provider: " + providerIdentifier);
-                return Response.status(500).build();
+                return Response.status(500).entity("Unable to find any data, please check the database parameters and make sure that the database is properly configured.").build();
             }
         } catch (DataStoreException | ConfigurationException e) {
             LOGGER.log(Level.WARNING, "Cannot open provider "+providerIdentifier, e);
