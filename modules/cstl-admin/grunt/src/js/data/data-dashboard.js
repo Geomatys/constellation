@@ -340,6 +340,66 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             });
         };
 
+        // Display the data in the preview map with style.
+        self.previewDataWithStyle = function(style) {
+            // Reset map state.
+            if (DataDashboardViewer.map) {
+                DataDashboardViewer.map.setTarget(undefined);
+            }
+            DataDashboardViewer.initConfig();
+            DataDashboardViewer.fullScreenControl = true;
+
+            if (selection.data) {
+                // Generate layer name.
+                var layerName = selection.data.name;
+                if (selection.data.namespace) {
+                    layerName = '{' + selection.data.namespace + '}' + layerName;
+                }
+
+                // Use the pyramid provider identifier for better performances (if expected).
+                var providerId = selection.data.providerIdentifier;
+                if (CstlConfig['data.overview.use_pyramid'] === true && selection.data.pyramidProviderIdentifier) {
+                    providerId = selection.data.pyramidProviderIdentifier;
+                }
+
+                // Wait for lazy loading completion.
+                var lastSelection = selection.data;
+                lastSelection.$infoPromise.then(function() {
+                    if (lastSelection !== selection.data) {
+                        return; // the selection has changed before the promise is resolved
+                    }
+
+                    // Create layer instance.
+                    var layer;
+                    if (style) {
+                        layer = DataDashboardViewer.createLayerWithStyle(
+                            $cookieStore.get('cstlUrl'),
+                            layerName,
+                            providerId,
+                            style.name,
+                            null,
+                            null,
+                            lastSelection.type !== 'VECTOR');
+                    } else {
+                        layer = DataDashboardViewer.createLayer(
+                            $cookieStore.get('cstlUrl'),
+                            layerName,
+                            providerId,
+                            null,
+                            lastSelection.type !== 'VECTOR');
+                    }
+                    layer.get('params').ts = new Date().getTime();
+
+                    // Display the layer and zoom on its extent.
+                    DataDashboardViewer.layers = [layer];
+                    DataDashboardViewer.extent = lastSelection.extent;
+                    DataDashboardViewer.initMap('dataPreviewMap');
+                });
+            } else {
+                DataDashboardViewer.initMap('dataPreviewMap');
+            }
+        };
+
         // Break the association between the selected data and a style.
         self.dissociateStyle = function(style) {
             if (!selection.data) {
