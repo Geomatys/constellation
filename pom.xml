@@ -1162,7 +1162,9 @@
   <version>9.2.2.v20140723</version>
     <configuration>
         <war>${project.basedir}/modules/cstl-sdi/target/constellation.war</war>
-      
+        <webApp>
+            <contextPath>/constellation</contextPath>
+        </webApp>
 <!--
     </webApp>
     <contextHandlers>
