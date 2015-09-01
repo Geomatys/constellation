@@ -328,7 +328,7 @@ public final class LayerProviders {
         }
     	MutableStyle style = styleBusiness.getStyle(sldProvider, styleId);
         if (style == null){
-            throw new CstlServiceException("styleid : "+styleId+" on provider : "+sldProvider+" not found");
+            throw new CstlServiceException("a problem occurred while retrieving the style from the database, styleid : "+styleId+" on provider : "+sldProvider);
         }
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
     	final StringWriter sw = new StringWriter();
