@@ -321,19 +321,20 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
             }).result.then(function(item) {
                 if (angular.isObject(item)) {
+                    var currentData = selection.data;
                     style.link({ provider: item.Provider, name: item.Name }, {
                         values: {
-                            dataProvider: selection.data.providerIdentifier,
-                            dataNamespace: selection.data.namespace,
-                            dataId: selection.data.name
+                            dataProvider: currentData.providerIdentifier,
+                            dataNamespace: currentData.namespace,
+                            dataId: currentData.name
                         }
                     }, function() {
-                        selection.data.styles.push({
+                        currentData.styles.push({
                             id: item.Id,
                             name: item.Name,
                             providerIdentifier: item.Provider
                         });
-                        selection.data.styleCount++;
+                        currentData.styleCount++;
                         self.updatePreview();
                     });
                 }
