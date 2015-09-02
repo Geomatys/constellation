@@ -39,7 +39,6 @@ import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IMapContextBusiness;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
@@ -326,12 +325,9 @@ public class MapContextBusiness implements IMapContextBusiness {
             Integer layerID = styledLayer.getLayerId();
             Integer dataID = styledLayer.getDataId();
             if (layerID != null || dataID != null) {
-                final Data data;
-                if(layerID != null) {
+                if(dataID == null) {
                     final Layer layerRecord = layerRepository.findById(layerID);
-                    data = dataRepository.findById(layerRecord.getData());
-                }else {
-                    data = dataRepository.findById(dataID);
+                    dataID = layerRecord.getData();
                 }
                 DefaultMetadata metadata = null;
                 if(dataID != null) {
