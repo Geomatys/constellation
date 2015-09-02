@@ -565,8 +565,12 @@ angular.module('cstl-mapcontext-edit', ['cstl-restapi', 'cstl-services', 'pascal
                             }else {//internal wms layer
                                 var serviceName = (layObj.layer.serviceIdentifier) ? layObj.layer.serviceIdentifier : layObj.service.identifier;
                                 var versions=[];
+                                var arry;
                                 if(layObj.service && layObj.service.versions) {
-                                    var arry = layObj.service.versions.split('µ');
+                                     arry = layObj.service.versions.split('µ');
+                                    versions.push(arry[arry.length-1]);
+                                }else if(layObj.layer.serviceVersions) {
+                                    arry = layObj.layer.serviceVersions.split('µ');
                                     versions.push(arry[arry.length-1]);
                                 }
 
