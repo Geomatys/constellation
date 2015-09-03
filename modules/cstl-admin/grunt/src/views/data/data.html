@@ -295,24 +295,21 @@
                                             <div id="linkedList" class="block-content">
                                                 <span ng-show="!dc.selection.data.styleCount" translate="label.no.association">No association</span>
                                                 <div class="style btn-assoc-item"
-                                                     ng-init="dc.currentstyle = (dc.selection.data.styles && dc.selection.data.styles.length > 0) ? dc.selection.data.styles[0].name : null;"
                                                      ng-repeat="style in dc.selection.data.styles" style="margin-bottom:5px;">
                                                     <button type="button" class="btn btn-small btn-block-assos btn-block-assos-style"
-                                                            ng-click="dc.currentstyle = style.name;dc.previewDataWithStyle(style);">
-                                                        <i class="glyphicon"
-                                                           ng-class="{'glyphicon-eye-open':dc.currentstyle === style.name,'glyphicon-eye-close':dc.currentstyle !== style.name}"></i>
-
+                                                            ng-click="dc.selectStyle(style)">
+                                                        <i class="glyphicon" ng-class="{'glyphicon-eye-open': dc.selection.style === style, 'glyphicon-eye-close': dc.selection.style !== style}"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-small btn-block-assos btn-block-assos-style"
                                                             ng-click="dc.editStyle(style)">
                                                         <i class="glyphicon glyphicon-pencil"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-small btn-block-assos btn-block-assos-style"
-                                                            ng-click="dc.dissociateStyle(style);dc.currentstyle = (dc.selection.data.styles && dc.selection.data.styles.length > 0) ? dc.selection.data.styles[0].name : null;">
+                                                            ng-click="dc.dissociateStyle(style)">
                                                         <i class="glyphicon glyphicon-trash"></i>
                                                     </button>
-                                                    <b ng-if="dc.currentstyle === style.name">{{style.name}}</b>
-                                                    <span ng-if="dc.currentstyle !== style.name">{{style.name}}</span>
+                                                    <b ng-if="dc.selection.style === style">{{style.name}}</b>
+                                                    <span ng-if="dc.selection.style !== style">{{style.name}}</span>
                                                 </div>
                                             </div>
                                         </div>
