@@ -873,11 +873,12 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                     $scope.optionsSLD.rasterPalette.colorModel = 'rgb';
                 }
             }
-            if(existsCellSymbolizer(symbolizers)){
+            var cellsymbolizer =existsCellSymbolizer(symbolizers);
+            if(cellsymbolizer){
                 //open raster cells panel
                 $scope.optionsSLD.enableRaster = $scope.rasterstyletype.cell;
                 if(symbolizers.length>0){
-                    var symb = symbolizers[0];
+                    var symb = cellsymbolizer;
                     $scope.optionsSLD.rasterCells.cellSize = symb.cellSize;
                     if(symb.rule && symb.rule.symbolizers && symb.rule.symbolizers.length>0){
                         var cellType = symb.rule.symbolizers[0]['@symbol'];
@@ -1981,13 +1982,15 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
          * Apply and bind cell point symbolizer for current style
          */
         $scope.applyCellPointSymbolizer = function(){
-            $scope.optionsSLD.selectedRule.symbolizers[0].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.pointSymbol;
+            var cellSymbol = existsCellSymbolizer($scope.optionsSLD.selectedRule.symbolizers);
+            cellSymbol.rule.symbolizers[0] = $scope.optionsSLD.rasterCells.pointSymbol;
         };
         /**
          * Apply and bind cell text symbolizer for current style
          */
         $scope.applyCellTextSymbolizer = function(){
-            $scope.optionsSLD.selectedRule.symbolizers[0].rule.symbolizers[0] = $scope.optionsSLD.rasterCells.textSymbol;
+            var cellSymbol = existsCellSymbolizer($scope.optionsSLD.selectedRule.symbolizers);
+            cellSymbol.rule.symbolizers[0] = $scope.optionsSLD.rasterCells.textSymbol;
         };
 
         /**
@@ -2343,12 +2346,14 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                 for(var i=0;i<symbolizers.length;i++){
                     var symb = symbolizers[i];
                     if(symb['@symbol']==='cell'){
-                        return true;
+                        return symb;
                     }
                 }
             }
-            return false;
+            return null;
         };
+
+        $scope.getCellSymbolizerCell = existsCellSymbolizer;
 
         /**
          * Returns true if there is a cell symbolizer in given array.
