@@ -192,36 +192,36 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
 
                 // Wait for lazy loading completion.
-                var lastSelection = selection.data;
-                lastSelection.$infoPromise.then(function() {
-                    if (lastSelection !== selection.data) {
+                var targetData = selection.data;
+                targetData.$infoPromise.then(function() {
+                    if (targetData !== selection.data) {
                         return; // the selection has changed before the promise is resolved
                     }
 
                     // Create layer instance.
                     var layer;
-                    if (lastSelection.styles.length) {
+                    if (targetData.styles.length) {
                         layer = DataDashboardViewer.createLayerWithStyle(
                             $cookieStore.get('cstlUrl'),
                             layerName,
                             providerId,
-                            lastSelection.styles[0].name,
+                            targetData.styles[0].name,
                             null,
                             null,
-                            lastSelection.type !== 'VECTOR');
+                            targetData.type !== 'VECTOR');
                     } else {
                         layer = DataDashboardViewer.createLayer(
                             $cookieStore.get('cstlUrl'),
                             layerName,
                             providerId,
                             null,
-                            lastSelection.type !== 'VECTOR');
+                            targetData.type !== 'VECTOR');
                     }
                     layer.get('params').ts = new Date().getTime();
 
                     // Display the layer and zoom on its extent.
                     DataDashboardViewer.layers = [layer];
-                    DataDashboardViewer.extent = lastSelection.extent;
+                    DataDashboardViewer.extent = targetData.extent;
                     DataDashboardViewer.initMap('dataPreviewMap');
                 });
             } else {
@@ -321,20 +321,20 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
             }).result.then(function(item) {
                 if (angular.isObject(item)) {
-                    var currentData = selection.data;
+                    var targetData = selection.data;
                     style.link({ provider: item.Provider, name: item.Name }, {
                         values: {
-                            dataProvider: currentData.providerIdentifier,
-                            dataNamespace: currentData.namespace,
-                            dataId: currentData.name
+                            dataProvider: targetData.providerIdentifier,
+                            dataNamespace: targetData.namespace,
+                            dataId: targetData.name
                         }
                     }, function() {
-                        currentData.styles.push({
+                        targetData.styles.push({
                             id: item.Id,
                             name: item.Name,
                             providerIdentifier: item.Provider
                         });
-                        currentData.styleCount++;
+                        targetData.styleCount++;
                         self.updatePreview();
                     });
                 }
@@ -364,9 +364,9 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 }
 
                 // Wait for lazy loading completion.
-                var lastSelection = selection.data;
-                lastSelection.$infoPromise.then(function() {
-                    if (lastSelection !== selection.data) {
+                var targetData = selection.data;
+                targetData.$infoPromise.then(function() {
+                    if (targetData !== selection.data) {
                         return; // the selection has changed before the promise is resolved
                     }
 
@@ -380,20 +380,20 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                             style.name,
                             null,
                             null,
-                            lastSelection.type !== 'VECTOR');
+                            targetData.type !== 'VECTOR');
                     } else {
                         layer = DataDashboardViewer.createLayer(
                             $cookieStore.get('cstlUrl'),
                             layerName,
                             providerId,
                             null,
-                            lastSelection.type !== 'VECTOR');
+                            targetData.type !== 'VECTOR');
                     }
                     layer.get('params').ts = new Date().getTime();
 
                     // Display the layer and zoom on its extent.
                     DataDashboardViewer.layers = [layer];
-                    DataDashboardViewer.extent = lastSelection.extent;
+                    DataDashboardViewer.extent = targetData.extent;
                     DataDashboardViewer.initMap('dataPreviewMap');
                 });
             } else {
@@ -406,9 +406,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             if (!selection.data) {
                 return;
             }
-            Data.dissociateStyle({ dataId: selection.data.id, styleId: style.id }, function() {
-                selection.data.styles.splice(selection.data.styles.indexOf(style), 1);
-                selection.data.styleCount--;
+            var targetData = selection.data;
+            Data.dissociateStyle({ dataId: targetData.id, styleId: style.id }, function() {
+                targetData.styles.splice(targetData.styles.indexOf(style), 1);
+                targetData.styleCount--;
                 self.updatePreview();
             });
         };
@@ -461,9 +462,10 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             if (!selection.data) {
                 return;
             }
-            Data.dissociateSensor({ dataId: selection.data.id, sensorIdentifier: sensor.identifier }, function() {
-                selection.data.sensors.splice(selection.data.sensors.indexOf(sensor), 1);
-                selection.data.sensorCount--;
+            var targetData = selection.data;
+            Data.dissociateSensor({ dataId: targetData.id, sensorIdentifier: sensor.identifier }, function() {
+                targetData.sensors.splice(targetData.sensors.indexOf(sensor), 1);
+                targetData.sensorCount--;
             });
         };
 
