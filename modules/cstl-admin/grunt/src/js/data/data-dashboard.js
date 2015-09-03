@@ -86,7 +86,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         self.tab = $routeParams.tab || 'dataset';
 
         // Variable to store dataset or/and data selection.
-        var selection = self.selection = { dataset: null, data: null };
+        var selection = self.selection = { dataset: null, data: null, style: null };
 
         // Array of available ways to add a data.
         self.addDataWays = [
@@ -139,6 +139,13 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }
 
             // Update data preview.
+            selection.style = null;
+            self.updatePreview();
+        };
+
+        // Select the style for data preview and.
+        self.selectStyle = function(style) {
+            selection.style = style;
             self.updatePreview();
         };
 
@@ -201,11 +208,12 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     // Create layer instance.
                     var layer;
                     if (targetData.styles.length) {
+                        selection.style = selection.style || targetData.styles[0]; // get or set the style selection
                         layer = DataDashboardViewer.createLayerWithStyle(
                             $cookieStore.get('cstlUrl'),
                             layerName,
                             providerId,
-                            targetData.styles[0].name,
+                            selection.style.name,
                             null,
                             null,
                             targetData.type !== 'VECTOR');
@@ -329,76 +337,17 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                             dataId: targetData.name
                         }
                     }, function() {
-                        targetData.styles.push({
-                            id: item.Id,
-                            name: item.Name,
-                            providerIdentifier: item.Provider
-                        });
+                        var style = { id: item.Id, name: item.Name, providerIdentifier: item.Provider };
+                        targetData.styles.push(style);
                         targetData.styleCount++;
-                        self.updatePreview();
+                        if (targetData === selection.data) {
+                            // If the selection hasn't changed, use the new style in preview.
+                            selection.style = style;
+                            self.updatePreview();
+                        }
                     });
                 }
             });
-        };
-
-        // Display the data in the preview map with style.
-        self.previewDataWithStyle = function(style) {
-            // Reset map state.
-            if (DataDashboardViewer.map) {
-                DataDashboardViewer.map.setTarget(undefined);
-            }
-            DataDashboardViewer.initConfig();
-            DataDashboardViewer.fullScreenControl = true;
-
-            if (selection.data) {
-                // Generate layer name.
-                var layerName = selection.data.name;
-                if (selection.data.namespace) {
-                    layerName = '{' + selection.data.namespace + '}' + layerName;
-                }
-
-                // Use the pyramid provider identifier for better performances (if expected).
-                var providerId = selection.data.providerIdentifier;
-                if (CstlConfig['data.overview.use_pyramid'] === true && selection.data.pyramidProviderIdentifier) {
-                    providerId = selection.data.pyramidProviderIdentifier;
-                }
-
-                // Wait for lazy loading completion.
-                var targetData = selection.data;
-                targetData.$infoPromise.then(function() {
-                    if (targetData !== selection.data) {
-                        return; // the selection has changed before the promise is resolved
-                    }
-
-                    // Create layer instance.
-                    var layer;
-                    if (style) {
-                        layer = DataDashboardViewer.createLayerWithStyle(
-                            $cookieStore.get('cstlUrl'),
-                            layerName,
-                            providerId,
-                            style.name,
-                            null,
-                            null,
-                            targetData.type !== 'VECTOR');
-                    } else {
-                        layer = DataDashboardViewer.createLayer(
-                            $cookieStore.get('cstlUrl'),
-                            layerName,
-                            providerId,
-                            null,
-                            targetData.type !== 'VECTOR');
-                    }
-                    layer.get('params').ts = new Date().getTime();
-
-                    // Display the layer and zoom on its extent.
-                    DataDashboardViewer.layers = [layer];
-                    DataDashboardViewer.extent = targetData.extent;
-                    DataDashboardViewer.initMap('dataPreviewMap');
-                });
-            } else {
-                DataDashboardViewer.initMap('dataPreviewMap');
-            }
         };
 
         // Break the association between the selected data and a style.
@@ -410,7 +359,12 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             Data.dissociateStyle({ dataId: targetData.id, styleId: style.id }, function() {
                 targetData.styles.splice(targetData.styles.indexOf(style), 1);
                 targetData.styleCount--;
-                self.updatePreview();
+                if (targetData === selection.data && style === selection.style) {
+                    // If the selection hasn't changed and the removed style was in use, no longer
+                    // use this style in preview.
+                    selection.style = null;
+                    self.updatePreview();
+                }
             });
         };
 
