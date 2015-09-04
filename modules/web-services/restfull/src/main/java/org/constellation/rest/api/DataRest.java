@@ -2313,8 +2313,7 @@ public class DataRest {
             final File f = filesToSend[0];
             return Response.ok(f).header("content-disposition", "attachment; filename="+ f.getName()).build();
         }
-
-        final File zip = new File(System.getProperty("java.io.tmpdir"), dataId +".zip");
+        final File zip = new File(System.getProperty("java.io.tmpdir"), provider.getId() +".zip");
         if (zip.exists()) {
             zip.delete();
         }
@@ -2325,17 +2324,31 @@ public class DataRest {
             URI uri = URI.create("jar:file:" + zip.getAbsolutePath());
             try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
                 for (final File fileToSend : filesToSend) {
-                    File[] files = fileToSend.listFiles();
-                    for (int i = 0; i < files.length; i++) {
-                        File fileAddToZip = files[i];
-                        java.nio.file.Path pathFile = fileAddToZip.toPath();
-                        java.nio.file.Path pathInZipFile = zipfs.getPath(fileAddToZip.getName());
+                    if(fileToSend.isDirectory()){
+                        java.nio.file.Path pathFileAbsolute = fileToSend.toPath();
+                        java.nio.file.Path pathInZipFileParent = zipfs.getPath(fileToSend.getName());
+                        Files.copy(pathFileAbsolute, pathInZipFileParent, StandardCopyOption.REPLACE_EXISTING);
+
+                        File[] files = fileToSend.listFiles();
+                        if (files != null) {
+                            final File[] expandedFiles = Util.expandSubDirectories(files);
+                            for (int i = 0; i < expandedFiles.length; i++) {
+                                File fileAddToZip = expandedFiles[i];
+                                java.nio.file.Path pathFile = fileAddToZip.toPath();
+                                String pathAbsolute = pathFile.toString();
+                                java.nio.file.Path pathInZipFile = zipfs.getPath(pathAbsolute.substring(pathAbsolute.lastIndexOf(fileToSend.getName())));
+                                Files.copy(pathFile, pathInZipFile, StandardCopyOption.REPLACE_EXISTING);
+                            }
+                        }
+                    }else {
+                        java.nio.file.Path pathFile = fileToSend.toPath();
+                        java.nio.file.Path pathInZipFile = zipfs.getPath(fileToSend.getName());
                         Files.copy(pathFile, pathInZipFile, StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
             }
         } catch (IOException ex) {
-            LOGGER.info("Error while zipping data");
+            LOGGER.log(Level.WARNING,"Error while zipping data",ex);
             return Response.status(500).entity(ex.getLocalizedMessage()).build();
         }
         return Response.ok(zip).header("content-disposition", "attachment; filename=" + zip.getName()).build();

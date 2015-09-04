@@ -32,6 +32,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -216,5 +218,22 @@ public final class Util {
         f = f.getParentFile(); // WEB-INF
         f = f.getParentFile(); // webapp root
         return f;
+    }
+
+    public static File[] expandSubDirectories(File... files) {
+        Set<File> addTo = new LinkedHashSet<>();
+        expandSubDirectories(files, addTo);
+        return addTo.toArray(new File[addTo.size()]);
+    }
+
+    private static void expandSubDirectories(File[] files, Set<File> addTo) {
+        if (files != null) {
+            for (File f : files) {
+                addTo.add(f);
+                if (f.isDirectory()) {
+                    expandSubDirectories(f.listFiles(), addTo);
+                }
+            }
+        }
     }
 }
