@@ -42,20 +42,19 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.DataType;
-import org.constellation.api.PropertyConstants;
 import org.constellation.api.ProviderType;
 import org.constellation.api.StyleType;
 import org.constellation.business.IDataBusiness;
-import org.constellation.business.IDataCoverageJob;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IStyleBusiness;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Style;
-import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Style;
+import org.constellation.database.api.repository.DatasetRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -109,12 +108,6 @@ public final class DefaultConfigurator implements Configurator {
     private IStyleBusiness styleBusiness;
 
     @Autowired
-    private IDataCoverageJob dataCoverageJob;
-
-    @Autowired
-    private PropertyRepository propertyRepository;
-
-    @Autowired
     private DatasetRepository datasetRepository;
 
     @Autowired
@@ -143,9 +136,9 @@ public final class DefaultConfigurator implements Configurator {
 
     @Override
     public List<ProviderInformation> getProviderInformations() throws ConfigurationException {
-        final List<org.constellation.engine.register.jooq.tables.pojos.Provider> records = providerBusiness.getProviders();
+        final List<org.constellation.database.api.jooq.tables.pojos.Provider> records = providerBusiness.getProviders();
         final List<ProviderInformation> entries = new ArrayList<>();
-        for (org.constellation.engine.register.jooq.tables.pojos.Provider record : records) {
+        for (org.constellation.database.api.jooq.tables.pojos.Provider record : records) {
             try {
                 final ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
                 if (param != null) {
@@ -160,7 +153,7 @@ public final class DefaultConfigurator implements Configurator {
 
     @Override
     public ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException {
-        final org.constellation.engine.register.jooq.tables.pojos.Provider record = providerBusiness.getProvider(providerId);
+        final org.constellation.database.api.jooq.tables.pojos.Provider record = providerBusiness.getProvider(providerId);
         final String impl = record.getImpl();
         ProviderFactory factory = DataProviders.getInstance().getFactory(impl);
         if(factory==null) factory = StyleProviders.getInstance().getFactory(impl);
@@ -197,14 +190,14 @@ public final class DefaultConfigurator implements Configurator {
         final String factoryName = provider.getFactory().getName();
 
         try {
-            final org.constellation.engine.register.jooq.tables.pojos.Provider pr = providerBusiness.storeProvider(providerId, null, type, factoryName, config);
+            final org.constellation.database.api.jooq.tables.pojos.Provider pr = providerBusiness.storeProvider(providerId, null, type, factoryName, config);
             checkDataUpdate(pr, datasetId, createDatasetIfNull);
         } catch ( IOException ex) {
             throw new ConfigurationException(ex);
         }
     }
 
-    private void checkDataUpdate(final org.constellation.engine.register.jooq.tables.pojos.Provider pr,
+    private void checkDataUpdate(final org.constellation.database.api.jooq.tables.pojos.Provider pr,
                                  final Integer datasetId) throws IOException, ConfigurationException{
         checkDataUpdate(pr,datasetId,true);
     }
@@ -216,11 +209,11 @@ public final class DefaultConfigurator implements Configurator {
      * @param createDatasetIfNull flag that indicates if a dataset will be created in case of given datasetId is null.
      * @throws IOException
      */
-    private void checkDataUpdate(final org.constellation.engine.register.jooq.tables.pojos.Provider pr,
+    private void checkDataUpdate(final org.constellation.database.api.jooq.tables.pojos.Provider pr,
                                  Integer datasetId,
                                  final boolean createDatasetIfNull) throws IOException, ConfigurationException{
 
-        final List<org.constellation.engine.register.jooq.tables.pojos.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
+        final List<org.constellation.database.api.jooq.tables.pojos.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();
         if (type.equals(ProviderType.LAYER.name())) {
             final DataProvider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
@@ -238,7 +231,7 @@ public final class DefaultConfigurator implements Configurator {
 
             // Remove no longer existing layer.
             final Map<String, String> metadata = new HashMap<>(0);
-            for (final org.constellation.engine.register.jooq.tables.pojos.Data data : list) {
+            for (final org.constellation.database.api.jooq.tables.pojos.Data data : list) {
                 boolean found = false;
                 for (final Object keyObj : provider.getKeys()) {
                     final GenericName key = (GenericName) keyObj;
@@ -257,7 +250,7 @@ public final class DefaultConfigurator implements Configurator {
             }
 
             //check if layer analysis is required
-            String propertyValue = propertyRepository.getValue(PropertyConstants.DATA_ANALYSE_KEY, null);
+            String propertyValue = Application.getProperty(AppProperty.DATA_AUTO_ANALYSE);
             boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
 
             // Add new layer.
@@ -267,7 +260,7 @@ public final class DefaultConfigurator implements Configurator {
                 if(ns.isEmpty()) ns = null;
                 final GenericName gname = NamesExt.create(ns, name.getLocalPart());
                 boolean found = false;
-                for (final org.constellation.engine.register.jooq.tables.pojos.Data data : list) {
+                for (final org.constellation.database.api.jooq.tables.pojos.Data data : list) {
                     if (name.equals(new QName(data.getNamespace(),data.getName()))) {
                         found = true;
                         break;
@@ -351,7 +344,7 @@ public final class DefaultConfigurator implements Configurator {
 
                     //dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
                     //do not save the coverage metadata in database, this metadata is obsolete, the full iso metadata is stored later.
-                    org.constellation.engine.register.jooq.tables.pojos.Data data = dataBusiness.create(
+                    org.constellation.database.api.jooq.tables.pojos.Data data = dataBusiness.create(
                             name, pr.getIdentifier(), provider.getDataType().name(),
                             provider.isSensorAffectable(), included, rendered, subType, null);
 
@@ -407,7 +400,7 @@ public final class DefaultConfigurator implements Configurator {
     @Override
     @Transactional
     public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
-        final org.constellation.engine.register.jooq.tables.pojos.Provider pr = providerBusiness.getProvider(providerId);
+        final org.constellation.database.api.jooq.tables.pojos.Provider pr = providerBusiness.getProvider(providerId);
         if (pr != null) {
             try {
                 final String configString = ParamUtilities.writeParameter(config);

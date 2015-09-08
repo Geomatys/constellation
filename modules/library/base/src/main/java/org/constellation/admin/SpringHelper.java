@@ -39,7 +39,7 @@ public class SpringHelper {
     public static void setApplicationContext(ApplicationContext applicationContext) {
         SpringHelper.applicationContext = applicationContext;
         SpringHelper.eventBus = applicationContext.getBean(EventBus.class);
-        LOGGER.info("spring application context loaded");
+        LOGGER.info("Spring application context loaded");
     }
 
     public static void injectDependencies(Object object) {

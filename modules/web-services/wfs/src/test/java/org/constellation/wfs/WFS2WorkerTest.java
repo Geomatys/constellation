@@ -44,6 +44,7 @@ import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
@@ -166,8 +167,8 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WFS2WorkerTest implements ApplicationContextAware {
 
     private static final Logger LOGGER = Logging.getLogger(WFS2WorkerTest.class);
@@ -400,6 +401,14 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     }
     @AfterClass
     public static void tearDownClass() throws Exception {
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (ConfigurationException ex) {
+            Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
+        }
         ConfigDirectory.shutdownTestEnvironement("WFS2WorkerTest");
         if (ds != null) {
             ds.shutdown();

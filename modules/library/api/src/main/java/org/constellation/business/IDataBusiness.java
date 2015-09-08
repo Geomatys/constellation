@@ -33,10 +33,10 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
-import org.constellation.engine.register.pojo.DataItem;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Provider;
+import org.constellation.database.api.pojo.DataItem;
 import org.geotoolkit.metadata.ImageStatistics;
 
 /**
@@ -299,7 +299,7 @@ public interface IDataBusiness {
     void updateDataStatistics();
 
     /**
-     * Update {@link org.constellation.engine.register.Data#isRendered()} attribute that define
+     * Update {@link org.constellation.database.api.Data#isRendered()} attribute that define
      * if a data is Rendered or Geophysic.
      *
      * @param fullName data name
@@ -309,7 +309,7 @@ public interface IDataBusiness {
     void updateDataRendered(QName fullName, String providerIdentifier, boolean isRendered);
 
     /**
-     * Update {@link org.constellation.engine.register.Data#datasetId} attribute.
+     * Update {@link org.constellation.database.api.Data#datasetId} attribute.
      *
      * @param fullName data name
      * @param providerIdentifier provider identifier name

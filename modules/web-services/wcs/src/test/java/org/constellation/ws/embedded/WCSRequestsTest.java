@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
@@ -40,6 +41,7 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
@@ -90,8 +92,8 @@ import org.springframework.test.context.ContextConfiguration;
  * @since 0.3
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WCSRequestsTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
@@ -221,6 +223,14 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     @AfterClass
     public static void shutDown() throws JAXBException {
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (ConfigurationException ex) {
+            Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
+        }
         ConfigDirectory.shutdownTestEnvironement("WCSRequestsTest");
         finish();
     }

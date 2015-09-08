@@ -58,9 +58,11 @@ import javax.xml.validation.Schema;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.api.PropertyConstants;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.jooq.tables.pojos.Property;
-import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.database.api.jooq.tables.pojos.Property;
+import org.constellation.database.api.repository.PropertyRepository;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.WebServiceUtilities;
@@ -641,27 +643,10 @@ public abstract class AbstractWebService implements WebService{
      *
      * @return the service uURL.
      */
-    
-    @Inject
-    private PropertyRepository propertyRepository;
-    
     protected String getServiceURL() {
-        String result;
-        Property service;
-        if (propertyRepository != null) {
-            service = propertyRepository.findOne(PropertyConstants.SERVICES_URL_KEY);
-        } else {
-            service = null;
-        }
-        if (service != null && (result = service.getValue()) != null && !result.isEmpty()) {
-        } else if (PROPERTIES_URL != null && !PROPERTIES_URL.isEmpty()) {
-            result = PROPERTIES_URL;
-        /*
-         * TODO : Reactivate the following line ? If Constellation is redirected, there's no way the last condition can
-         * give us the right URI, but does the referer really provide WS URL ?
-         */
-//        } else if (httpHeaders != null && (result = httpHeaders.getHeaderString(com.google.common.net.HttpHeaders.REFERER)) != null && !result.isEmpty()) {
-        } else {
+        String result = Application.getProperty(AppProperty.CSTL_SERVICE_URL);
+
+        if (result == null) {
             result = getUriContext().getBaseUri().toString();
         }
         return result;

@@ -48,33 +48,26 @@ import org.constellation.admin.listener.DefaultDataBusinessListener;
 import org.constellation.admin.listener.IDataBusinessListener;
 import org.constellation.admin.util.ImageStatisticDeserializer;
 import org.constellation.api.DataType;
-import org.constellation.api.PropertyConstants;
-import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
 import org.constellation.business.IDataCoverageJob;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.ServiceProtocol;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.configuration.*;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.FileBean;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Layer;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
-import org.constellation.engine.register.jooq.tables.pojos.Style;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.SensorRepository;
-import org.constellation.engine.register.repository.StyleRepository;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Layer;
+import org.constellation.database.api.jooq.tables.pojos.Provider;
+import org.constellation.database.api.jooq.tables.pojos.Service;
+import org.constellation.database.api.jooq.tables.pojos.Style;
+import org.constellation.database.api.repository.DataRepository;
+import org.constellation.database.api.repository.DatasetRepository;
+import org.constellation.database.api.repository.LayerRepository;
+import org.constellation.database.api.repository.ProviderRepository;
+import org.constellation.database.api.repository.SensorRepository;
+import org.constellation.database.api.repository.StyleRepository;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.token.TokenUtils;
@@ -99,8 +92,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.base.Optional;
 import java.util.Collection;
 import org.constellation.business.IMetadataBusiness;
-import org.constellation.engine.register.pojo.DataItem;
-import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.database.api.pojo.DataItem;
+import org.constellation.database.api.repository.ServiceRepository;
 
 
 /**
@@ -175,12 +168,6 @@ public class DataBusiness implements IDataBusiness {
      */
     @Inject
     private IDataCoverageJob dataCoverageJob;
-
-    /**
-     * Injected configuration business
-     */
-    @Inject
-    private IConfigurationBusiness configurationBusiness;
 
     @Autowired(required = false)
     private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
@@ -823,7 +810,7 @@ public class DataBusiness implements IDataBusiness {
     @Override
     @Scheduled(cron = "1 * * * * *")
     public void updateDataStatistics() {
-        String propertyValue = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
+        String propertyValue = Application.getProperty(AppProperty.DATA_AUTO_ANALYSE);
         boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
         if (doAnalysis) {
             computeEmptyDataStatistics(false);

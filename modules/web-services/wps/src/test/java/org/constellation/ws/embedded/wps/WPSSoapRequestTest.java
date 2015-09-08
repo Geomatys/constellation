@@ -19,11 +19,8 @@
 package org.constellation.ws.embedded.wps;
 
 import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.*;
 import org.constellation.admin.SpringHelper;
-import org.constellation.configuration.ProcessContext;
-import org.constellation.configuration.ProcessFactory;
-import org.constellation.configuration.Processes;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.wps.ws.soap.WPSService;
@@ -38,6 +35,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -61,8 +59,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WPSSoapRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
@@ -88,7 +86,9 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                serviceBusiness.deleteAll();
+                try {
+                    serviceBusiness.deleteAll();
+                } catch (ConfigurationException ex) {}
                 
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
                 final Processes processes = new Processes(process);
@@ -111,6 +111,11 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
     @AfterClass
     public static void shutdown() {
+        try {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(WPSSoapRequestTest.class.getName()).log(Level.WARNING, ex.getMessage());
+        }
         ConfigDirectory.shutdownTestEnvironement("WPSSoapRequestTest");
         finish();
     }

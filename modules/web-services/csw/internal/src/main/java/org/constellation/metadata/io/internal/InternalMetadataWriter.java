@@ -36,7 +36,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.database.api.jooq.tables.pojos.Metadata;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;

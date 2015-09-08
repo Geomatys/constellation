@@ -129,9 +129,9 @@
     <module>process</module>
     <module>testing</module>
     <module>admin</module>
-    <module>register</module>
+    <!-- <module>register</module> -->
     <module>template</module>
-    <module>derby-store</module>
+    <!-- <module>derby-store</module> -->
     <module>indexing</module>
   </modules>
 

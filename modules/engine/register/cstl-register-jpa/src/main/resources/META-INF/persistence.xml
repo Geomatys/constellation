@@ -1,4 +1,0 @@
-<jpa:persistence xmlns:jpa="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
-  <jpa:persistence-unit name="cstl" transaction-type="RESOURCE_LOCAL" />
-
-</jpa:persistence>

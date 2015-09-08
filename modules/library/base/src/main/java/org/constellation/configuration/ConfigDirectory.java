@@ -83,8 +83,8 @@ public final class ConfigDirectory {
             private boolean testing;
 
             public Builder() {
-                this.homeLocation = System.getProperty("cstl.home", System.getProperty("user.home") + "/.constellation");
-                this.dataLocation = System.getProperty("cstl.data", homeLocation + "/data");
+                this.homeLocation = Application.getProperty(AppProperty.CSTL_HOME, System.getProperty("user.home") + "/.constellation");
+                this.dataLocation = Application.getProperty(AppProperty.CSTL_DATA, homeLocation + "/data");
             }
 
             Config build() {
@@ -409,8 +409,14 @@ public final class ConfigDirectory {
         }
     }
 
+    /**
+     *
+     * @return service URL found in configuration or null
+     * @deprecated use {@link Application#getProperty(AppProperty#CSTL_SERVICE_URL)} instead
+     */
+    @Deprecated
     public static String getServiceURL() {
-        return System.getProperty("cstl.service.url");
+        return Application.getProperty(AppProperty.CSTL_SERVICE_URL, null);
     }
 
     public static File getInstanceDirectory(String type, String id) {

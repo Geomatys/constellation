@@ -23,8 +23,8 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Sensor;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Sensor;
 
 /**
  * @author Cédric Briançon (Geomatys)

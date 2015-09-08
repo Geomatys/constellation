@@ -18,7 +18,6 @@
  */
 package org.constellation.sos.ws;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.junit.Assert;
@@ -32,8 +31,8 @@ import org.springframework.test.context.ContextConfiguration;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public abstract class SOSConfigurerTest  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

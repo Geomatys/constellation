@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
-import org.constellation.engine.register.jooq.tables.pojos.Task;
+import org.constellation.database.api.jooq.tables.pojos.Task;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.parameter.ParameterGroup;
 import org.geotoolkit.process.ProcessEvent;

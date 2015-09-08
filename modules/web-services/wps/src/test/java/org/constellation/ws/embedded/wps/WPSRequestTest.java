@@ -21,11 +21,8 @@ package org.constellation.ws.embedded.wps;
 // JUnit dependencies
 
 import org.constellation.business.IServiceBusiness;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.*;
 import org.constellation.admin.SpringHelper;
-import org.constellation.configuration.ProcessContext;
-import org.constellation.configuration.ProcessFactory;
-import org.constellation.configuration.Processes;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
@@ -41,6 +38,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,9 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.configuration.WebdavContext;
+
 import org.constellation.webdav.AdminWebdavService;
-import org.constellation.webdav.WebdavService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -66,8 +63,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @since 0.9
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 @Ignore //@FIXME this test break the build on jenkins see JIRA CSTL-1172, please fix this and use mock objects
 public class WPSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
@@ -97,7 +94,9 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                serviceBusiness.deleteAll();
+                try {
+                    serviceBusiness.deleteAll();
+                } catch (ConfigurationException ex) {}
                 
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
                 final Processes processes = new Processes(process);
@@ -121,7 +120,8 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
     }
 
     @AfterClass
-    public static void shutDown() {
+    public static void shutDown() throws Exception {
+        SpringHelper.getBean(IServiceBusiness.class).deleteAll();
         ConfigDirectory.shutdownTestEnvironement("WPSRequestTest");
         finish();
     }

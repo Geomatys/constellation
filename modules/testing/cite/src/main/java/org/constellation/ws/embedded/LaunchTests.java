@@ -100,9 +100,9 @@ public final class LaunchTests implements Runnable {
         ConfigDirectory.setupTestEnvironement("CITE_CONFIGURATION");
         
         GrizzlyServer server = new GrizzlyServer();
-        applicationContext.getEnvironment().setActiveProfiles("standard","derby");
+        applicationContext.getEnvironment().setActiveProfiles("standard");
         
-        applicationContext.setConfigLocation("classpath:/cstl/spring/test-derby.xml");
+        applicationContext.setConfigLocation("classpath:/cstl/spring/test-context.xml");
         applicationContext.refresh();
         applicationContext.getAutowireCapableBeanFactory().autowireBean(server);
         applicationContext.getAutowireCapableBeanFactory().autowireBean(DataProviders.getConfigurator());

@@ -24,6 +24,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,13 +33,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.constellation.configuration.ConfigDirectory;
 import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard", "derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard" })
 public class ServiceBusinessTest {
 
     @Autowired
@@ -48,7 +55,26 @@ public class ServiceBusinessTest {
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("ServiceBusinessTest");
     }
-    
+
+    @PostConstruct
+    public void initSpring() {
+        clean();
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        clean();
+    }
+
+    private static void clean() {
+        try {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            ConfigDirectory.shutdownTestEnvironement("ServiceBusinessTest");
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(ServiceBusinessTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     @Test
     public void createService() throws ConfigurationException {
        /* ServiceDTO serviceDTO = new ServiceDTO();

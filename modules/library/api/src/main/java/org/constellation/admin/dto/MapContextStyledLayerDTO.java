@@ -6,7 +6,7 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerSummary;
 import org.constellation.configuration.StyleBrief;
-import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
+import org.constellation.database.api.jooq.tables.pojos.MapcontextStyledLayer;
 
 public class MapContextStyledLayerDTO extends LayerSummary implements Comparable<MapContextStyledLayerDTO> {
     private Integer id;

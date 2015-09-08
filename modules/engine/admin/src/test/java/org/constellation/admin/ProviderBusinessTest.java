@@ -19,17 +19,20 @@ package org.constellation.admin;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.constellation.business.IProviderBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
+import org.constellation.database.api.jooq.tables.pojos.Provider;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.storage.coverage.CoverageStoreFactory;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,6 +46,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 /**
  * Date: 18/09/14
  * Time: 10:28
@@ -50,8 +56,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Alexis Manin (Geomatys)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard", "derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard" })
 public class ProviderBusinessTest implements ApplicationContextAware {
 
     @Autowired
@@ -61,7 +67,22 @@ public class ProviderBusinessTest implements ApplicationContextAware {
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("ProviderBusinessTest");
     }
-    
+
+    @PostConstruct
+    public void init() {
+        clean();
+    }
+
+    @AfterClass
+    public static void destroy() {
+        clean();
+    }
+
+    private static void clean() {
+        SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        ConfigDirectory.shutdownTestEnvironement("ProviderBusinessTest");
+    }
+
     @Test
     public void createFromDataStoreFactory() throws ConfigurationException, MalformedURLException {
         final String id = "teeeeeeeeeeeest";

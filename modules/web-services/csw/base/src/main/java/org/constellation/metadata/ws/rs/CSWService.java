@@ -109,7 +109,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     public CSWService() {
         super(Specification.CSW);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
+        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)", getWorkerMapSize());
     }
 
     /**

@@ -36,14 +36,14 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSetBrief;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Provider;
+import org.constellation.database.api.repository.DataRepository;
+import org.constellation.database.api.repository.DatasetRepository;
+import org.constellation.database.api.repository.ProviderRepository;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.security.SecurityManagerHolder;
@@ -61,6 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,11 +72,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.engine.register.domain.Page;
-import org.constellation.engine.register.domain.Pageable;
-import org.constellation.engine.register.pojo.DataItem;
-import org.constellation.engine.register.pojo.DatasetItem;
-import org.constellation.engine.register.pojo.DatasetItemWithData;
+import org.constellation.database.api.domain.Page;
+import org.constellation.database.api.domain.Pageable;
+import org.constellation.database.api.pojo.DataItem;
+import org.constellation.database.api.pojo.DatasetItem;
+import org.constellation.database.api.pojo.DatasetItemWithData;
 
 /**
  *
@@ -243,7 +244,7 @@ public class DatasetBusiness implements IDatasetBusiness {
             extractedMetadata = new DefaultMetadata();
         }
         //Update metadata
-        final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
+        final Properties prop = getMetadataTemplateProperties();
         final String metadataID = CstlMetadatas.getMetadataIdForDataset(providerId);
         prop.put("fileId", metadataID);
         prop.put("dataTitle", metadataID);
@@ -390,6 +391,15 @@ public class DatasetBusiness implements IDatasetBusiness {
         removeDataset(datasetRepository.findByIdentifier(datasetIdentifier));
     }
 
+    @Transactional
+    @Override
+    public void removeAllDatasets() throws ConfigurationException {
+        final List<Dataset> all = datasetRepository.findAll();
+        for (Dataset dataset : all) {
+            removeDataset(dataset.getId());
+        }
+    }
+
     private void removeDataset(Dataset ds) throws ConfigurationException {
         if (ds != null) {
             final Set<Integer> involvedProvider = new HashSet<>();
@@ -490,5 +500,19 @@ public class DatasetBusiness implements IDatasetBusiness {
     @Override
     public DatasetItemWithData getSingletonDatasetItem(DatasetItem dsItem, List<DataItem> items) {
         return new DatasetItemWithData(dsItem, items);
+    }
+
+    private Properties getMetadataTemplateProperties() {
+        final File cstlDir = ConfigDirectory.getConfigDirectory();
+        final File propFile = new File(cstlDir, "metadataTemplate.properties");
+        final Properties prop = new Properties();
+        if (propFile.exists()) {
+            try {
+                prop.load(new FileReader(propFile));
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
+            }
+        }
+        return prop;
     }
 }

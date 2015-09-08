@@ -6,7 +6,7 @@
 
   <import resource="classpath:/spring/constellation-context.xml" />
 
-  <import resource="classpath:/cstl/spring/register-context.xml" />
+  <import resource="classpath:/cstl/spring/database-context.xml" />
 
   <import resource="security-sdi.xml" />
 

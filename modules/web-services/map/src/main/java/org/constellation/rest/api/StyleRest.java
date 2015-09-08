@@ -175,7 +175,7 @@ public final class StyleRest {
     @PUT
     @Path("{id}/style/create")
     public Response createStyleJson(final @PathParam("id") String id, final Style style) throws Exception {
-        org.constellation.engine.register.jooq.tables.pojos.Style created = styleBusiness.createStyle(id, style.toType());
+        org.constellation.database.api.jooq.tables.pojos.Style created = styleBusiness.createStyle(id, style.toType());
         created.setBody(null);
         return ok(created);
     }

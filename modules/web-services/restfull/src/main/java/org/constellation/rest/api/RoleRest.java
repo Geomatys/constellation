@@ -1,6 +1,6 @@
 package org.constellation.rest.api;
 
-import org.constellation.engine.register.repository.RoleRepository;
+import org.constellation.database.api.repository.RoleRepository;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;

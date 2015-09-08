@@ -19,6 +19,7 @@
 package org.constellation.ws.embedded;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.AppProperty;
 import org.constellation.ws.rs.CstlApplication;
 import org.constellation.ws.rs.jackson.JacksonFeature;
 import org.geotoolkit.console.CommandLine;
@@ -26,7 +27,6 @@ import org.geotoolkit.console.Option;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
@@ -250,8 +250,10 @@ public class CstlEmbeddedService extends CommandLine {
             working = true;
             try {
                 final ResourceConfig config = ResourceConfig.forApplication(new CstlApplication());
-                System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard,derby");
-                System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard,derby");
+                System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard");
+                System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard");
+                System.setProperty(AppProperty.CSTL_URL.getKey(), currentUri.toString());
+                System.setProperty(AppProperty.CSTL_SERVICE_URL.getKey(), currentUri.toString());
 //                grizzlyWebContainerProperties.put(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, "standard");
 //                grizzlyWebContainerProperties.put(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "standard");
                 config.addProperties(grizzlyWebContainerProperties);

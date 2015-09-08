@@ -1,10 +1,7 @@
 package org.constellation.admin;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,18 +10,18 @@ import javax.xml.bind.JAXBException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.MetadataUtilities;
-import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
+import org.constellation.configuration.AppProperty;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.MetadataComplete;
-import org.constellation.engine.register.MetadataIOUtils;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
-import org.constellation.engine.register.jooq.tables.pojos.Property;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
-import org.constellation.engine.register.repository.MetadataRepository;
-import org.constellation.engine.register.repository.PropertyRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.database.api.MetadataComplete;
+import org.constellation.database.api.MetadataIOUtils;
+import org.constellation.database.api.jooq.tables.pojos.Metadata;
+import org.constellation.database.api.jooq.tables.pojos.MetadataBbox;
+import org.constellation.database.api.jooq.tables.pojos.Property;
+import org.constellation.database.api.jooq.tables.pojos.Service;
+import org.constellation.database.api.repository.MetadataRepository;
+import org.constellation.database.api.repository.PropertyRepository;
+import org.constellation.database.api.repository.ServiceRepository;
 import org.constellation.utils.CstlMetadatas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -64,11 +61,14 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
     @Override
     @Transactional
     public void setProperty(final String key, final String value) {
+        System.setProperty(key, value);
+        // FIXME continue to save in database ?
+        // create/update external configuration file to save preferences ?
         propertyRepository.save(new Property(key, value));
         // update metadata when service URL key is updated
-            if (PropertyConstants.SERVICES_URL_KEY.equals(key)) {
-                updateServiceUrlForMetadata(value);
-            }
+        if (AppProperty.CSTL_SERVICE_URL.getKey().equals(key)) {
+            updateServiceUrlForMetadata(value);
+        }
     }
     
     private void updateServiceUrlForMetadata(final String url) {
@@ -90,24 +90,5 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
             LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
         } 
     }
-    
-  
-    
-    public static String getConfigPath() {
-        return ConfigDirectory.getConfigDirectory().getPath();
-    }
 
-    public static Properties getMetadataTemplateProperties() {
-        final File cstlDir = ConfigDirectory.getConfigDirectory();
-        final File propFile = new File(cstlDir, "metadataTemplate.properties");
-        final Properties prop = new Properties();
-        if (propFile.exists()) {
-            try {
-                prop.load(new FileReader(propFile));
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
-            }
-        }
-        return prop;
-    }
 }

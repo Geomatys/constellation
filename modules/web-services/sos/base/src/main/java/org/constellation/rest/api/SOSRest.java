@@ -49,8 +49,8 @@ import org.constellation.configuration.StringList;
 import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Sensor;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Sensor;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
@@ -299,7 +299,7 @@ public class SOSRest {
         // look for provider ids
         final Set<String> providerIDs = new HashSet<>();
         for (Data data : datas) {
-            final org.constellation.engine.register.jooq.tables.pojos.Provider provider = providerBusiness.getProvider(data.getProvider());
+            final org.constellation.database.api.jooq.tables.pojos.Provider provider = providerBusiness.getProvider(data.getProvider());
             providerIDs.add(provider.getIdentifier());
         }
         

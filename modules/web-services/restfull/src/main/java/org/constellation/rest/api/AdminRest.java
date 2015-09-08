@@ -29,7 +29,7 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.*;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.database.api.repository.LayerRepository;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ICSWConfigurer;
@@ -100,7 +100,7 @@ public class AdminRest {
     @GET
     @Path("/configurationLocation")
     public Response configurationPath() throws CstlServiceException {
-        final String path = ConfigurationBusiness.getConfigPath();
+        final String path = configurationBusiness.getConfigurationDirectory().getPath();
         return Response.ok(new AcknowlegementType(true, path)).build();
     }
 

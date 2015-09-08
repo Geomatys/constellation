@@ -11,7 +11,18 @@
 
   <bean id="cstlTokenService" class="org.constellation.services.component.TokenService" autowire="byType" />
 
-  <sec:jdbc-user-service id="cstlUserService" data-source-ref="dataSource" />
+  <sec:jdbc-user-service id="cstlUserService" data-source-ref="dataSource"
+
+                     users-by-username-query="
+          select login,password, active
+          from admin.cstl_user where login=?"
+
+                     authorities-by-username-query="
+          select u.login, ur.role
+          from admin.cstl_user u, admin.user_x_role ur
+          where u.id = ur.user_id and u.login =?  "
+
+          />
 
   <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider user-service-ref="cstlUserService">

@@ -31,7 +31,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
 public class PyramidCoverageHelperTestCase  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;

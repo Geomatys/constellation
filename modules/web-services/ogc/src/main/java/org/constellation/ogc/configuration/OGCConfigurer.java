@@ -29,7 +29,7 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Details;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
+import org.constellation.database.api.jooq.tables.pojos.Service;
 import org.constellation.ws.ServiceConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 

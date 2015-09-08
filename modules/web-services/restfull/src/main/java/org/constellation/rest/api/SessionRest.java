@@ -34,9 +34,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.constellation.engine.register.UserWithRole;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.UserWithRole;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

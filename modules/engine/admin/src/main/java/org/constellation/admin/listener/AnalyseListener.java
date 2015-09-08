@@ -20,9 +20,10 @@ package org.constellation.admin.listener;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.SpringHelper;
-import org.constellation.api.PropertyConstants;
 import org.constellation.business.IConfigurationBusiness;
 import org.constellation.business.IDataBusiness;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
@@ -53,7 +54,7 @@ public class AnalyseListener implements ServletContextListener {
 
         if (configurationBusiness != null) {
             //check if data analysis is required
-            String propertyValue = configurationBusiness.getProperty(PropertyConstants.DATA_ANALYSE_KEY);
+            String propertyValue = Application.getProperty(AppProperty.DATA_AUTO_ANALYSE);
             boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
 
             if (doAnalysis && dataBusiness != null) {

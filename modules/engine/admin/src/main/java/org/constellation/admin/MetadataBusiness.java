@@ -41,16 +41,16 @@ import org.constellation.admin.util.MetadataUtilities;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.jooq.tables.pojos.Data;
-import org.constellation.engine.register.jooq.tables.pojos.Dataset;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
-import org.constellation.engine.register.jooq.tables.pojos.Service;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.DatasetRepository;
-import org.constellation.engine.register.repository.MetadataRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.jooq.tables.pojos.Data;
+import org.constellation.database.api.jooq.tables.pojos.Dataset;
+import org.constellation.database.api.jooq.tables.pojos.Metadata;
+import org.constellation.database.api.jooq.tables.pojos.Service;
+import org.constellation.database.api.repository.DataRepository;
+import org.constellation.database.api.repository.DatasetRepository;
+import org.constellation.database.api.repository.MetadataRepository;
+import org.constellation.database.api.repository.ServiceRepository;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.json.metadata.v2.Template;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -77,9 +77,9 @@ import org.constellation.admin.dto.metadata.GroupStatBrief;
 import org.constellation.admin.dto.metadata.OwnerStatBrief;
 import org.constellation.admin.dto.metadata.User;
 import org.constellation.dto.MetadataLists;
-import org.constellation.engine.register.MetadataComplete;
-import org.constellation.engine.register.MetadataWithState;
-import org.constellation.engine.register.jooq.tables.pojos.MetadataBbox;
+import org.constellation.database.api.MetadataComplete;
+import org.constellation.database.api.MetadataWithState;
+import org.constellation.database.api.jooq.tables.pojos.MetadataBbox;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.utils.MetadataFeeder;
@@ -491,6 +491,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updatePublication(final int id, final boolean newStatus) throws ConfigurationException {
         updatePublication(Arrays.asList(id), newStatus);
     }
@@ -499,6 +500,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updatePublication(final List<Integer> ids, final boolean newStatus) throws ConfigurationException {
         final List<MetadataWithState> toUpdate = new ArrayList<>();
         for (Integer id : ids) {
@@ -517,6 +519,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updateProfile(final Integer id, final String newProfile) throws ConfigurationException {
         metadataRepository.changeProfile(id, newProfile);
     }
@@ -525,6 +528,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updateValidation(int id, boolean newStatus) {
         metadataRepository.changeValidation(id, newStatus);
     }
@@ -533,6 +537,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updateOwner(int id, int newOwner) {
         metadataRepository.changeOwner(id, newOwner);
     }
@@ -541,6 +546,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updateOwner(List<Integer> ids, int newOwner) {
         for (final Integer id : ids) {
             metadataRepository.changeOwner(id, newOwner);
@@ -551,6 +557,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteMetadata(int id) throws ConfigurationException {
         deleteMetadata(Arrays.asList(id));
     }
@@ -559,6 +566,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteDataMetadata(final int dataId) throws ConfigurationException {
         final Metadata meta = metadataRepository.findByDataId(dataId);
         if (meta != null) {
@@ -570,6 +578,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteDatasetMetadata(final int datasetId) throws ConfigurationException {
         final Metadata meta = metadataRepository.findByDatasetId(datasetId);
         if (meta != null) {
@@ -581,6 +590,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteMetadata(List<Integer> ids) throws ConfigurationException {
         // First we update the csw index
         final List<MetadataWithState> toDelete = new ArrayList<>();
@@ -595,6 +605,15 @@ public class MetadataBusiness implements IMetadataBusiness {
         for (Integer id : ids) {
             metadataRepository.delete(id);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public void deleteAllMetadata() throws ConfigurationException {
+        metadataRepository.deleteAll();
     }
 
     /**
@@ -941,6 +960,7 @@ public class MetadataBusiness implements IMetadataBusiness {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Metadata duplicateMetadata(final int id, final String newTitle) throws ConfigurationException {
         final Metadata meta = metadataRepository.findById(id);
         if (meta != null) {
@@ -1037,6 +1057,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
     
     @Override
+    @Transactional
     public void askForValidation(final int metadataID) {
         final Metadata metadata = metadataRepository.findById(metadataID);
         if (metadata != null) {
@@ -1060,16 +1081,19 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     @Override
+    @Transactional
     public void denyValidation(final int metadataID, final String comment) {
         metadataRepository.denyValidation(metadataID, comment);
     }
 
     @Override
+    @Transactional
     public void denyValidation(final Metadata metadata, final String comment, final String metadataLink) {
         metadataRepository.denyValidation(metadata.getId(), comment);
     }
     
     @Override
+    @Transactional
     public void acceptValidation(final int metadataID) {
         final Metadata metadata = metadataRepository.findById(metadataID);
         if (metadata != null) {
@@ -1079,6 +1103,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     }
 
     @Override
+    @Transactional
     public void acceptValidation(final Metadata metadata, final String metadataLink) {
         if (metadata != null) {
             metadataRepository.changeValidation(metadata.getId(), true);

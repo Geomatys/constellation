@@ -74,6 +74,8 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
     private static File dataDirectory;
 
+    private static boolean initialized = false;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         final File configDir = ConfigDirectory.setupTestEnvironement("NCCSWWorkerTest");
@@ -94,7 +96,8 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+            if (!initialized) {
+                serviceBusiness.deleteAll();
                 //we write the configuration file
                 Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
                 configuration.putParameter("transactionSecurized", "false");
@@ -111,6 +114,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);
+                initialized = true;
             }
         } catch (Exception ex) {
             Logger.getLogger(NetCDFCSWWorkerTest.class.getName()).log(Level.SEVERE, null, ex);

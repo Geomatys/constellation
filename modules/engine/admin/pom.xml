@@ -155,8 +155,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.constellation.engine.register</groupId>
-            <artifactId>cstl-register-api</artifactId>
+            <groupId>org.constellation.database</groupId>
+            <artifactId>cstl-database-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -184,8 +184,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.constellation.engine.register</groupId>
-            <artifactId>cstl-register-jooq</artifactId>
+            <groupId>org.constellation.database</groupId>
+            <artifactId>cstl-database-configuration</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

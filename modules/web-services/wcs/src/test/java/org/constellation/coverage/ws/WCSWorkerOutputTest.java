@@ -18,6 +18,7 @@
  */
 package org.constellation.coverage.ws;
 
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -105,8 +106,8 @@ import org.springframework.test.context.ActiveProfiles;
  * @since 0.5
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WCSWorkerOutputTest implements ApplicationContextAware {
     
     private static final Logger LOGGER = Logging.getLogger(WCSWorkerOutputTest.class);
@@ -214,6 +215,14 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (ConfigurationException ex) {
+            Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
+        }
         ConfigDirectory.shutdownTestEnvironement("WCSWorkerOutputTest");
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

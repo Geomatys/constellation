@@ -61,13 +61,10 @@ import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.ogc.xml.v110.AndType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.LiteralType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
-import org.geotoolkit.ogc.xml.v110.PropertyNameType;
+
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
@@ -94,8 +91,8 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     private static final Logger LOGGER = Logging.getLogger(WFSCIteWorkerTest.class);

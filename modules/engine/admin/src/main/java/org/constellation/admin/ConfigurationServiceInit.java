@@ -19,9 +19,7 @@
 package org.constellation.admin;
 
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.engine.register.ConfigurationService;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.security.SecurityManagerHolder;
+import org.constellation.business.IConfigurationService;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
@@ -51,7 +49,7 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Inject
-    private ConfigurationService configurationService;
+    private IConfigurationService configurationService;
     
     /**
      * Spring application context.
@@ -88,11 +86,11 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
 
     }
 
-    public ConfigurationService getConfigurationService() {
+    public IConfigurationService getConfigurationService() {
         return configurationService;
     }
 
-    public void setConfigurationService(ConfigurationService configurationService) {
+    public void setConfigurationService(IConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
 

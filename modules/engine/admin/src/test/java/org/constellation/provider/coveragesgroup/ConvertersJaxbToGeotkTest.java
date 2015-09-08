@@ -46,8 +46,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Cédric Briançon (Geomatys)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard", "derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard" })
 @Ignore //ignore this test due to compilation lock in jenkins, this test should be rewrited with mock objects see issue CSTL-1163
 public class ConvertersJaxbToGeotkTest implements ApplicationContextAware {
 

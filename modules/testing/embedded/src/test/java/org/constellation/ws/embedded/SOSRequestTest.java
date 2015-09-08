@@ -52,12 +52,14 @@ import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileWriter;
@@ -82,9 +84,11 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class SOSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("org.constellation.ws.embedded");
 
     protected ApplicationContext applicationContext;
     
@@ -121,6 +125,12 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
+                try {
+                    serviceBusiness.deleteAll();
+                } catch (Exception ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
+
                 final String url = "jdbc:derby:memory:TestOM2;create=true";
                 final DefaultDataSource ds = new DefaultDataSource(url);
                 Connection con = ds.getConnection();
@@ -167,13 +177,18 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
                 pool = SOSMarshallerPool.getInstance();
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(SOSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error(ex.getMessage(), ex);
             }
         }
     }
 
     @AfterClass
     public static void shutDown() {
+        try {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

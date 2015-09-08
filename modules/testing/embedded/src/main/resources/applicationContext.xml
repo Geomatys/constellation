@@ -8,5 +8,5 @@
 
   <bean class="org.constellation.admin.ConfigurationServiceInit" init-method="init" autowire="byType"/>
 
-  <import resource="classpath:/cstl/spring/test-derby.xml" />
+  <import resource="classpath:/cstl/spring/test-context.xml" />
 </beans>

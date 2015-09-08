@@ -43,11 +43,11 @@ import org.constellation.business.ILayerBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
 import org.constellation.test.utils.SpringTestRunner;
@@ -83,8 +83,8 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Johann Sorel (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class WMSServiceTest implements ApplicationContextAware {
 
     private static final Logger LOGGER = Logging.getLogger(WMSServiceTest.class);
@@ -210,6 +210,14 @@ public class WMSServiceTest implements ApplicationContextAware {
     public static void finish() {
         service.destroy();
         ConfigDirectory.shutdownTestEnvironement("WMSServiceTest");
+        try {
+            SpringHelper.getBean(ILayerBusiness.class).removeAll();
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IDataBusiness.class).deleteAll();
+            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+        } catch (ConfigurationException ex) {
+            Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
+        }
     }
     
     public void setFields() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {

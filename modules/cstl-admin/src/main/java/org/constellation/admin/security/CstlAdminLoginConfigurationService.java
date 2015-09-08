@@ -13,7 +13,7 @@ public class CstlAdminLoginConfigurationService {
     private String cstlLoginURL = "login.html";
     
     public CstlAdminLoginConfigurationService() {
-         LOGGER.info("***** CstlAdminLoginConfigurationService construct *****");
+         LOGGER.debug("CstlAdminLoginConfigurationService construct");
     }
     
     

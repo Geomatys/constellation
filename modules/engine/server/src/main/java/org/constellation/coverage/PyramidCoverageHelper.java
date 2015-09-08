@@ -52,14 +52,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import org.constellation.admin.SpringHelper;
-import org.constellation.engine.register.repository.PropertyRepository;
 import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.storage.coverage.CoverageReference;
 import org.geotoolkit.storage.coverage.CoverageStore;
 import org.geotoolkit.storage.coverage.CoverageStoreFinder;
 import org.geotoolkit.storage.coverage.PyramidCoverageBuilder;
 import org.opengis.util.GenericName;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Helper class to ease the pyramid process.
@@ -94,9 +92,6 @@ public class PyramidCoverageHelper {
     private List<GridCoverage2D> coveragesPyramid;
     private double[] depth;
     private Envelope envelope;
-    
-    @Autowired
-    private PropertyRepository propertyRepository;
 
     public PyramidCoverageHelper(Builder builder) throws DataStoreException {
         SpringHelper.injectDependencies(this);

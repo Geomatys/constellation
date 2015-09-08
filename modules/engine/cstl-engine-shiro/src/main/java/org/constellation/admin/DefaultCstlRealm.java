@@ -31,9 +31,9 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.DomainUser;
+import org.constellation.database.api.User;
+import org.constellation.database.api.repository.UserRepository;
 import org.mdweb.model.auth.MDwebRole;
 
 import javax.inject.Inject;

@@ -186,7 +186,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.apache.sis.internal.jaxb.geometry"), null);
             setXMLContext(pool);
-            LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)\n", getWorkerMapSize());
+            LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)", getWorkerMapSize());
 
         } catch (JAXBException ex){
             LOGGER.warning("The WFS REST service is not running.\ncause  : Error creating XML context.\n error  : " + ex.getMessage()  +

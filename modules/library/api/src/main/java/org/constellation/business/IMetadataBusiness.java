@@ -29,8 +29,8 @@ import org.constellation.admin.dto.metadata.OwnerStatBrief;
 import org.constellation.admin.dto.metadata.User;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.MetadataLists;
-import org.constellation.engine.register.MetadataWithState;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.database.api.MetadataWithState;
+import org.constellation.database.api.jooq.tables.pojos.Metadata;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -320,7 +320,13 @@ public interface IMetadataBusiness {
      * @throws org.constellation.configuration.ConfigurationException 
      */
     void deleteMetadata(final List<Integer> ids) throws ConfigurationException;
-    
+
+    /**
+     * Delete all metadata in database
+     * @throws ConfigurationException
+     */
+    void deleteAllMetadata() throws ConfigurationException;
+
     /**
      * Return a percentage of the metadata completion (related to the profile linked to the metadata pojo).
      * The metadata pojo is retrieve from the linked specified data.

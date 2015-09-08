@@ -19,16 +19,6 @@
 
 package org.constellation.ws.embedded;
 
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -36,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -54,18 +42,14 @@ import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.api.ProviderType;
 import org.constellation.business.IDatasetBusiness;
+import org.constellation.business.IMetadataBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
-import org.constellation.engine.register.jooq.tables.pojos.Provider;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.DataProviders;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
@@ -73,7 +57,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opengis.parameter.ParameterValueGroup;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -84,16 +68,17 @@ import org.w3c.dom.Node;
 // JUnit dependencies
 
 /**
- *
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard","derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard"})
 public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("org.constellation.ws.embedded");
+
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -104,58 +89,48 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
 
     @Inject
     private IProviderBusiness providerBusiness;
-    
+
     @Inject
     private IDatasetBusiness datasetBusiness;
-    
+
+    @Inject
+    private IMetadataBusiness metadataBusiness;
+
     private static ConstellationClient client;
-    
+
     private static boolean initialized = false;
-    
+
     private static File configDirectory;
-    
+
     @BeforeClass
     public static void initTestDir() {
         configDirectory = ConfigDirectory.setupTestEnvironement("OGCRestTest");
     }
-    
-    /**
-     * Initialize the list of layers from the defined providers in Constellation's configuration.
-     */
-    @PostConstruct
-    public void initPool() {
-        SpringHelper.setApplicationContext(applicationContext);
-        if (!initialized) {
-            try {
-                final File dataDirectory2 = new File(configDirectory, "dataCsw2");
-                dataDirectory2.mkdir();
-
-                try {
-                    serviceBusiness.delete("csw", "default");
-                    serviceBusiness.delete("csw", "intern");
-                } catch (ConfigurationException ex) {}
-
-                final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
-                config2.putParameter("shiroAccessible", "false");
-                serviceBusiness.create("csw", "default", config2, null);
-
-                writeProvider("meta1.xml",  "42292_5p_19900609195600");
-
-                Automatic configuration = new Automatic("internal", (String)null);
-                configuration.putParameter("shiroAccessible", "false");
-                serviceBusiness.create("csw", "intern", configuration, null);
-
-                initServer(null, null, "api");
-                pool = GenericDatabaseMarshallerPool.getInstance();
-                initialized = true;
-            } catch (Exception ex) {
-                Logger.getLogger(OGCRestTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
 
     @AfterClass
-    public static void shutDown() {
+    public static void teardown() {
+        try {
+            final IDatasetBusiness dataset = SpringHelper.getBean(IDatasetBusiness.class);
+            dataset.removeAllDatasets();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+
+        //clean providers
+        try {
+            final IProviderBusiness provider = SpringHelper.getBean(IProviderBusiness.class);
+            provider.removeAll();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
+
+        //clean services
+        try {
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            service.deleteAll();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+        }
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
@@ -164,11 +139,62 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         finish();
     }
 
+    /**
+     * Initialize the list of layers from the defined providers in Constellation's configuration.
+     */
+    @PostConstruct
+    public void initPool() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                //clean datasets
+                try {
+                    datasetBusiness.removeAllDatasets();
+                } catch (Exception ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
+
+                //clean providers
+                try {
+                    providerBusiness.removeAll();
+                } catch (Exception ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
+
+                //clean services
+                try {
+                    serviceBusiness.deleteAll();
+                } catch (Exception ex) {
+                    LOGGER.warn(ex.getMessage());
+                }
+
+                final File dataDirectory2 = new File(configDirectory, "dataCsw2");
+                dataDirectory2.mkdir();
+
+                final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
+                config2.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "default", config2, null);
+
+                createDataset("meta1.xml", "42292_5p_19900609195600");
+
+                Automatic configuration = new Automatic("internal", (String) null);
+                configuration.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "intern", configuration, null);
+
+                initServer(null, null, "api");
+                pool = GenericDatabaseMarshallerPool.getInstance();
+                initialized = true;
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage(), ex);
+            }
+        }
+    }
+
     @Test
     public void testGetConfiguration() throws Exception {
         waitForStart();
 
-        client = new ConstellationClient("http://localhost:" +  grizzly.getCurrentPort() + "/");
+        client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort() + "/");
 
         Instance in = client.services.getInstance(ServiceDef.Specification.CSW, "default");
 
@@ -196,8 +222,8 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
     @Test
     public void testMetadata() throws Exception {
         waitForStart();
-        
-        client = new ConstellationClient("http://localhost:" +  grizzly.getCurrentPort() + "/");
+
+        client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort() + "/");
         client.connectTimeout(3000000);
         client.readTimeout(3000000);
         final Node node = client.csw.getMetadata("intern", "42292_5p_19900609195600");
@@ -205,20 +231,7 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         assertEquals("MD_Metadata", node.getLocalName());
     }
 
-    public void writeProvider(String resourceName, String identifier) throws Exception {
-
-        final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
-        final ParameterValueGroup source = service.getProviderDescriptor().createValue();
-        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-        final String rootDir = "whathever";
-        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(identifier);
+    public void createDataset(String resourceName, String identifier) throws Exception {
 
         Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
         u.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
@@ -230,13 +243,13 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         final StringWriter sw = new StringWriter();
         m.marshal(meta, sw);
         CSWMarshallerPool.getInstance().recycle(m);
-        
-        final Provider prov = providerBusiness.storeProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
+
         datasetBusiness.createDataset(identifier, sw.toString(), null);
     }
 
     /**
      * used for debug
+     *
      * @param n
      * @return
      * @throws Exception

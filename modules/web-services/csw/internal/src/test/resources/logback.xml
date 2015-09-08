@@ -1,0 +1,29 @@
+<!-- /* * Constellation - An open source and standard compliant SDI * http://www.constellation-sdi.org * * (C) 2013, Geomatys
+  * * This library is free software; you can redistribute it and/or * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either * version 3 of the License, or (at your option) any later
+  version. * * This library is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the
+  implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU * Lesser General Public License for
+  more details. */ -->
+<configuration scan="true">
+
+    <property name="cstl.log.dir" value="${cslt.dir:-${user.home}/.constellation}/logs/cstl" />
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="org.constellation" level="INFO" />
+    <logger name="org.geotoolkit" level="INFO" />
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+
+    </root>
+</configuration>

@@ -26,10 +26,11 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.mail.EmailException;
 import org.constellation.admin.mail.MailService;
 import org.constellation.auth.transfer.TokenTransfer;
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
-import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.repository.UserRepository;
 import org.constellation.services.component.TokenService;
 import org.geotoolkit.util.StringUtilities;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -152,8 +153,9 @@ public class AuthController {
             Authentication authentication = this.authManager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (BadCredentialsException e) {
-
-            return new ResponseEntity<TokenTransfer>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception ex) {
+            LoggerFactory.getLogger(AuthController.class).warn(ex.getMessage(), ex);
         }
 
         /*

@@ -19,6 +19,8 @@
 package org.constellation.admin.web.controller;
 
 import org.constellation.admin.security.CstlAdminLoginConfigurationService;
+import org.constellation.configuration.AppProperty;
+import org.constellation.configuration.Application;
 import org.constellation.token.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +40,6 @@ import java.util.Properties;
 @Controller
 public class ConfigController {
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigController.class);
 
     private static long TOKEN_LIFE = TokenUtils.getTokenLife();
@@ -47,9 +48,8 @@ public class ConfigController {
     private CstlAdminLoginConfigurationService cstlAdminLoginConfigurationService;
 
     public ConfigController() {
-        LOGGER.info("***** ConfigController construct *****");
+        LOGGER.debug("ConfigController construct");
     }
-
 
     @Inject
     @Named("build")
@@ -57,27 +57,24 @@ public class ConfigController {
 
     @Inject
     private Environment env;
-
     /**
      * Resolve the Constellation service webapp context.
      * It will return:
      * <ul>
-     * <li>-Dcstl.url</li>
-     * <li>/constellation</li>
+     *   <li>-Dcstl.url</li>
+     *   <li>/constellation</li>
      * </ul>
      * Current webapp context if running the same webapp (cstl-uberwar)
-     *
      * @param request {@code HttpServletRequest}
      * @return Map
      */
-    @RequestMapping(value = "/conf", method = RequestMethod.GET)
-    public
-    @ResponseBody
+    @RequestMapping(value = "/conf", method=RequestMethod.GET)
+    public @ResponseBody
     Map<Object, Object> get(final HttpServletRequest request) {
         final ServletContext servletCtxt = request.getServletContext();
         Properties properties = new Properties();
         String context;
-        final String cstlConfUrl = env.getProperty("cstl.url");
+        final String cstlConfUrl = Application.getProperty(AppProperty.CSTL_URL);
         //first check against variable if defined to override cstl url
         if (cstlConfUrl != null) {
             context = cstlConfUrl;
@@ -102,13 +99,10 @@ public class ConfigController {
         return properties;
     }
 
-
-    @RequestMapping(value = "/build", method = RequestMethod.GET)
-    public
-    @ResponseBody
+    @RequestMapping(value = "/build", method=RequestMethod.GET)
+    public @ResponseBody
     Properties getBuildInfo(final HttpServletRequest request) {
         return buildProperties;
     }
-
 
 }

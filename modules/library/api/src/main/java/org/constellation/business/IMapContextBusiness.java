@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.dto.ParameterValues;
-import org.constellation.engine.register.jooq.tables.pojos.Mapcontext;
-import org.constellation.engine.register.jooq.tables.pojos.MapcontextStyledLayer;
+import org.constellation.database.api.jooq.tables.pojos.Mapcontext;
+import org.constellation.database.api.jooq.tables.pojos.MapcontextStyledLayer;
 import org.opengis.util.FactoryException;
 
 /**

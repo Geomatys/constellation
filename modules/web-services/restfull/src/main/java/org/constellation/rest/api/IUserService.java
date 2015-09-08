@@ -20,7 +20,7 @@ package org.constellation.rest.api;
 
 import javax.ws.rs.core.Response;
 
-import org.constellation.engine.register.jooq.tables.pojos.CstlUser;
+import org.constellation.database.api.jooq.tables.pojos.CstlUser;
 
 public interface IUserService {
 

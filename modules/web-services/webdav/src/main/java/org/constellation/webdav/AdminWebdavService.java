@@ -42,7 +42,7 @@ public class AdminWebdavService extends OGCWebService<WebdavWorker> {
      */
     public AdminWebdavService() {
         super(ServiceDef.Specification.WEBDAV);
-        LOGGER.log(Level.INFO, "Webdav (Admin) REST service running ({0} instances)\n", getWorkerMapSize());
+        LOGGER.log(Level.INFO, "Webdav (Admin) REST service running ({0} instances)", getWorkerMapSize());
     }
 
     @Override

@@ -19,9 +19,11 @@
 package org.constellation.admin;
 
 import org.constellation.business.IMetadataBusiness;
+import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.engine.register.jooq.tables.pojos.Metadata;
+import org.constellation.database.api.jooq.tables.pojos.Metadata;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,21 +33,49 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author guilhem
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-@ActiveProfiles({"standard", "derby"})
+@ContextConfiguration("classpath:/cstl/spring/test-context.xml")
+@ActiveProfiles({"standard" })
 public class MetadataBusinessTest {
     
     @Autowired
     private IMetadataBusiness metadataBusiness;
-    
+
+    @Autowired
+    private IServiceBusiness serviceBusiness;
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("MetadataBusinessTest");
+    }
+
+    @PostConstruct
+    public void init() {
+        clean();
+    }
+
+    @AfterClass
+    public static void destroy() {
+        clean();
+    }
+
+    private static void clean() {
+        try {
+            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            SpringHelper.getBean(IMetadataBusiness.class).deleteAllMetadata();
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(MetadataBusinessTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ConfigDirectory.shutdownTestEnvironement("MetadataBusinessTest");
     }
 
     @Test
