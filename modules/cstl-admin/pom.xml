@@ -78,10 +78,11 @@
     <codahale.metrics.version>3.0.1</codahale.metrics.version>
     <node.version>v0.10.31</node.version>
     <npm.version>1.4.23</npm.version>
-    <frontend.maven.plugin.version>0.0.23</frontend.maven.plugin.version>
+    <frontend.maven.plugin.version>0.0.24</frontend.maven.plugin.version>
 
     <!-- Grunt build properties -->
     <grunt.target.dir>${project.build.directory}/grunt-build</grunt.target.dir>
+    <node.install.dir>${project.basedir}</node.install.dir>
   </properties>
 
   <repositories>
@@ -435,9 +436,11 @@
                     <goals>
                         <goal>install-node-and-npm</goal>
                     </goals>
+                    <phase>generate-resources</phase>
                     <configuration>
                         <nodeVersion>${node.version}</nodeVersion>
                         <npmVersion>${npm.version}</npmVersion>
+                        <installDirectory>${node.install.dir}</installDirectory>
                     </configuration>
                 </execution>
                 <!-- Install required Node Packaged Modules -->
