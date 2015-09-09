@@ -23,7 +23,7 @@
                                             "help": "system.field.uniqueID.name_help",
                                             "path": "metadata.member.realProcess.identification.identifierList.identifier.name",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "uniqueID",
                                             "value": null
                                         }
@@ -35,7 +35,7 @@
                                             "help": "system.field.uniqueID.definition_help",
                                             "path": "metadata.member.realProcess.identification.identifierList.identifier.term.definition",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "urn:ogc:def:identifierType:OGC:uniqueID",
                                             "value": null
                                         }
@@ -48,7 +48,7 @@
                                             "path": "metadata.member.realProcess.identification.identifierList.identifier.term.value",
                                             "render": "text",
                                             "tag": "title",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -71,7 +71,7 @@
                                             "help": "system.field.identifier.name_help",
                                             "path": "metadata.member.realProcess.identification.identifierList.identifier.name",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -83,7 +83,7 @@
                                             "help": "system.field.identifier.definition_help",
                                             "path": "metadata.member.realProcess.identification.identifierList.identifier.term.definition",
                                             "render": "uri",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -95,7 +95,7 @@
                                             "help": "system.field.identifier.value_help",
                                             "path": "metadata.member.realProcess.identification.identifierList.identifier.term.value",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -126,7 +126,7 @@
                                             "help": "system.field.validTime.beginPosition_help",
                                             "path": "metadata.member.realProcess.validTime.timePeriod.beginPosition.value",
                                             "render": "DATE.text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -138,7 +138,7 @@
                                             "help": "system.field.validTime.endPosition_help",
                                             "path": "metadata.member.realProcess.validTime.timePeriod.endPosition.value",
                                             "render": "DATE.text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -169,7 +169,7 @@
                                             "help": "system.field.position.name_help",
                                             "path": "metadata.member.realProcess.position.name",
                                             "render": "text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "platform-location",
                                             "value": null
                                         }
@@ -181,7 +181,7 @@
                                             "help": "system.field.position.referenceFrame_help",
                                             "path": "metadata.member.realProcess.position.position.referenceFrame",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "urn:ogc:def:crs,crs:EPSG::4326",
                                             "value": null
                                         }
@@ -193,7 +193,7 @@
                                             "help": "system.field.position.definition_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.definition",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "urn:ogc:def:phenomenon:location",
                                             "value": null
                                         }
@@ -205,7 +205,7 @@
                                             "help": "system.field.latitude.name_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.latitude.name",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "latitude",
                                             "value": null
                                         }
@@ -217,7 +217,7 @@
                                             "help": "system.field.latitude.definition_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.latitude.quantity.definition",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "urn:ogc:def:phenomenon:latitude",
                                             "value": null
                                         }
@@ -229,7 +229,7 @@
                                             "help": "system.field.latitude.uom_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.latitude.quantity.uom.code",
                                             "render": "text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "degree",
                                             "value": null
                                         }
@@ -241,7 +241,7 @@
                                             "help": "system.field.latitude.value_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.latitude.quantity.value",
                                             "render": "decimal",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -253,7 +253,7 @@
                                             "help": "system.field.longitude.name_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.longitude.name",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "longitude",
                                             "value": null
                                         }
@@ -265,7 +265,7 @@
                                             "help": "system.field.longitude.definition_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.longitude.quantity.definition",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "urn:ogc:def:phenomenon:longitude",
                                             "value": null
                                         }
@@ -277,7 +277,7 @@
                                             "help": "system.field.longitude.uom_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.longitude.quantity.uom.code",
                                             "render": "text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "degree",
                                             "value": null
                                         }
@@ -289,7 +289,7 @@
                                             "help": "system.field.longitude.value_help",
                                             "path": "metadata.member.realProcess.position.position.location.vector.longitude.quantity.value",
                                             "render": "decimal",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -320,7 +320,7 @@
                                             "help": "system.field.input.name_help",
                                             "path": "metadata.member.realProcess.inputs.inputList.input.name",
                                             "render": "text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -332,7 +332,7 @@
                                             "help": "system.field.input.definition_help",
                                             "path": "metadata.member.realProcess.inputs.inputList.input.observableProperty.definition",
                                             "render": "uri",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -354,7 +354,7 @@
                                             "help": "system.field.output.name_help",
                                             "path": "metadata.member.realProcess.outputs.outputList.output.name",
                                             "render": "text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -366,7 +366,7 @@
                                             "help": "system.field.output.definition_help",
                                             "path": "metadata.member.realProcess.outputs.outputList.output.quantity.definition",
                                             "render": "uri",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -378,7 +378,7 @@
                                             "help": "system.field.output.uom_help",
                                             "path": "metadata.member.realProcess.outputs.outputList.output.quantity.uom.code",
                                             "render": "text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -409,7 +409,7 @@
                                             "help": "system.field.component.name_help",
                                             "path": "metadata.member.realProcess.components.componentList.component.name",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -421,7 +421,7 @@
                                             "help": "system.field.component.href_help",
                                             "path": "metadata.member.realProcess.components.componentList.component.href",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
