@@ -229,7 +229,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     protected Data getLayerReference(final Layer layer) throws CstlServiceException {
-        return DataProviders.getInstance().get(NamesExt.create(layer.getName()), layer.getProviderID(), layer.getDate());
+        return DataProviders.getInstance().get(NamesExt.create(layer.getName()), layer.getProviderID(), null);
     }
 
     protected Data getLayerReference(final String login, final QName layerName) throws CstlServiceException {
