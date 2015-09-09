@@ -24,7 +24,7 @@
                                             "path": "metadata.identificationInfo.citation.title",
                                             "render": "text",
                                             "tag": "title",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -36,7 +36,7 @@
                                             "help": "metadata.field.abstract_help",
                                             "path": "metadata.identificationInfo.abstract",
                                             "render": "textarea",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -48,7 +48,7 @@
                                             "help": "metadata.field.keyword_help",
                                             "path": "metadata.identificationInfo.descriptiveKeywords.keyword",
                                             "render": "KEYWORD.text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -60,7 +60,7 @@
                                             "help": "metadata.field.date_help",
                                             "path": "metadata.identificationInfo.citation.date.date",
                                             "render": "DATE.text",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -72,7 +72,7 @@
                                             "help": "metadata.field.dateType_help",
                                             "path": "metadata.identificationInfo.citation.date.dateType",
                                             "render": "DATE.codelist",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -84,7 +84,7 @@
                                             "help": "metadata.field.language_help",
                                             "path": "metadata.identificationInfo.language",
                                             "render": "Language.codelist",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "LanguageCode.fra",
                                             "value": null
                                         }
@@ -96,7 +96,7 @@
                                             "help": "metadata.field.graphicOverViewFileName_help",
                                             "path": "metadata.identificationInfo.graphicOverview.fileName",
                                             "render": "web",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -128,7 +128,7 @@
                                             "help": "metadata.field.role_help",
                                             "path": "metadata.contact.role",
                                             "render": "CODELIST.readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "CI_RoleCode.pointOfContact",
                                             "value": null
                                         }
@@ -140,7 +140,7 @@
                                             "help": "metadata.field.individualName_help",
                                             "path": "metadata.contact.individualName",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -152,7 +152,7 @@
                                             "help": "metadata.field.positionName_help",
                                             "path": "metadata.contact.positionName",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -164,7 +164,7 @@
                                             "help": "metadata.field.deliveryPoint_help",
                                             "path": "metadata.contact.contactInfo.address.deliveryPoint",
                                             "render": "textarea",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -176,7 +176,7 @@
                                             "help": "metadata.field.city_help",
                                             "path": "metadata.contact.contactInfo.address.city",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -188,7 +188,7 @@
                                             "help": "metadata.field.postalCode_help",
                                             "path": "metadata.contact.contactInfo.address.postalCode",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -200,7 +200,7 @@
                                             "help": "metadata.field.country_help",
                                             "path": "metadata.contact.contactInfo.address.country",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": "France",
                                             "value": null
                                         }
@@ -212,7 +212,7 @@
                                             "help": "metadata.field.electronicMailAddress_help",
                                             "path": "metadata.contact.contactInfo.address.electronicMailAddress",
                                             "render": "mail",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -224,7 +224,7 @@
                                             "help": "metadata.field.voice_help",
                                             "path": "metadata.contact.contactInfo.phone.voice",
                                             "render": "text",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -236,7 +236,7 @@
                                             "help": "metadata.field.linkage_help",
                                             "path": "metadata.contact.contactInfo.onlineResource.linkage",
                                             "render": "web",
-                                            "obligation": "O",
+                                            "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -258,7 +258,7 @@
                                             "help": "metadata.field.identifier_help",
                                             "path": "metadata.fileIdentifier",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -270,7 +270,7 @@
                                             "help": "metadata.field.dateStamp_help",
                                             "path": "metadata.dateStamp",
                                             "render": "DATE.readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": null,
                                             "value": null
                                         }
@@ -282,7 +282,7 @@
                                             "help": "metadata.field.metadataStandardVersion_help",
                                             "path": "metadata.metadataStandardVersion",
                                             "render": "readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "2011.03",
                                             "value": null
                                         }
@@ -294,7 +294,7 @@
                                             "help": "metadata.field.characterSet_help",
                                             "path": "metadata.characterSet",
                                             "render": "CharacterSet.codelist",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "UTF-8",
                                             "value": null
                                         }
@@ -306,7 +306,7 @@
                                             "help": "metadata.field.hierarchyLevel_help",
                                             "path": "metadata.hierarchyLevel",
                                             "render": "CODELIST.readonly",
-                                            "obligation": "M",
+                                            "obligation": "M","completion" : "ELEMENTARY",
                                             "defaultValue": "MD_ScopeCode.dataset",
                                             "value": null
                                         }
