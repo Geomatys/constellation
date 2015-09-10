@@ -66,7 +66,10 @@ import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ICSWConfigurer;
+import org.constellation.ws.Refreshable;
+import org.constellation.ws.WSEngine;
 import org.geotoolkit.index.tree.manager.NamedEnvelope;
 import org.opengis.metadata.Metadata;
 
@@ -395,13 +398,17 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
             try {
                 final boolean deleted = writer.deleteMetadata(identifierList);
                 if (deleted) {
+                    final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", id);
+                    if (worker != null) {
+                        worker.refresh();
+                    }
                     final String msg = "The specified record has been deleted from the CSW";
                     return new AcknowlegementType("Success", msg);
                 } else {
                     final String msg = "The specified record has not been deleted from the CSW";
                     return new AcknowlegementType("Failure", msg);
                 }
-            } catch (MetadataIoException ex) {
+            } catch (MetadataIoException | CstlServiceException ex) {
                 throw new ConfigurationException(ex);
             }
         } finally {
@@ -422,10 +429,14 @@ public class CSWConfigurer extends OGCConfigurer implements ICSWConfigurer {
                 for (String metaID : metaIDS) {
                     writer.deleteMetadata(metaID);
                 }
+                final Refreshable worker = (Refreshable) WSEngine.getInstance("CSW", id);
+                if (worker != null) {
+                    worker.refresh();
+                }
                 final String msg = "All records have been deleted from the CSW";
                 return new AcknowlegementType("Success", msg);
 
-            } catch (MetadataIoException ex) {
+            } catch (MetadataIoException | CstlServiceException ex) {
                 throw new ConfigurationException(ex);
             }
         } finally {
