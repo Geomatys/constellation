@@ -393,7 +393,8 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                 $scope.import.allowNext = true;
 
             },function(response){//error
-                Growl('error','Error','Unable to connect database. Verify parameters');
+                console.debug(response);
+                Growl('error','Error',response.data);
             });
         };
 

@@ -103,14 +103,14 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                 translateKey: 'label.file.server',
                 defaultTranslateValue: 'Server file',
                 bindFunction: function() { startDataImport('server', 'step1DataServer', true); }
-            },
+            }/*,
             {
                 idHTML: 'dbchoice',
                 name: 'database',
                 translateKey: 'label.file.db',
                 defaultTranslateValue: 'Database',
                 bindFunction: function() { startDataImport('database', 'step1Database', true); }
-            }
+            }*/
         ];
 
 
