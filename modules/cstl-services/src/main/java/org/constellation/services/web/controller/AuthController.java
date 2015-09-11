@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -133,10 +134,7 @@ public class AuthController {
     /**
      * Authenticates a user and creates an authentication token.
      * 
-     * @param username
-     *            The name of the user.
-     * @param password
-     *            The password of the user.
+     * @param login pojo that contains the name and the password of the user.
      * @return A transfer containing the authentication token.
      */
     @RequestMapping(value="/login", method=RequestMethod.POST)
@@ -153,6 +151,8 @@ public class AuthController {
             Authentication authentication = this.authManager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (BadCredentialsException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (DisabledException exception) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (Exception ex) {
             LoggerFactory.getLogger(AuthController.class).warn(ex.getMessage(), ex);

@@ -783,6 +783,7 @@
     "login.form.button": "Authenticate",
     "login.login.messages.error.authentication": "<strong>Authentication failed!</strong> Please check your credentials and try again.",
     "login.error": "Login or password incorrect.",
+    "login.disabled": "This account is disabled, thank you to contact an administrator to reactivate it.",
 
     "label.user":"User",
     "confirm.delete.dialog":"Confirm delete ?",

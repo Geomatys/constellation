@@ -54,18 +54,28 @@ cstlLoginApp.controller("login", function($scope, $http, $modal){
     };
 
     $scope.login = function(target){
-        $http.post(cstlUrl + 'spring/login', {username: $scope.formInputs.username,
-                                                       password: $scope.formInputs.password})
-            .success(function(resp){
+        $http.post(cstlUrl + 'spring/login',
+            {username: $scope.formInputs.username,
+             password: $scope.formInputs.password}
+        ).then(function(resp){
                 jQuery('#msg-error').hide();
-                if (resp.token) {
-                    $.cookie('access_token', resp.token, { path : '/' });
+                if (resp.data.token) {
+                    $.cookie('access_token', resp.data.token, { path : '/' });
                     $.cookie('cstlActiveDomainId', 1, { path : '/' });
-                    $.cookie('cstlUserId', resp.userId, { path : '/' });
+                    $.cookie('cstlUserId', resp.data.userId, { path : '/' });
                     window.location.href= target ? target : "admin.html";
                 }
-            }).error(function(resp){
-                jQuery('#msg-error').show('fade');
+            }, function(resp){
+                jQuery(".msg_auth_error").hide();
+                if(resp) {
+                    if(resp.status === 401 ) {
+                        jQuery('#msg-error').show('fade');
+                    }else if (resp.status === 403) {
+                        jQuery('#msg-error2').show('fade');
+                    }
+                }else {
+                    jQuery('#msg-error').show('fade');
+                }
             });
     };
 
