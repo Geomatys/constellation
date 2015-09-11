@@ -15,6 +15,7 @@
                                 "multiplicity": 1,
                                 "help": "component.block.identification.uniqueID_help",
                                 "path": "metadata.member.realProcess.identification.identifierList.identifier",
+                                "strict": true,
                                 "children": [{
                                         "type": "field",
                                         "field": {

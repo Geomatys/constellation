@@ -3,6 +3,7 @@ package org.constellation.json.metadata.v2;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -422,7 +423,9 @@ public class TemplateReader extends AbstractTemplateHandler {
         }
         if (!CharSequence.class.isAssignableFrom(type) && (value instanceof CharSequence)) {
             String text = value.toString();
-            if (text.startsWith("nilReason:")) {
+            if (type == URI.class) {
+                return URI.create(text);
+            } else if (text.startsWith("nilReason:")) {
                 try {
                     value = NilReason.valueOf(text.substring("nilReason:".length())).createNilObject(type);
                 } catch (URISyntaxException | IllegalArgumentException e) {
