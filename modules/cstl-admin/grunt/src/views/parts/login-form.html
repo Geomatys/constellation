@@ -1,8 +1,12 @@
 <h1 translate="login.title">Authentication</h1>
 <div id="msg-error"
      style="display:none;border-color:#D89A9A; background-color:#FFC0CB;padding: 8px;"
-     class="alert"
+     class="alert msg_auth_error"
      translate="login.error">Login or password incorrect.</div>
+<div id="msg-error2"
+     style="display:none;border-color:#D89A9A; background-color:#FFC0CB;padding: 8px;"
+     class="alert msg_auth_error"
+     translate="login.disabled">This account is disabled, thank you to contact an administrator to reactivate it.</div>
 <form id="loginForm" class="form" role="form" ng-submit="login()" form-autofill-fix>
     <div class="form-group">
         <label for="username"

@@ -539,6 +539,7 @@
     "login.messages.error.authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion.",
     "login.title": "S'authentifier",
     "login.error": "Identifiant ou mot de passe incorrect.",
+    "login.disabled": "Ce compte est désactivé, merci de contacter un administrateur pour le réactiver.",
 
     "logs.filter": "Filtrer",
     "logs.nbloggers": "Total de {{ total }} \"loggers\".",
