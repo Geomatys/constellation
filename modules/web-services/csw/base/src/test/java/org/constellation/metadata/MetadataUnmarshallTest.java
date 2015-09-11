@@ -120,6 +120,7 @@ import static java.util.Collections.singleton;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Ignore;
 
 
 /**
@@ -723,5 +724,43 @@ public class MetadataUnmarshallTest extends DefaultMetadataTest {
         final DefaultOnlineResource expResult = (DefaultOnlineResource) unmarshaller.unmarshal(new StringReader(result));
 
         assertEquals(expResult, online);
+    }
+    
+    /**
+     * TODO enable when SIS version will be > 0.6-jdk7-MC0020
+     * 
+     * @throws Exception 
+     */
+    @Ignore
+    public void topicCategoryMarshallTest() throws Exception {
+
+        StringWriter sw = new StringWriter();
+        marshaller = testPool.acquireMarshaller();
+        
+        DefaultDataIdentification data = new DefaultDataIdentification();
+        data.setTopicCategories(Arrays.asList(TopicCategory.BIOTA));
+        
+        marshaller.marshal(data, sw);
+        String result = sw.toString();
+        System.out.println(result);
+
+        unmarshaller = testPool.acquireUnmarshaller();
+        DefaultDataIdentification expResult = (DefaultDataIdentification) unmarshaller.unmarshal(new StringReader(result));
+        assertEquals(expResult, data);
+        
+        sw = new StringWriter();
+        
+        data = new DefaultDataIdentification();
+        data.setTopicCategories(Arrays.asList(TopicCategory.IMAGERY_BASE_MAPS_EARTH_COVER));
+        
+        marshaller.marshal(data, sw);
+        result = sw.toString();
+        System.out.println(result);
+
+        unmarshaller = testPool.acquireUnmarshaller();
+        expResult = (DefaultDataIdentification) unmarshaller.unmarshal(new StringReader(result));
+
+        assertEquals(expResult, data);
+        
     }
 }
