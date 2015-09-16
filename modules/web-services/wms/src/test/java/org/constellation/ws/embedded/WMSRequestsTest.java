@@ -60,7 +60,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
@@ -382,10 +381,22 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @AfterClass
     public static void shutDown() throws JAXBException {
         try {
-            SpringHelper.getBean(ILayerBusiness.class).removeAll();
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
-            SpringHelper.getBean(IDataBusiness.class).deleteAll();
-            SpringHelper.getBean(IProviderBusiness.class).removeAll();
+            final ILayerBusiness layerBean = SpringHelper.getBean(ILayerBusiness.class);
+            if (layerBean != null) {
+                layerBean.removeAll();
+            }
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
+            final IDataBusiness dataBean = SpringHelper.getBean(IDataBusiness.class);
+            if (dataBean != null) {
+                dataBean.deleteAll();
+            }
+            final IProviderBusiness provider = SpringHelper.getBean(IProviderBusiness.class);
+            if (provider != null) {
+                provider.removeAll();
+            }
         } catch (Exception ex) {
             Logger.getLogger(WMSRequestsTest.class.getName()).log(Level.WARNING, ex.getMessage());
         }

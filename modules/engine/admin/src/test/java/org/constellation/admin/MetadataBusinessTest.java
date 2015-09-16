@@ -34,7 +34,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,8 +69,14 @@ public class MetadataBusinessTest {
 
     private static void clean() {
         try {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
-            SpringHelper.getBean(IMetadataBusiness.class).deleteAllMetadata();
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
+            final IMetadataBusiness mdBean = SpringHelper.getBean(IMetadataBusiness.class);
+            if (mdBean != null) {
+                mdBean.deleteAllMetadata();
+            }
         } catch (ConfigurationException ex) {
             Logger.getLogger(MetadataBusinessTest.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -41,7 +41,6 @@ import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-context.xml")
@@ -68,7 +67,10 @@ public class ServiceBusinessTest {
 
     private static void clean() {
         try {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
             ConfigDirectory.shutdownTestEnvironement("ServiceBusinessTest");
         } catch (ConfigurationException ex) {
             Logger.getLogger(ServiceBusinessTest.class.getName()).log(Level.SEVERE, null, ex);

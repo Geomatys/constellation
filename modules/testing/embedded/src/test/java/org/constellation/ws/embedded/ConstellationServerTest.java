@@ -23,7 +23,6 @@ import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
@@ -41,14 +40,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFile;
 import static org.junit.Assert.assertFalse;
@@ -157,7 +153,10 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
     @AfterClass
     public static void shutDown() {
         try {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

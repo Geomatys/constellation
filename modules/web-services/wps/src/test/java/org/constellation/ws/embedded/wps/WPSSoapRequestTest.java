@@ -35,7 +35,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -112,7 +111,10 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     @AfterClass
     public static void shutdown() {
         try {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
         } catch (ConfigurationException ex) {
             Logger.getLogger(WPSSoapRequestTest.class.getName()).log(Level.WARNING, ex.getMessage());
         }
