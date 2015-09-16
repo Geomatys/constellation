@@ -21,12 +21,10 @@ package org.constellation.ws.embedded;
 // JUnit dependencies
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
@@ -52,7 +50,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -65,8 +62,6 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -173,7 +168,9 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     public static void shutDown() {
         try {
             final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
-            service.deleteAll();
+            if (service != null) {
+                service.deleteAll();
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -41,16 +40,13 @@ import org.constellation.business.IMetadataBusiness;
 import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.database.api.repository.MetadataRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -129,9 +125,18 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
-            SpringHelper.getBean(IProviderBusiness.class).removeAll();
-            SpringHelper.getBean(IMetadataBusiness.class).deleteAllMetadata();
+        final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+        if (service != null) {
+            service.deleteAll();
+        }
+        final IProviderBusiness provider = SpringHelper.getBean(IProviderBusiness.class);
+        if (provider != null) {
+            provider.removeAll();
+        }
+        final IMetadataBusiness mdService = SpringHelper.getBean(IMetadataBusiness.class);
+        if (mdService != null) {
+            mdService.deleteAllMetadata();
+        }
 
         if (worker != null) {
             worker.destroy();

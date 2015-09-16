@@ -59,7 +59,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileWriter;
@@ -71,8 +70,6 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -185,7 +182,10 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
     @AfterClass
     public static void shutDown() {
         try {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

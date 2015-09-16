@@ -38,7 +38,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -121,7 +120,10 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
 
     @AfterClass
     public static void shutDown() throws Exception {
-        SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+        final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+        if (service != null) {
+            service.deleteAll();
+        }
         ConfigDirectory.shutdownTestEnvironement("WPSRequestTest");
         finish();
     }

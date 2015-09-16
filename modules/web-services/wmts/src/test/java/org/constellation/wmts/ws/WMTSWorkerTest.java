@@ -44,7 +44,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
@@ -111,7 +110,10 @@ public class WMTSWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+        final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+        if (service != null) {
+            service.deleteAll();
+        }
         ConfigDirectory.shutdownTestEnvironement("WMTSWorkerTest");
     }
 

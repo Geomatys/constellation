@@ -127,7 +127,9 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         //clean services
         try {
             final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
-            service.deleteAll();
+            if (service != null) {
+                service.deleteAll();
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

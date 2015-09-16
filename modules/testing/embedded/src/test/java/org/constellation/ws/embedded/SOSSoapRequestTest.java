@@ -21,7 +21,6 @@ package org.constellation.ws.embedded;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -41,7 +40,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileWriter;
@@ -53,8 +51,6 @@ import java.net.URLConnection;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -155,7 +151,10 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     @AfterClass
     public static void shutDown() {
         try {
-            SpringHelper.getBean(IServiceBusiness.class).deleteAll();
+            final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
+            if (service != null) {
+                service.deleteAll();
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
