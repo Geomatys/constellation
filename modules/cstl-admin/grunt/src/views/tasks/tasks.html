@@ -81,10 +81,19 @@
                                                    tooltip data-placement="top"
                                                    title="{{task.date | date:'yyyy-MM-dd'}}"></i>
                                             </div>
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;text-shadow: none;">
+                                                <i class="fa fa-user"
+                                                   title="{{task.ownerName || ('unknown'|translate)}}"
+                                                   tooltip data-placement="top"></i>
+                                            </div>
                                         </div>
                                         <div ng-class="{'hidden':small}">
                                             <div class="block">
                                                 <i class="fa fa-calendar"></i>{{task.date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{task.ownerName || ('unknown'|translate)}}
                                             </div>
                                         </div>
                                         <div class="block pull-right">
