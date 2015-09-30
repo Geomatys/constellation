@@ -40,7 +40,7 @@ cstlResetPasswordApp.config(['$locationProvider', function ($locationProvider) {
 /**
  * Login controller.
  */
-cstlResetPasswordApp.controller("resetPasswordController", function($scope, $http, $location, $translate, Growl){
+cstlResetPasswordApp.controller("resetPasswordController", function($scope, $http, $location, $translate, Growl, AppConfigService){
 
     var self = this;
 
@@ -60,8 +60,8 @@ cstlResetPasswordApp.controller("resetPasswordController", function($scope, $htt
             });
     };
 
-    $http.get('app/conf').success(function(conf) {
-        cstlUrl = conf.cstl;
-        $.cookie('cstlUrl', cstlUrl);
+    AppConfigService.getConfigProperty('cstl', function (val) {
+        cstlUrl = val;
+        $.cookie('cstlUrl', val);
     });
 });

@@ -75,7 +75,8 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
         $scope.$on('reloadDatasets', self.search);
     })
 
-    .controller('DatasetDashboardController', function($scope, $q, $routeParams, $http, $cookieStore, $modal, CstlConfig, Growl, Dataset, Data, dataListing, style, provider) {
+    .controller('DatasetDashboardController', function($scope, $q, $routeParams, $http, $cookieStore, $modal, CstlConfig,
+                                                       Growl, Dataset, Data, dataListing, style, provider, AppConfigService) {
 
         var self = this;
 
@@ -545,9 +546,8 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             Growl('error', 'Error', 'Data ' + selection.data.name + ' deletion failed');
         }
 
+        AppConfigService.getConfig(function(config) {
 
-        // Load data import configuration.
-        $http.get("app/conf").success(function(config) {
             if (config['cstl.import.empty']) {
                 self.addDataWays.push({
                     name: 'emptyDataset',
@@ -557,6 +557,7 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     bindFunction: function() { startDataImport('empty', 'step2Metadata', true); }
                 });
             }
+
             if (config['cstl.import.custom']) {
                 self.addDataWays.push({
                     name: 'customDataset',
