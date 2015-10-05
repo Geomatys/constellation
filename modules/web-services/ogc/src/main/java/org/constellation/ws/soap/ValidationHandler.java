@@ -27,15 +27,15 @@ import java.util.logging.Logger;
 
 /**
  * use with @SchemaValidation(handler = ValidationHandler.class) annotations a JAX-WS service classes.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class ValidationHandler extends ValidationErrorHandler {
 
-    private static final Logger LOGGER = Logging.getLogger(ValidationHandler.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.soap");
+
     public static final String ERROR       = "SchemaValidationError";
-  
+
     @Override
     public void warning(SAXParseException exception) {
         LOGGER.log(Level.FINER, ERROR, exception);

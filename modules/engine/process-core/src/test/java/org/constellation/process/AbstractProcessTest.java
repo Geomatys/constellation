@@ -36,8 +36,8 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertNotNull;
 import org.springframework.test.context.ActiveProfiles;
 /**
- * Abstract test base for all engine process tests. 
- * 
+ * Abstract test base for all engine process tests.
+ *
  * @author Quentin Boileau (Geomatys)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,15 +45,15 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"standard"})
 public abstract class AbstractProcessTest implements ApplicationContextAware {
 
-    protected static final Logger LOGGER = Logging.getLogger(AbstractProcessTest.class);
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.process");
     private final String factory = ConstellationProcessFactory.NAME;
     private final String process;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         SpringHelper.setApplicationContext(applicationContext);
     }
-    
+
     protected AbstractProcessTest(final String process){
         this.process = process;
     }
@@ -63,5 +63,5 @@ public abstract class AbstractProcessTest implements ApplicationContextAware {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(factory, process);
         assertNotNull(desc);
     }
-    
+
 }

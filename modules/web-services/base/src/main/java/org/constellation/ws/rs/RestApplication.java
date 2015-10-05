@@ -26,12 +26,12 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 public class RestApplication extends ResourceConfig {
-    private static final Logger LOGGER = Logging.getLogger(RestApplication.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs");
+
     public RestApplication() {
          super(JacksonFeature.class, MultiPartFeature.class, RolesAllowedDynamicFeature.class);
          LOGGER.info("Starting Rest API Application");
          packages("org.constellation.rest.api;org.constellation.ws.rest;org.constellation.metadata.ws.rs.provider;org.constellation.ws.rs.provider");
     }
-    
+
 }

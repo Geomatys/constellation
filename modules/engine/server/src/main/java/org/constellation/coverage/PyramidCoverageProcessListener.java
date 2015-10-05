@@ -36,6 +36,7 @@ import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.apache.sis.util.logging.Logging;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -47,7 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class PyramidCoverageProcessListener implements ProcessListener {
 
-    private static final Logger LOGGER = Logger.getLogger(PyramidCoverageProcessListener.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage");
 
     private String uuidTask;
 
@@ -57,7 +58,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     @Autowired
     private IProcessBusiness processBusiness;
-    
+
     public PyramidCoverageProcessListener(final Integer userId, final String path, final String identifier) {
         SpringHelper.injectDependencies(this);
         this.userId = userId;

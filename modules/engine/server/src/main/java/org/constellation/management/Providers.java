@@ -33,13 +33,13 @@ import org.opengis.util.GenericName;
 
 /**
  * Providers MBean implementation.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public final class Providers implements ProvidersMBean{
 
     static final Providers INSTANCE = new Providers();
-    private static final Logger LOGGER = Logging.getLogger(Providers.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.management");
 
     private Providers(){}
 

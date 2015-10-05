@@ -37,10 +37,10 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 @ApplicationPath("/")
 public class CstlApplication extends Application {
 
-    private static final Logger LOGGER = Logging.getLogger(CstlApplication.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs");
+
     private final Set<Object> singletons = new HashSet<>();
-    
+
     public CstlApplication() {
         LOGGER.info("Starting CSTL Application");
         final Iterator<WebService> ite = ServiceRegistry.lookupProviders(WebService.class);
@@ -62,7 +62,7 @@ public class CstlApplication extends Application {
         return result;
     }
 
-    
+
 
     @PreDestroy
     public void destroy() {

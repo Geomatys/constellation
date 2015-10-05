@@ -42,7 +42,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -53,13 +53,13 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static File dataDirectory;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         final File configDir = ConfigDirectory.setupTestEnvironement("FSCSWWorkerTest");
-            
+
         File CSWDirectory  = new File(configDir, "CSW");
         CSWDirectory.mkdir();
         final File instDirectory = new File(CSWDirectory, "default");
@@ -80,10 +80,10 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         writeDataFile(dataDirectory, "ebrim3.xml", "urn:motiive:csw-ebrim");
         //writeDataFile(dataDirectory, "error-meta.xml", "urn:error:file");
         writeDataFile(dataDirectory, "meta13.xml", "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
-        
+
         pool = EBRIMMarshallerPool.getInstance();
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -102,23 +102,23 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
 
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);
-                
+
             } else if (worker == null) {
-                
+
                 serviceBusiness.delete("csw", "default");
-                
+
                 //we write the configuration file
                 Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
 
                 serviceBusiness.create("csw", "default", configuration, null);
-                
+
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(FileSystemCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.metadata").log(Level.SEVERE, null, ex);
         }
 
     }

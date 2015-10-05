@@ -21,7 +21,6 @@ package org.constellation.admin;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -35,8 +34,6 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.database.api.jooq.tables.pojos.Provider;
 import org.constellation.database.api.jooq.tables.pojos.Service;
 import org.constellation.database.api.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,8 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ConfigurationService implements IConfigurationService {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
     private PropertyRepository propertyRepository;
@@ -63,8 +58,8 @@ public class ConfigurationService implements IConfigurationService {
 
     @Autowired
     private LayerRepository layerRepository;
-    
-    
+
+
 //    /**
 //     * Store configuration, this method is too "generic" and should be refactored/splited.
 //     * <br />

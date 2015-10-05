@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  */
 public abstract class ServiceConfigurer {
 
-    protected static final Logger LOGGER = Logging.getLogger(ServiceConfigurer.class);
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
 
     private static AutowireCapableBeanFactory autowirer;
 
@@ -60,6 +60,6 @@ public abstract class ServiceConfigurer {
 
     public static void setApplicationContext(ApplicationContext applicationContext) {
         ServiceConfigurer.autowirer = applicationContext.getAutowireCapableBeanFactory();
-        
+
     }
 }

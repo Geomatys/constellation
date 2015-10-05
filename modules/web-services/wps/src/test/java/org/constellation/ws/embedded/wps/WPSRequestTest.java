@@ -46,8 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.webdav.AdminWebdavService;
 
 import static org.junit.Assert.assertEquals;
@@ -68,7 +68,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class WPSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -80,14 +80,14 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WPSRequestTest");
     }
-    
+
     @PostConstruct
     public void initLayerList() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -96,7 +96,7 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
                 try {
                     serviceBusiness.deleteAll();
                 } catch (ConfigurationException ex) {}
-                
+
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
                 final Processes processes = new Processes(process);
                 final ProcessContext config = new ProcessContext(processes);
@@ -110,10 +110,10 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
                 map.put("wps", new WPSService());
                 initServer(null, map);
                 pool = WPSMarshallerPool.getInstance();
-                
+
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WPSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded.wps").log(Level.SEVERE, null, ex);
             }
         }
     }

@@ -35,7 +35,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -57,12 +56,9 @@ import javax.xml.validation.Schema;
 
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.api.PropertyConstants;
 import org.constellation.configuration.AppProperty;
 import org.constellation.configuration.Application;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.database.api.jooq.tables.pojos.Property;
-import org.constellation.database.api.repository.PropertyRepository;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.WebServiceUtilities;
@@ -70,11 +66,6 @@ import org.constellation.xml.PrefixMappingInvocationHandler;
 import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 
-// Jersey dependencies
-// JAXB dependencies
-// Constellation dependencies
-// Geotoolkit dependencies
-// Apache SIS dependencies
 
 /**
  * Abstract parent of all REST facade classes for Constellation web services.
@@ -136,7 +127,7 @@ public abstract class AbstractWebService implements WebService{
     /**
      * The default debugging logger for all web services.
      */
-    protected static final Logger LOGGER = Logging.getLogger(AbstractWebService.class);
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs");
 
     private static final String PROPERTIES_URL = ConfigDirectory.getServiceURL();
 

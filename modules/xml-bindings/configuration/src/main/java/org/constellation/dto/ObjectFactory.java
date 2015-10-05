@@ -19,15 +19,12 @@
 package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRegistry;
-import java.util.logging.Logger;
 
 /**
  * @author Benjamin Garcia (Geomatys)
  */
 @XmlRegistry
 public class ObjectFactory {
-
-    private static final Logger LOGGER = Logger.getLogger(ObjectFactory.class.getName());
 
     public ObjectFactory() {
     }
@@ -71,11 +68,11 @@ public class ObjectFactory {
     public ParameterValues createParameterValues(){
         return new ParameterValues();
     }
-    
+
     public ObservationFilter createObservationFilter(){
         return new ObservationFilter();
     }
-    
+
     public SimpleValue createSimpleValue() {
         return new SimpleValue();
     }

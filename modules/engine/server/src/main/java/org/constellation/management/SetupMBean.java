@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public class SetupMBean implements ServletContextListener {
 
-    private static final Logger LOGGER = Logging.getLogger(SetupMBean.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.management");
     private static final AtomicBoolean REGISTERED = new AtomicBoolean(false);
 
     @Override

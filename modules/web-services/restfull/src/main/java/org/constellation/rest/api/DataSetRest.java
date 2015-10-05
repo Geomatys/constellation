@@ -82,14 +82,14 @@ public class DataSetRest {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(DataSetRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     /**
      * Injected dataset business.
      */
     @Inject
     private IDatasetBusiness datasetBusiness;
-    
+
     /**
      * Injected metadata business.
      */
@@ -141,7 +141,7 @@ public class DataSetRest {
                                   final ParameterValues values) {
 
         final String metaPath = values.getValues().get("metadataFilePath");
-        
+
         final String datasetIdentifier = values.getValues().get("datasetIdentifier");
         if (datasetIdentifier != null && !datasetIdentifier.isEmpty()) {
             try {
@@ -150,7 +150,7 @@ public class DataSetRest {
                     LOGGER.log(Level.WARNING, "Dataset with identifier " + datasetIdentifier + " already exist");
                     return Response.status(Response.Status.CONFLICT).entity("failed").build();
                 }
-                
+
                 String metadataXML = null;
                 if (metaPath != null) {
                     final File f = new File(metaPath);
@@ -162,7 +162,7 @@ public class DataSetRest {
                     }
                     metadataXML = metadataBusiness.marshallMetadata(metadata);
                 }
-                
+
                 Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
                 Dataset dataSet = datasetBusiness.createDataset(datasetIdentifier, metadataXML, user.get().getId());
                 return Response.ok().status(Response.Status.CREATED)

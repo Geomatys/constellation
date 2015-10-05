@@ -44,7 +44,7 @@ public class CiteTests extends AbstractMojo {
     /**
      * The default logger of exceptions.
      */
-    private static final Logger LOGGER = Logging.getLogger(CiteTests.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.plugin");
 
     /**
      * The different services that will be tested.
@@ -58,7 +58,7 @@ public class CiteTests extends AbstractMojo {
      * phase will be done in the end, and the build will fail if a regression
      * is found.
      *
-     * @throws MojoExecutionException 
+     * @throws MojoExecutionException
      * @throws MojoFailureException if some new tests are failing.
      */
     @Override

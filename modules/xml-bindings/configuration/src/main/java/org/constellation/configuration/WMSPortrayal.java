@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class WMSPortrayal {
 
-    private static final Logger LOGGER = Logging.getLogger(WMSPortrayal.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.configuration");
 
     private static final String INTERPOLATION_NEAREST = "nearest";
     private static final String INTERPOLATION_BILINEAR = "bilinear";

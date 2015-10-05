@@ -34,13 +34,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * @author bgarcia
  */
 public class CRSUtilities {
 
-    private static final Logger LOGGER = Logger.getLogger(CRSUtilities.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.utils");
 
     private static SortedMap<String, String> ePSGCodes;
 

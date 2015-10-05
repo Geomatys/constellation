@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class MapUtilities {
 
-    private static final Logger LOGGER = Logging.getLogger(MapUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs");
 
     /**
      * Verify that all layers are queryable for a {@code GetFeatureInfo}.

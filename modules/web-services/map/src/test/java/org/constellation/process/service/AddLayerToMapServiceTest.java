@@ -37,9 +37,7 @@ import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -47,8 +45,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.xml.namespace.QName;
 
 import java.io.File;
@@ -57,9 +53,9 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.geotoolkit.feature.type.NamesExt;
 
+import org.apache.sis.util.logging.Logging;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -71,15 +67,15 @@ import static org.junit.Assert.assertTrue;
  * @author Quentin Boileau (Geomatys)
  */
 public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
-    
+
     private static final String PROCESS_NAME = "service.add_layer";
     private static final DataReference COUNTRIES_DATA_REF = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, "shapeProvider", "{http://custom-namespace/}Countries");
     private static final DataReference STYLE_DATA_REF = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "styleProvider", "redBlue");
     private static final FilterFactory FF = FactoryFinder.getFilterFactory(null);
-    
+
     @Before
     public void createProvider() throws ConfigurationException{
-        
+
         ParameterDescriptorGroup sourceDesc = null;
         ProviderFactory service = null;
         final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
@@ -107,12 +103,12 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
             shapefileValue.parameter("charset").setValue(Charset.forName("UTF-8"));
             shapefileValue.parameter("load qix").setValue(true);
         } catch (MalformedURLException ex) {
-            Logger.getLogger(AddLayerToMapServiceTest.class.getName()).log(Level.WARNING, null, ex);
-        }         
-        
+            Logging.getLogger("org.constellation.process.service").log(Level.WARNING, null, ex);
+        }
+
         DataProviders.getInstance().createProvider("shapeProvider",(DataProviderFactory) service, sourceValue, null);
     }
-    
+
     @After
     public void destroyProvider() throws ConfigurationException {
         DataProvider provider = null;
@@ -123,7 +119,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         }
         DataProviders.getInstance().removeProvider(provider);
     }
-    
+
     public AddLayerToMapServiceTest(final String serviceName, final Class workerClass) {
         super(AddLayerToMapServiceDescriptor.NAME, serviceName, workerClass);
     }
@@ -131,11 +127,11 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testAddSFLayerToConfiguration() throws NoSuchIdentifierException, ProcessException, MalformedURLException, ConfigurationException {
         final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, PROCESS_NAME);
-        
+
         //init
         final LayerContext inputContext = new LayerContext();
         inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        
+
         createCustomInstance("addLayer1", inputContext);
         startInstance("addLayer1");
 
@@ -156,13 +152,13 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertNotNull(outputLayer);
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer1", null);
         assertTrue(layers.size() == 1);
-        
+
         final Layer outLayer = layers.get(0);
         assertEquals(COUNTRIES_DATA_REF.getLayerId().tip().toString(),outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
-        
+
         assertTrue(checkInstanceExist("addLayer1"));
         deleteInstance(serviceBusiness, layerBusiness, "addLayer1");
     }
@@ -177,9 +173,9 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         final LayerContext inputContext = new LayerContext();
         createCustomInstance("addLayer2", inputContext);
-        
+
         startInstance("addLayer2");
-        
+
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
 
         final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
@@ -195,7 +191,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final Layer layer = (Layer) outputs.parameter(AddLayerToMapServiceDescriptor.OUT_LAYER_PARAM_NAME).getValue();
 
         assertNotNull(layer);
-        
+
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer2", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 1);
@@ -207,7 +203,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
-        
+
         assertTrue(checkInstanceExist("addLayer2"));
         deleteInstance(serviceBusiness, layerBusiness,  "addLayer2");
     }
@@ -222,27 +218,27 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         //init
         final LayerContext inputContext = new LayerContext();
         inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        
+
         createCustomInstance("addLayer3", inputContext);
         startInstance("addLayer3");
-        
+
         Layer layer = new Layer(new QName(NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()), COUNTRIES_DATA_REF.getLayerId().tip().toString()));
         layer.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        
+
         layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().tip().toString(),
                           NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()),
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
-                          null, 
-                          "addLayer3", 
-                          serviceName.toLowerCase(), 
+                          null,
+                          "addLayer3",
+                          serviceName.toLowerCase(),
                           layer);
-        
+
 
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
-        
+
         final List<GetFeatureInfoCfg> gfi = FeatureInfoUtilities.createGenericConfiguration();
         final GetFeatureInfoCfg[] customGFI = gfi.toArray(new GetFeatureInfoCfg[gfi.size()]);
-        
+
         //exec process
         final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_REF_PARAM_NAME).setValue(COUNTRIES_DATA_REF);
@@ -258,7 +254,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final Layer outputLayer = (Layer) outputs.parameter(AddLayerToMapServiceDescriptor.OUT_LAYER_PARAM_NAME).getValue();
 
         assertNotNull(outputLayer);
-        
+
         final List<Layer> layers = layerBusiness.getLayers(serviceName.toLowerCase(), "addLayer3", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 1);
@@ -269,7 +265,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
-        
+
         assertTrue(checkInstanceExist("addLayer3"));
         deleteInstance(serviceBusiness, layerBusiness, "addLayer3");
     }
@@ -287,31 +283,31 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final List<GetFeatureInfoCfg> gfi = FeatureInfoUtilities.createGenericConfiguration();
         final GetFeatureInfoCfg[] gfiArray = gfi.toArray(new GetFeatureInfoCfg[gfi.size()]);
         inputContext.setGetFeatureInfoCfgs(gfi);
-        
+
         createCustomInstance("addLayer5", inputContext);
         startInstance("addLayer5");
-        
+
         Layer layer1 = new Layer(new QName(NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()), COUNTRIES_DATA_REF.getLayerId().tip().toString()));
         layer1.setGetFeatureInfoCfgs(gfi);
         layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().tip().toString(),
                           NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()),
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
-                          null, 
-                          "addLayer5", 
-                          serviceName.toLowerCase(), 
+                          null,
+                          "addLayer5",
+                          serviceName.toLowerCase(),
                           layer1);
-        
+
         Layer layer2 = new Layer(new QName(NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()), "city"));
         layer2.setGetFeatureInfoCfgs(gfi);
-        layerBusiness.add("city", 
+        layerBusiness.add("city",
                           NamesExt.getNamespace(COUNTRIES_DATA_REF.getLayerId()),
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
-                          null, 
-                          "addLayer5", 
-                          serviceName.toLowerCase(), 
+                          null,
+                          "addLayer5",
+                          serviceName.toLowerCase(),
                           layer2);
-        
-        
+
+
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
 
         //exec process
@@ -330,7 +326,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final Layer outputLayer = (Layer) outputs.parameter(AddLayerToMapServiceDescriptor.OUT_LAYER_PARAM_NAME).getValue();
 
         assertNotNull(outputLayer);
-        
+
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer5", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 2);
@@ -361,10 +357,10 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         //init
         final LayerContext inputContext = new LayerContext();
         inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        
+
         createCustomInstance("addLayer6", inputContext);
         startInstance("addLayer6");
-        
+
         final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, PROCESS_NAME);
 
         final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
@@ -377,7 +373,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final Layer outputLayer = (Layer) outputs.parameter(AddLayerToMapServiceDescriptor.OUT_LAYER_PARAM_NAME).getValue();
 
         assertNotNull(outputLayer);
-        
+
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer6", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 1);
@@ -389,7 +385,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertNull(outLayer.getAlias());
         assertNull(outLayer.getFilter());
         assertTrue(outLayer.getStyles().isEmpty());
-        
+
         assertTrue(checkInstanceExist("addLayer6"));
         deleteInstance(serviceBusiness, layerBusiness, "addLayer6");
 
@@ -405,10 +401,10 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         //init
         final LayerContext inputContext = new LayerContext();
         inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        
+
         createCustomInstance("addLayer7", inputContext);
         startInstance("addLayer7");
-        
+
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
         final GetFeatureInfoCfg[] customGFI = new GetFeatureInfoCfg[1];
         customGFI[0] = new GetFeatureInfoCfg("text/plain", CSVFeatureInfoFormat.class.getCanonicalName());
@@ -427,7 +423,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final Layer output = (Layer) outputs.parameter(AddLayerToMapServiceDescriptor.OUT_LAYER_PARAM_NAME).getValue();
 
         assertNotNull(output);
-        
+
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer7", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 1);
@@ -448,5 +444,5 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(checkInstanceExist("addLayer7"));
         deleteInstance(serviceBusiness, layerBusiness, "addLayer7");
     }
-    
+
 }

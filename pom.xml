@@ -177,9 +177,9 @@
     <properties>
         <!-- Define parent projects versions -->
         <shiro.version>1.2.1</shiro.version>
-        <geoapi.version>4.0.0-MC0005</geoapi.version>
-        <sis.version>0.6-jdk7-MC0020</sis.version>
-        <geotoolkit.version>4.0.0-MC0068</geotoolkit.version>
+        <geoapi.version>4.0.0-MC0006</geoapi.version>
+        <sis.version>0.7-jdk7-MC0022</sis.version>
+        <geotoolkit.version>4.0.0-MC0069</geotoolkit.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.12</jersey.version>
         <jaxws.version>2.2.8</jaxws.version>
@@ -1111,10 +1111,6 @@
             <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
         </repository>
         <repository>
-            <id>dev</id>
-            <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
-        </repository>
-        <repository>
             <id>geomatys</id>
             <url>http://maven.geomatys.com/</url>
         </repository>
@@ -1126,17 +1122,6 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-					 <id>dev</id>
-					 <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>maven.nexus</id>
-            <name>Maven Geomatys Snapshot</name>
-            <url>http://dev.geomatys.com/nexus/content/repositories/snapshots/</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>false</enabled></releases>
         </pluginRepository>
     </pluginRepositories>
 
@@ -1169,15 +1154,15 @@
     </webApp>
     <contextHandlers>
       <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-        <war>${project.basedir}/modules/cstl-sdi/target/constellation.war</war>        
+        <war>${project.basedir}/modules/cstl-sdi/target/constellation.war</war>
         <contextPath>/sdi</contextPath>
       </contextHandler>
       <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-        <war>${project.basedir}/modules/cstl-services/target/constellation.war</war>        
+        <war>${project.basedir}/modules/cstl-services/target/constellation.war</war>
         <contextPath>/services</contextPath>
       </contextHandler>
       <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-        <war>${project.basedir}/modules/cstl-admin/target/cstl-admin.war</war>        
+        <war>${project.basedir}/modules/cstl-admin/target/cstl-admin.war</war>
         <contextPath>/admin</contextPath>
       </contextHandler>
     </contextHandlers>-->

@@ -22,7 +22,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.constellation.gui.service.bean.LayerData;
 
 import java.util.Comparator;
-import java.util.logging.Logger;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
@@ -30,8 +29,6 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  * @author Benjamin Garcia (Geomatys)
  */
 public class LayerDataComparator implements Comparator<LayerData> {
-
-    private static final Logger LOGGER = Logger.getLogger(LayerDataComparator.class.getName());
 
     private final Criteria criteria;
     private final Mode mode;

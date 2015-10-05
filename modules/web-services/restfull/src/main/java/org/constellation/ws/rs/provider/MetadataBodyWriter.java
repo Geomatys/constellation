@@ -71,7 +71,7 @@ public final class MetadataBodyWriter implements MessageBodyWriter {
         XML_TO_JSON_NAMESPACES.put("http://www.isotc211.org/2005/gmd",           "gmd");
     }
 
-    private static final Logger LOGGER = Logging.getLogger(MetadataBodyWriter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     @Override
     public boolean isWriteable(Class type, Type type1, Annotation[] antns, MediaType mt) {

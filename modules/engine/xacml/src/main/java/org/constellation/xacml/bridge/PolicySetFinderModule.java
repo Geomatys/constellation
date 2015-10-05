@@ -32,6 +32,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -45,8 +46,8 @@ public class PolicySetFinderModule extends PolicyFinderModule {
     private final PolicySet policySet;
     private final List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>();
     protected PolicyFinder policyFinder         = null;
-    
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.xacml.bridge");
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.xacml.bridge");
 
     public PolicySetFinderModule() {
         this(null);
@@ -78,14 +79,14 @@ public class PolicySetFinderModule extends PolicyFinderModule {
     @Override
     public PolicyFinderResult findPolicy(final EvaluationCtx context) {
         LOGGER.finer(context.getResourceId().encode());
-        
+
         AbstractPolicy selectedPolicy = null;
         final MatchResult match = policySet.match(context);
         final int result = match.getResult();
         if (result == MatchResult.MATCH) {
             selectedPolicy = policySet;
         }
-        
+
         // if target matching was indeterminate, then return the error
         if (result == MatchResult.INDETERMINATE) {
             LOGGER.finer("undeterminate matching");
@@ -97,7 +98,7 @@ public class PolicySetFinderModule extends PolicyFinderModule {
         }
         if (result == MatchResult.NO_MATCH) {
             LOGGER.finer("no match: ");
-            return new PolicyFinderResult(match.getStatus());  
+            return new PolicyFinderResult(match.getStatus());
         }
 
         LOGGER.finer("returning null");

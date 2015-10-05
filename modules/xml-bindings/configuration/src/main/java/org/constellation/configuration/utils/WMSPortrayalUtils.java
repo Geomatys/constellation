@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  */
 public final class WMSPortrayalUtils {
 
-    private static final Logger LOGGER = Logging.getLogger(WMSPortrayalUtils.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.configuration.utils");
 
     private WMSPortrayalUtils() {
     }

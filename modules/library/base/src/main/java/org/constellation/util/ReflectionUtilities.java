@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  */
 public final class ReflectionUtilities {
 
-    private static final Logger LOGGER = Logging.getLogger(ReflectionUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.util");
 
     private static final String INCLASS = " in the class ";
 
@@ -490,7 +490,7 @@ public final class ReflectionUtilities {
                 occurenceType++;
             }
         }
-        
+
         // look for private method
         if (getter == null) {
             Class superC = rootClass;

@@ -37,22 +37,22 @@ import java.util.logging.Logger;
  * @author Guilhem Legal (Geomatys)
  */
 public final class WSEngine {
-    
-    private static final Logger LOGGER = Logging.getLogger(WSEngine.class);
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
 
     /**
      * Default value, changes nothing, just using reflection to instantiate the worker.
      */
     private static WorkerFactory workerFactory = new WorkerFactory() {
-        
+
         @Override
         public Worker build(Class<? extends Worker> workerClass, String identifier) {
             return (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
         }
-        
-        
+
+
     };
-    
+
     private WSEngine() {}
 
 
@@ -79,11 +79,11 @@ public final class WSEngine {
     @Deprecated
     private static final List<String> TO_RESTART = new ArrayList<>();
 
-    
+
     public static void setWorkerFactory(WorkerFactory workerFactory) {
         WSEngine.workerFactory = workerFactory;
     }
-    
+
     public static Map<String, Worker> getWorkersMap(final String specification) {
         final Map<String, Worker> result = WORKERS_MAP.get(specification.toLowerCase());
         if (result == null) {
@@ -250,7 +250,7 @@ public final class WSEngine {
      *
      * @param specification The OGC service type (WMS, CSW, WFS, ...).
      * @param identifier The identifier of the new {@link Worker}.
-     * 
+     *
      * @return The new instancied {@link Worker}.
      */
     public static Worker buildWorker(final String specification, final String identifier) {

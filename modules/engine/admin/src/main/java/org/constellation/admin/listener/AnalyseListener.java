@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class AnalyseListener implements ServletContextListener {
 
-    private static final Logger LOGGER = Logging.getLogger(AnalyseListener.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.listener");
 
     @Inject
     private IDataBusiness dataBusiness;

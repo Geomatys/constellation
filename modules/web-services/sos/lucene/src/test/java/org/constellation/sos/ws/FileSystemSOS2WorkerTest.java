@@ -45,7 +45,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -57,9 +57,9 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     @Inject
     private IServiceBusiness serviceBusiness;
 
-    private static File instDirectory; 
-    
-    
+    private static File instDirectory;
+
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
@@ -148,12 +148,12 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         sensor10.createNewFile();
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 //we write the configuration file
                 Automatic SMLConfiguration = new Automatic();
@@ -180,9 +180,9 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setServiceUrl(URL);
                 worker.setLogLevel(Level.FINER);
             } else if (worker == null) {
-                
+
                 serviceBusiness.delete("sos", "default");
-                
+
                 //we write the configuration file
                 Automatic SMLConfiguration = new Automatic();
 
@@ -209,7 +209,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(FileSystemSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -285,7 +285,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         super.getCapabilitiesTest();
 
     }
-    
+
     /**
      * Tests the GetObservation method
      *
@@ -297,7 +297,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationErrorTest() throws Exception {
         super.GetObservationErrorTest();
     }
-    
+
     /**
      * Tests the GetObservation method
      *
@@ -321,7 +321,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
-    
+
     /**
      * Tests the GetObservationById method
      *
@@ -333,7 +333,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
-    
+
     /**
      * Tests the GetFeatureOfInterest method
      *
@@ -357,7 +357,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
-    
+
     /**
      * Tests the GetResultTemplate method
      *
@@ -369,7 +369,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void GetResultTemplateTest() throws Exception {
         super.GetResultTemplateTest();
     }
-    
+
     /**
      * Tests the GetResult method
      *
@@ -412,7 +412,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void insertResultTest() throws Exception {
         super.insertResultTest();
     }
-    
+
     /**
      * Tests the destroy method
      *

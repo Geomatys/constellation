@@ -41,8 +41,8 @@ import java.util.logging.Logger;
  */
 @Provider
 public class GeneralParameterDescriptorWriter implements MessageBodyWriter<GeneralParameterDescriptor> {
-    
-    private static final Logger LOGGER = Logging.getLogger(GeneralParameterValueWriter.class);
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     @Override
     public long getSize(final GeneralParameterDescriptor r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) {

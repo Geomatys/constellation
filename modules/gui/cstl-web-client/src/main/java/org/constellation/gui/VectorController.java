@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  */
 public class VectorController {
 
-    private final Logger LOGGER = Logging.getLogger(VectorController.class);
+    private final Logger LOGGER = Logging.getLogger("org.constellation.gui");
 
     /**
      * Manager used to call constellation server side.

@@ -73,7 +73,7 @@ import org.opengis.util.GenericName;
  */
 public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
-    private static final Logger LOGGER = Logging.getLogger(GMLFeatureInfoFormat.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.map.featureinfo");
 
     private GetFeatureInfo gfi;
 
@@ -375,7 +375,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         final Map<String, List<String>> values = new HashMap<>();
         values.putAll(features);
         values.putAll(coverages);
-        
+
         // optimization move this filter to getCandidates
         Integer maxValue = getFeatureCount(getFI);
         if (maxValue == null) {

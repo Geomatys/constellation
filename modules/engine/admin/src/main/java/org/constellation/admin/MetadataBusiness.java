@@ -117,8 +117,8 @@ import org.xml.sax.SAXException;
 @Primary
 public class MetadataBusiness implements IMetadataBusiness {
 
-    protected static final Logger LOGGER = Logging.getLogger(MetadataBusiness.class);
-    
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
+
     /**
      * Injected data repository.
      */
@@ -139,13 +139,13 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Inject
     protected MetadataRepository metadataRepository;
-    
+
     @Inject
     protected UserRepository userRepository;
-    
+
     @Inject
     private org.constellation.security.SecurityManager securityManager;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -163,7 +163,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -181,7 +181,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -190,7 +190,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public Metadata updateMetadata(final String metadataId, final DefaultMetadata metadata) throws ConfigurationException  {
         return updateMetadata(metadataId, metadata, null, null, null);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -199,7 +199,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public Metadata updateMetadata(final String metadataId, final String xml) throws ConfigurationException  {
         return updateMetadata(metadataId, xml, null, null, null);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -208,7 +208,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public Metadata updateMetadata(final String metadataId, final String xml, final Integer owner) throws ConfigurationException  {
         return updateMetadata(metadataId, xml, null, null, owner);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -218,7 +218,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         final String xml = marshallMetadata(metadata);
         return updateMetadata(metadataId, xml, dataID, datasetID, owner);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -229,7 +229,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         Metadata metadata          = metadataRepository.findByMetadataId(metadataId);
         final boolean update       = metadata != null;
         final DefaultMetadata meta = (DefaultMetadata) unmarshallMetadata(xml);
-        
+
         final Long dateStamp  = MetadataUtilities.extractDatestamp(meta);
         final String title    = MetadataUtilities.extractTitle(meta);
         final String resume   = MetadataUtilities.extractResume(meta);
@@ -269,7 +269,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         metadata.setParentIdentifier(parentID);
         metadata.setIsPublished(false);
         metadata.setIsValidated(false);
-        
+
         // if the metadata is not yet present look for empty metadata object
         final Dataset dataset;
         if (datasetID != null) {
@@ -301,7 +301,7 @@ public class MetadataBusiness implements IMetadataBusiness {
                 templateName = getTemplateFromMetadata(meta);
             }
         }
-        
+
         if (templateName == null) {
             templateName = getDefaultTemplate();
         }
@@ -322,7 +322,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         metadata.setProfile(templateName);
         metadata.setMdCompletion(completion);
         metadata.setLevel(level);
-        
+
         if (update) {
             metadataRepository.update(new MetadataComplete(metadata, bboxes));
         } else {
@@ -348,7 +348,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public List<String> getInternalMetadataIds(final boolean includeService, final boolean onlyPublished) {
         return metadataRepository.findMetadataID(includeService, onlyPublished);
     }
-    
+
     @Override
     public int getInternalMetadataCount(final boolean includeService, final boolean onlyPublished) {
         return metadataRepository.countMetadata(includeService, onlyPublished);
@@ -361,7 +361,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public List<String> getAllMetadata(final boolean includeService, final boolean onlyPublished) {
         return metadataRepository.findAllIsoMetadata(includeService, onlyPublished);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -374,7 +374,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return results;
     }
-    
+
     @Override
     public int getLinkedMetadataCount(final String cswIdentifier, final boolean includeService, final boolean onlyPublished) {
         int count = 0;
@@ -384,7 +384,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return count;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -392,7 +392,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public boolean isLinkedMetadataToCSW(final int metadataID, final int cswID) {
         return metadataRepository.isLinkedMetadata(metadataID, cswID);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -400,12 +400,12 @@ public class MetadataBusiness implements IMetadataBusiness {
     public boolean isLinkedMetadataToCSW(final String metadataID, final String cswID) {
         return metadataRepository.isLinkedMetadata(metadataID, cswID);
     }
-    
+
     @Override
     public boolean isLinkedMetadataToCSW(final String metadataID, final String cswID, final boolean includeService, final boolean onlyPublished) {
         return metadataRepository.isLinkedMetadata(metadataID, cswID, includeService, onlyPublished);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -430,7 +430,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -442,7 +442,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadataRepository.removeDataFromCSW(metadataId, service.getId());
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -454,7 +454,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -466,7 +466,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -478,7 +478,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -486,7 +486,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public Metadata getMetadataById(final int id) {
         return metadataRepository.findById(id);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -495,7 +495,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void updatePublication(final int id, final boolean newStatus) throws ConfigurationException {
         updatePublication(Arrays.asList(id), newStatus);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -514,7 +514,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         updateInternalCSWIndex(toUpdate, true);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -523,7 +523,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void updateProfile(final Integer id, final String newProfile) throws ConfigurationException {
         metadataRepository.changeProfile(id, newProfile);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -561,7 +561,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void deleteMetadata(int id) throws ConfigurationException {
         deleteMetadata(Arrays.asList(id));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -573,7 +573,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             deleteMetadata(meta.getId());
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -585,7 +585,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             deleteMetadata(meta.getId());
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -627,7 +627,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -639,7 +639,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -649,12 +649,12 @@ public class MetadataBusiness implements IMetadataBusiness {
         try {
             final List<Service> services = serviceRepository.findByType("csw");
             for (Service service : services) {
-            
+
                 final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 // read config to determine CSW type
                 final Automatic conf = (Automatic) um.unmarshal(new StringReader(service.getConfig()));
                 GenericDatabaseMarshallerPool.getInstance().recycle(um);
-                
+
                 if (isInternalCSW(conf.getFormat())) {
                     boolean partial       = conf.getBooleanParameter("partial", false);
                     boolean onlyPublished = conf.getBooleanParameter("onlyPublished", false);
@@ -666,7 +666,7 @@ public class MetadataBusiness implements IMetadataBusiness {
                             if (!onlyPublished  || onlyPublished && metadata.isPreviousPublishState()) {
                                 identifierToRemove.add(metadata.getMetadataId());
                                 needRefresh = true;
-                            } 
+                            }
                             if (update) {
                                 if ((onlyPublished && metadata.getIsPublished()) || !onlyPublished) {
                                     identifierToUpdate.add(metadata.getMetadataId());
@@ -690,7 +690,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             throw new ConfigurationException("Error while updating internal CSW index", ex);
         }
     }
-    
+
     @Override
     public MetadataLists getMetadataCodeLists() {
         final MetadataLists mdList = new MetadataLists();
@@ -873,7 +873,7 @@ public class MetadataBusiness implements IMetadataBusiness {
 
         return mdList;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -885,7 +885,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             throw new ConfigurationException("Unable to unmarshall metadata", ex);
         }
     }
-    
+
     @Override
     public Object unmarshallMetadata(final File metadata) throws ConfigurationException {
         try {
@@ -894,7 +894,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             throw new ConfigurationException("Unable to unmarshall metadata", ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -906,7 +906,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             throw new ConfigurationException("Unable to unmarshall metadata", ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -925,7 +925,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return templateName;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -946,12 +946,12 @@ public class MetadataBusiness implements IMetadataBusiness {
         return templateName;
     }
 
-    
+
     @Override
     public String getTemplateFromMetadata(DefaultMetadata meta) {
         return null; // must be overriden
     }
-    
+
     protected String getDefaultTemplate() {
         return "profile_import"; // must be overriden
     }
@@ -970,7 +970,7 @@ public class MetadataBusiness implements IMetadataBusiness {
             String title;
             if (newTitle != null) {
                 title = newTitle;
-                
+
             } else {
                 String oldTitle = feeder.getTitle();
                 title = oldTitle + "(1)";
@@ -980,19 +980,19 @@ public class MetadataBusiness implements IMetadataBusiness {
             metaObj.setFileIdentifier(newMetadataID);
             final long dateStamp = System.currentTimeMillis();
             metaObj.setDateStamp(new Date(dateStamp));
-            
+
             final Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
             if (user.isPresent()) {
                 meta.setOwner(user.get().getId());
             }
-            
+
             meta.setDateCreation(dateStamp);
             meta.setMetadataIso(marshallMetadata(metaObj));
             meta.setMetadataId(newMetadataID);
             meta.setTitle(title);
             meta.setIsPublished(false);
             meta.setIsValidated(false);
-            
+
             final MetadataComplete duplicated = new MetadataComplete(meta, bboxes);
             final int newID = metadataRepository.create(duplicated);
             return metadataRepository.findById(newID);
@@ -1007,7 +1007,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public int countTotal(final Map<String,Object> filterMap) {
         return metadataRepository.countTotalMetadata(filterMap);
     }
-    
+
     @Override
     public int[] countInCompletionRange(final Map<String,Object> filterMap) {
         final int[] completionArray = new int[10];
@@ -1031,7 +1031,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public int countPublished(final boolean status,final Map<String,Object> filterMap) {
         return metadataRepository.countPublished(status,filterMap);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1055,7 +1055,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public List<String> getAllProfiles() {
         return new ArrayList<>(Template.getAvailableNames());
     }
-    
+
     @Override
     @Transactional
     public void askForValidation(final int metadataID) {
@@ -1091,7 +1091,7 @@ public class MetadataBusiness implements IMetadataBusiness {
     public void denyValidation(final Metadata metadata, final String comment, final String metadataLink) {
         metadataRepository.denyValidation(metadata.getId(), comment);
     }
-    
+
     @Override
     @Transactional
     public void acceptValidation(final int metadataID) {
@@ -1110,17 +1110,17 @@ public class MetadataBusiness implements IMetadataBusiness {
             metadataRepository.setValidationRequired(metadata.getId(), "NONE", metadata.getMetadataIso());
         }
     }
-    
+
     @Override
     public Map<Integer, List> filterAndGet(final Map<String,Object> filterMap, final Map.Entry<String,String> sortEntry,final int pageNumber,final int rowsPerPage) {
         return metadataRepository.filterAndGet(filterMap, sortEntry, pageNumber, rowsPerPage);
     }
-    
+
     @Override
     public Map<Integer,String> filterAndGetWithoutPagination(final Map<String,Object> filterMap) {
         return metadataRepository.filterAndGetWithoutPagination(filterMap);
     }
-    
+
     @Override
     public List<OwnerStatBrief> getOwnerStatBriefs(final Map<String, Object> filter) {
         final List<OwnerStatBrief> briefs = new ArrayList<>();
@@ -1140,12 +1140,12 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return briefs;
     }
-    
+
     @Override
     public List<GroupStatBrief> getGroupStatBriefs(final Map<String, Object> filter) {
         return new ArrayList<>();
     }
-    
+
     @Override
     public List<User> getUsers() {
         final List<User> results = new ArrayList<>();
@@ -1154,7 +1154,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return results;
     }
-    
+
     @Override
     public User getUser(final int id) {
         final Optional<CstlUser> optUser = userRepository.findById(id);
@@ -1167,12 +1167,12 @@ public class MetadataBusiness implements IMetadataBusiness {
         }
         return owner;
     }
-    
+
     @Override
     public boolean isSpecialMetadataFormat(File metadataFile) {
         return metadataFile.getName().endsWith(".dim");
     }
-    
+
     @Override
     public DefaultMetadata getMetadataFromSpecialFormat(File metadataFile) throws ConfigurationException {
         if (metadataFile.getName().endsWith(".dim")) {
@@ -1210,11 +1210,11 @@ public class MetadataBusiness implements IMetadataBusiness {
             }
         }
     }
-    
+
     /**
      * Return true if the specified CSW implementation handle internal metadata.
      * @param implementation
-     * @return 
+     * @return
      */
     protected boolean isInternalCSW(String implementation) {
         return "internal".equals(implementation);

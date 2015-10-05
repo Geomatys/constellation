@@ -24,7 +24,6 @@ import org.constellation.configuration.LayerList;
 import org.constellation.gui.service.MapManager;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 /**
  * Just WMS Mock
@@ -35,9 +34,6 @@ import java.util.logging.Logger;
  *
  */
 public class MapManagerMock extends MapManager {
-
-    private static final Logger LOGGER = Logger.getLogger(MapManagerMock.class.getName());
-
 
     /**
      *

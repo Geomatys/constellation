@@ -21,6 +21,7 @@ package org.constellation.gui.service;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.LayerList;
+import org.apache.sis.util.logging.Logging;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.util.logging.Logger;
  */
 public class MapManager {
 
-    private static final Logger LOGGER = Logger.getLogger(MapManager.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.gui.service");
     /**
      * Constellation manager used to communicate with the Constellation server.
      */

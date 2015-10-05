@@ -109,11 +109,11 @@ import com.vividsolutions.jts.io.WKTWriter;
 @Component
 @Path("/1/sensor/")
 public class SensorRest {
-    private static final Logger LOGGER = Logging.getLogger(SensorRest.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
+
     @Inject
     private ISensorBusiness sensorBusiness;
-    
+
     @Inject
     private IProviderBusiness providerBusiness;
 
@@ -122,7 +122,7 @@ public class SensorRest {
      */
     @Inject
     private UserRepository userRepository;
-    
+
     @GET
     @Path("list")
     @Produces({MediaType.APPLICATION_JSON})
@@ -131,7 +131,7 @@ public class SensorRest {
         final SensorMLTree result = getFullSensorMLTree();
         return Response.ok(result).build();
     }
-    
+
     private SensorMLTree getFullSensorMLTree() {
         final List<SensorMLTree> values = new ArrayList<>();
         final List<Sensor> sensors = sensorBusiness.getAll();
@@ -163,14 +163,14 @@ public class SensorRest {
         }
         return SensorMLTree.buildTree(values);
     }
-    
+
     @DELETE
     @Path("{sensorid}")
     public Response deleteSensor(@PathParam("sensorid") String sensorid) {
         sensorBusiness.delete(sensorid);
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
-    
+
     @GET
     @Path("{sensorid}")
     public Response getSensorMetadata(@PathParam("sensorid") String sensorid) {
@@ -301,7 +301,7 @@ public class SensorRest {
         }
         return Response.status(500).entity("failed").build();
     }
-    
+
     @PUT
     @Path("generate")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -309,7 +309,7 @@ public class SensorRest {
     public Response generateSensor(final ParameterValues pv) {
         final String providerId = pv.get("providerId");
         final QName dataId      = Util.parseQName(pv.get("dataId"));
-        
+
         final org.constellation.provider.Provider provider = DataProviders.getInstance().getProvider(providerId);
         final List<ProcedureTree> procedures;
         try {
@@ -330,7 +330,7 @@ public class SensorRest {
             LOGGER.log(Level.WARNING, "Error while reading netCDF", ex);
             return ok(new AcknowlegementType("Failure", "Error while reading netCDF"));
         }
-        
+
         // SensorML generation
         try {
             for (ProcedureTree process : procedures) {
@@ -342,7 +342,7 @@ public class SensorRest {
         }
         return ok(new AcknowlegementType("Success", "The sensors has been succesfully generated"));
     }
-    
+
     private void generateSensorML(final QName dataID, final String providerID, final ProcedureTree process, final String parentID) throws SQLException {
         final Properties prop = new Properties();
         prop.put("id",         process.id);
@@ -359,13 +359,13 @@ public class SensorRest {
             prop.put("latitude",   process.spatialBound.miny);
         }
         prop.put("phenomenon", process.fields);
-        
+
         Sensor sensor = sensorBusiness.getSensor(process.id);
         if (sensor == null) {
             sensor = sensorBusiness.create(process.id, process.type, parentID, null, System.currentTimeMillis());
 
         }
-        
+
         final List<String> component = new ArrayList<>();
         for (ProcedureTree child : process.children) {
             component.add(child.id);
@@ -373,7 +373,7 @@ public class SensorRest {
         }
         prop.put("component", component);
         final String sml = SensorMLGenerator.getTemplateSensorMLString(prop, process.type);
-        
+
         // update sml
         sensor.setMetadata(sml);
         sensorBusiness.update(sensor);
@@ -481,7 +481,7 @@ public class SensorRest {
         }
         return sensorsImported;
     }
-    
+
     @GET
     @Path("observedProperties/identifiers")
     public Response getObservedPropertiesIds() throws Exception {
@@ -490,14 +490,14 @@ public class SensorRest {
             final List<Sensor> records = sensorBusiness.getAll();
             for (Sensor record : records) {
                 final List<Data> datas = sensorBusiness.getLinkedData(record);
-                
+
                 // look for provider ids
                 final Set<String> providerIDs = new HashSet<>();
                 for (Data data : datas) {
                     final Provider provider = providerBusiness.getProvider(data.getProvider());
                     providerIDs.add(provider.getIdentifier());
                 }
-                
+
                 for (String providerId : providerIDs) {
                     final ObservationReader reader = getObservationReader(providerId);
                     phenomenons.addAll(reader.getPhenomenonNames());
@@ -508,7 +508,7 @@ public class SensorRest {
             throw new ConfigurationException(ex);
         }
     }
-    
+
     @GET
     @Path("sensors/identifiers/{observedProperty}")
     public Response getSensorIdsForObservedProperty(final @PathParam("observedProperty") String observedProperty) throws Exception {
@@ -533,12 +533,12 @@ public class SensorRest {
                 }
             }
             return ok(new StringList(sensorIDS));
-            
+
         } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
-    
+
     @GET
     @Path("observedProperty/identifiers/{sensorID}")
     public Response getObservedPropertiesForSensor(final @PathParam("sensorID") String sensorID) throws ConfigurationException {
@@ -547,14 +547,14 @@ public class SensorRest {
             if (sensor != null) {
                 final Set<String> phenomenons = new HashSet<>();
                 final List<Data> datas = sensorBusiness.getLinkedData(sensor);
-                
+
                 // look for provider ids
                 final Set<String> providerIDs = new HashSet<>();
                 for (Data data : datas) {
                     final Provider provider = providerBusiness.getProvider(data.getProvider());
                     providerIDs.add(provider.getIdentifier());
                 }
-                
+
                 for (String providerId : providerIDs) {
                     final ObservationReader reader = getObservationReader(providerId);
                     phenomenons.addAll(reader.getPhenomenonNames());
@@ -568,7 +568,7 @@ public class SensorRest {
             throw new ConfigurationException(ex);
         }
     }
-    
+
     @GET
     @Path("location/{sensorID}")
     public Response getWKTSensorLocation(final @PathParam("sensorID") String sensorID) throws ConfigurationException {
@@ -602,7 +602,7 @@ public class SensorRest {
                     return ok(new SimpleValue(writer.write(coll)));
                 }
                 return ok(new SimpleValue(""));
-                
+
             } else {
                 return Response.status(404).build();
             }
@@ -610,7 +610,7 @@ public class SensorRest {
             throw new ConfigurationException(ex);
         }
     }
-    
+
     private ObservationReader getObservationReader(final String providerID) throws ConfigurationException {
         final org.constellation.provider.Provider provider = DataProviders.getInstance().getProvider(providerID);
         if (provider instanceof ObservationStoreProvider) {
@@ -643,7 +643,7 @@ public class SensorRest {
         }
         return results;
     }
-    
+
     private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException {
         final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(f);
@@ -656,7 +656,7 @@ public class SensorRest {
         }
         return null;
     }
-    
+
     private static String marshallSensor(final AbstractSensorML f) throws JAXBException {
         final Marshaller m = SensorMLMarshallerPool.getInstance().acquireMarshaller();
         final StringWriter sw = new StringWriter();

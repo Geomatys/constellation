@@ -131,7 +131,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -143,7 +142,6 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.measure.NumberRange;
 
 import org.apache.sis.util.CharSequences;
@@ -181,6 +179,7 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
 import org.opengis.util.GenericName;
+import org.apache.sis.util.logging.Logging;
 
 //Geoapi dependencies
 
@@ -559,7 +558,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     }
 
                 } catch (PortrayalException | DataStoreException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.INFO, ex.getMessage(), ex);
+                    Logging.getLogger("org.constellation.map.ws").log(Level.INFO, ex.getMessage(), ex);
                     break;
                 }
             }
@@ -1555,7 +1554,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     fml.getExtraDimensions().add(fdef);
 
                 } catch (CQLException ex) {
-                    Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.WARNING, null, ex);
+                    Logging.getLogger("org.constellation.map.ws").log(Level.WARNING, null, ex);
                 }
             }
 
@@ -1594,5 +1593,5 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
     }
-    
+
 }

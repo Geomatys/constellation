@@ -63,7 +63,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
  */
 public final class ConstellationClient {
 
-    private static final Logger LOGGER = Logging.getLogger(ConstellationClient.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
 
     /**
      * Jersey client.
@@ -89,7 +89,7 @@ public final class ConstellationClient {
      * API methods related to providers administration.
      */
     public final ProvidersAPI providers;
-    
+
     /**
      * API methods related to tasks administration.
      */
@@ -99,7 +99,7 @@ public final class ConstellationClient {
      * API methods related to csw administration.
      */
     public final CswAPI csw;
-    
+
     /**
      * API methods related to constellation administration.
      */
@@ -158,7 +158,7 @@ public final class ConstellationClient {
         this.client.register(new BasicAuthenticator(login, password));
         return this;
     }
-    
+
     public ConstellationClient auth(final String login, final String password) {
 
         String str = url + "j_spring_security_check?";

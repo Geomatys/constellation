@@ -46,7 +46,6 @@ import org.geotoolkit.wmts.WMTSUtilities;
 import org.geotoolkit.wmts.xml.v100.*;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
@@ -78,14 +77,14 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class MapRest {
-    private static final Logger LOGGER = Logging.getLogger(MapRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     @Inject
     private IStyleBusiness styleBusiness;
-    
+
     @Inject
     private ILayerBusiness layerBusiness;
-    
+
     @Inject
     private SecurityManager securityManager;
 
@@ -111,7 +110,7 @@ public class MapRest {
     @Path("{id}/layersummary/all")
     public Response getLayersSummary(final @PathParam("spec") String spec, final @PathParam("id") String id) throws ConfigurationException {
         final List<Layer> layers = layerBusiness.getLayers(spec, id, securityManager.getCurrentUserLogin());
-        
+
         final List<LayerSummary> sumLayers = new ArrayList<>();
         for (final Layer lay : layers) {
             final DataBrief db = dataBusiness.getDataBrief(lay.getName(), lay.getProviderID());

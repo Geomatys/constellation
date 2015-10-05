@@ -90,7 +90,7 @@ import org.springframework.stereotype.Component;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ProviderRest {
 
-    private static final Logger LOGGER = Logging.getLogger(ProviderRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     @Inject
     private IProviderBusiness providerBusiness;
@@ -353,7 +353,7 @@ public class ProviderRest {
     @Path("{id}/{layerName}/isGeophysic")
     public Response isGeophysic(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
                                 final @PathParam("layerName") String layerName) {
-        
+
         boolean isGeophysic = false;
         try {
             final Data data = LayerProviders.getLayer(id, layerName);
@@ -363,17 +363,17 @@ public class ProviderRest {
                 final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
                 if(dims!=null && !dims.isEmpty()){
                     isGeophysic = true;
-                }                
+                }
                 ref.recycle(reader);
             }
         } catch (CstlServiceException|CoverageStoreException ex) {
             LOGGER.log(Level.WARNING, "Cannot retrieve information for layer "+layerName, ex);
             return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
-                
+
        return Response.ok(new SimpleValue(isGeophysic)).build();
     }
-        
+
     /**
      * List the available pyramids for this layer
      */
@@ -388,7 +388,7 @@ public class ProviderRest {
             return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
-    
+
     /**
      * @see LayerProviders#getBandValues(String, String, int)
      */
@@ -406,9 +406,9 @@ public class ProviderRest {
     }
 
     /**
-     *  
+     *
      * Is this method still used ??
-     * 
+     *
      * No longer metadata for provider but for dataset
      */
     @GET
@@ -426,9 +426,9 @@ public class ProviderRest {
     }
 
     /**
-     *  
+     *
      * Is this method still used ??
-     * 
+     *
      * No longer metadata for provider but for dataset
      */
     @POST

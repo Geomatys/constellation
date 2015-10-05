@@ -34,13 +34,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.configuration.ConfigDirectory;
 import org.junit.BeforeClass;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.PostConstruct;
+import org.apache.sis.util.logging.Logging;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-context.xml")
@@ -73,7 +73,7 @@ public class ServiceBusinessTest {
             }
             ConfigDirectory.shutdownTestEnvironement("ServiceBusinessTest");
         } catch (ConfigurationException ex) {
-            Logger.getLogger(ServiceBusinessTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.admin").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -92,7 +92,7 @@ public class ServiceBusinessTest {
         final Details details = new Details("name", "identifier", Arrays.asList("keyword1", "keyword2"), "description", Arrays.asList("version1"), new Contact(), new AccessConstraint(), true, "FR");
         Object conf = serviceBusiness.create("wms", "test", new LayerContext(), details);
         Assert.assertTrue(serviceBusiness.getServiceIdentifiers("wms").contains("test"));
-        
+
     }
 
 }

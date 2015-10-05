@@ -86,7 +86,7 @@ import org.opengis.util.GenericName;
  */
 public final class ConvertersJaxbToGeotk {
 
-    private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.coveragesgroup.util");
     public static final String ORIGINAL_CONFIG = "original_config";
 
     public static MapItem convertsMapLayer(final org.constellation.provider.coveragesgroup.xml.MapLayer mapLayer, final String login, final String password, final IStyleBusiness sb) {

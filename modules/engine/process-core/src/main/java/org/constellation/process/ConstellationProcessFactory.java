@@ -43,8 +43,8 @@ import org.geotoolkit.processing.AbstractProcessingRegistry;
  */
 public class ConstellationProcessFactory extends AbstractProcessingRegistry {
 
-    private static final Logger LOGGER = Logging.getLogger(ConstellationProcessFactory.class);
-            
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.process");
+
     /**Factory name*/
     public static final String NAME = "constellation";
     public static final DefaultServiceIdentification IDENTIFICATION;
@@ -56,22 +56,22 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
         citation.setIdentifiers(Collections.singleton(id));
         IDENTIFICATION.setCitation(citation);
     }
-    
+
     /**
-     * Default constructor 
+     * Default constructor
      */
     public ConstellationProcessFactory() {
         super( findDescriptors() );
     }
-    
+
     @Override
     public Identification getIdentification() {
         return IDENTIFICATION;
     }
-        
+
     /**
      * Find all processDescriptor defined in META-INF/service files.
-     * @return 
+     * @return
      */
     private static synchronized ProcessDescriptor[] findDescriptors() {
         final Iterator<ProcessDescriptor> ite = ServiceRegistry.lookupProviders(ProcessDescriptor.class);
@@ -79,13 +79,13 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
         while (ite.hasNext()) {
             descriptors.add(ite.next());
         }
-        
+
         try {
             descriptors.addAll(new ChainProcessRetriever().getChainDescriptors());
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "Exception while retrieving chain process", ex);
         }
-        
+
         return descriptors.toArray(new ProcessDescriptor[descriptors.size()]);
     }
 }

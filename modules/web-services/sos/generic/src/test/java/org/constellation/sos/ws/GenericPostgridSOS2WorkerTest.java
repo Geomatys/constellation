@@ -24,7 +24,6 @@ package org.constellation.sos.ws;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
@@ -41,6 +40,7 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.apache.sis.util.logging.Logging;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -59,9 +59,9 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static String url;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         url = "jdbc:derby:memory:GPGTest2;create=true";
@@ -100,24 +100,24 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         ConfigDirectory.setupTestEnvironement("GPGSOSWorkerTest");
 
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
             Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        
+
             //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setFormat("nosml");
-            
+
             Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
             pool.recycle(unmarshaller);
-            
+
             OMConfiguration.getBdd().setConnectURL(url);
-            
+
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.GENERIC);
             configuration.setObservationWriterType(DataSourceType.NONE);
@@ -129,7 +129,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 serviceBusiness.create("sos", "default", configuration, null);
                 init();
@@ -138,7 +138,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             }  else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
-                
+
                 serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
@@ -147,10 +147,10 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(GenericPostgridSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public void initWorker() {
         worker = new SOSworker("default");
@@ -240,7 +240,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
-    
+
     /**
      * Tests the GetObservationById method
      *
@@ -264,7 +264,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     public void GetResultTemplateTest() throws Exception {
         super.GetResultTemplateTest();
     }
-    
+
     /**
      * Tests the GetResult method
      *
@@ -287,7 +287,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
-    
+
      /**
      * Tests the InsertObservation method
      *
@@ -323,7 +323,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         super.GetFeatureOfInterestTest();
     }
 
-    
+
     /**
      * Tests the destroy method
      *

@@ -39,16 +39,16 @@ import java.util.logging.Logger;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Decorations {
-    
-    
-    private static final Logger LOGGER = Logging.getLogger(Decorations.class);
-    
+
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.configuration");
+
     static final String DECORATION_TYPE = "type";
     static final String DECORATION_VALUE = "value";
     static final String DECORATION_POSITION = "position";
     static final String DECORATION_OFFSET_X = "offsetX";
     static final String DECORATION_OFFSET_Y = "offsetY";
-    
+
     @XmlElements(value={@XmlElement(name="GridDecoration", type=GridDecoration.class),
                         @XmlElement(name="TextDecoration", type=TextDecoration.class),
                         @XmlElement(name="ImageDecoration", type=ImageDecoration.class),
@@ -60,11 +60,11 @@ public class Decorations {
     public Decorations() {
     }
 
-    
+
     public PortrayalExtension getExtension() {
-               
+
         final DecorationExtension extention = new DecorationExtension();
-        
+
         Map<String, Object> decorationMap;
         for (final AbstractDecoration decoration : decorations) {
             if(decoration != null) {
@@ -113,11 +113,11 @@ public class Decorations {
                 extention.getDecorations().add(decorationMap);
             }
         }
-        
+
         return extention;
     }
-    
-    
+
+
     public List<AbstractDecoration> getDecorations() {
         return decorations;
     }

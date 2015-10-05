@@ -97,6 +97,7 @@ import org.geotoolkit.wfs.xml.v200.CreateStoredQueryResponseType;
 import org.geotoolkit.wfs.xml.v200.CreatedOrModifiedFeatureType;
 import org.geotoolkit.wfs.xml.v200.DropStoredQueryResponseType;
 import org.geotoolkit.wfs.xml.v200.StoredQueryListItemType;
+import org.apache.sis.util.logging.Logging;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -119,7 +120,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class WFSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -127,25 +128,25 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     private static final String WFS_GETCAPABILITIES_URL_NO_SERV = "request=GetCapabilities&version=1.1.0";
     private static final String WFS_GETCAPABILITIES_URL_NO_SERV2 = "request=GetCapabilities&version=2.0.0";
-    
+
     private static final String WFS_GETCAPABILITIES_URL_NO_VERS = "request=GetCapabilities&service=WFS";
-    
+
     private static final String WFS_GETCAPABILITIES_URL = "request=GetCapabilities&version=1.1.0&service=WFS";
-    
+
     private static final String WFS_GETCAPABILITIES_URL_AV = "request=GetCapabilities&acceptversions=10.0.0,2.0.0,1.1.0&service=WFS";
-    
+
     private static final String WFS_GETCAPABILITIES_ERROR_URL = "request=GetCapabilities&version=1.3.0&service=WFS";
 
     private static final String WFS_GETFEATURE_URL = "request=getFeature&service=WFS&version=1.1.0&"
@@ -156,7 +157,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
             + "%3Cogc:Literal%3E10972X0137-PONT%3C/ogc:Literal%3E"
             + "%3C/ogc:PropertyIsEqualTo%3E"
             + "%3C/ogc:Filter%3E";
-    
+
     private static final String WFS_GETFEATURE_URL_V2 = "request=getFeature&service=WFS&version=2.0.0&"
             + "typenames=sa:SamplingPoint&namespace=xmlns(sa=http://www.opengis.net/sampling/1.0)&"
             + "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
@@ -169,21 +170,21 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     private static final String WFS_GETFEATURE_SQ_URL = "typeName=tns:SamplingPoint&startindex=0&count=10&request=GetFeature&service=WFS"
             +                                           "&namespaces=xmlns(xml,http://www.w3.org/XML/1998/namespace),xmlns(tns,http://www.opengis.net/sampling/1.0),xmlns(wfs,http://www.opengis.net/wfs/2.0)"
             +                                           "&storedquery_id=urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType&version=2.0.0";
-    
+
     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
 
-    
+
     private static final String WFS_GETFEATURE_CITE1 = "service=WFS&version=1.1.0&request=GetFeature&typename=sf:PrimitiveGeoFeature&namespace=xmlns%28sf=http://cite.opengeospatial.org/gmlsf%29&filter=%3Cogc:Filter%20xmlns:gml=%22http://www.opengis.net/gml%22%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%3Cogc:PropertyIsEqualTo%3E%3Cogc:PropertyName%3E//gml:description%3C/ogc:PropertyName%3E%3Cogc:Literal%3Edescription-f008%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%3C/ogc:Filter%3E";
-    
+
     private static final String WFS_GETFEATURE_CITE2 = "service=WFS&version=1.1.0&request=GetFeature&typename=sf:PrimitiveGeoFeature&namespace=xmlns%28sf=http://cite.opengeospatial.org/gmlsf%29&filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%3Cogc:PropertyIsEqualTo%3E%3Cogc:PropertyName%3E*[1]%3C/ogc:PropertyName%3E%3Cogc:Literal%3Edescription-f001%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%3C/ogc:Filter%3E";
-    
+
     private static String EPSG_VERSION;
 
     private static boolean initialized = false;
-    
+
     private static boolean mdweb_active = true;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WFSRequestTest");
@@ -200,7 +201,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
-                
+
                 final File outputDir = initDataDirectory();
                 String path;
                 if (outputDir.getAbsolutePath().endsWith("org/constellation/ws/embedded/wms111/styles")) {
@@ -209,7 +210,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     path = outputDir.getAbsolutePath();
                 }
                 LOGGER.info("DATA PATH:" + path);
-                
+
                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
                 // Defines a GML data provider
@@ -229,8 +230,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
                 providerBusiness.storeProvider("primGMLSrc", null, ProviderType.LAYER, "feature-store", source);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "primGMLSrc", "VECTOR", false, true, null, null);
-                
-                
+
+
                 source = featfactory.getProviderDescriptor().createValue();
                 source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                 source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("entGMLSrc");
@@ -246,7 +247,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
                 providerBusiness.storeProvider("entGMLSrc", null, ProviderType.LAYER, "feature-store", source);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "entGMLSrc", "VECTOR", false, true, null, null);
-                
+
 
                 source = featfactory.getProviderDescriptor().createValue();
                 source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
@@ -263,8 +264,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
                 providerBusiness.storeProvider("aggGMLSrc", null, ProviderType.LAYER, "feature-store", source);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "aggGMLSrc", "VECTOR", false, true, null, null);
-                
-                
+
+
                 final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourcef, "id").setValue("shapeSrc");
                 getOrCreateValue(sourcef, "load_all").setValue(true);
@@ -293,7 +294,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
-                
+
                 final String url = "jdbc:derby:memory:TestWFSRequestOM";
                 final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                 Connection con = ds.getConnection();
@@ -305,16 +306,16 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
                 final ParameterValueGroup sourceOM = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourceOM, "id").setValue("omSrc");
-                getOrCreateValue(sourceOM, "load_all").setValue(true);    
+                getOrCreateValue(sourceOM, "load_all").setValue(true);
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
                 final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                
+
                 providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
-                
+
                 // MDWEB store
                 mdweb_active = Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql") != null;
                 if (mdweb_active) {
@@ -334,7 +335,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
                     final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
                     getOrCreateValue(sourceSML, "id").setValue("smlSrc");
-                    getOrCreateValue(sourceSML, "load_all").setValue(true);             
+                    getOrCreateValue(sourceSML, "load_all").setValue(true);
 
                     final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
                     final ParameterValueGroup smlconfig = getOrCreateGroup(choiceSML, "SMLParameters");
@@ -348,20 +349,20 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessModel"),   "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
                 }
-                
+
                 DataProviders.getInstance().reload();
-                
+
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
                 config.getCustomParameters().put("transactionnal", "true");
 
                 serviceBusiness.create("wfs", "default", config, null);
-                
+
                 layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
                 layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
                 layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc", null, "default", "wfs", null);
-                
+
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
@@ -380,7 +381,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc",  null, "test", "wfs", null);
                 layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "test", "wfs", null);
                 layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc",  null, "test", "wfs", null);
-                
+
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
@@ -435,7 +436,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                         ":org.apache.sis.internal.jaxb.geometry"), null);
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WFSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded").log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -477,7 +478,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL);
-        
+
         Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WFSCapabilitiesType);
 
@@ -501,27 +502,27 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         responseCaps = (WFSCapabilitiesType)obj;
         currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
         assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?", currentUrl);
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_ERROR_URL);
         obj = unmarshallResponse(getCapsUrl);
         assertTrue("unexpected type:" + obj.getClass().getName(), obj instanceof ExceptionReport);
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL_AV);
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.WFSCapabilitiesType);
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL_NO_SERV);
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof org.geotoolkit.ows.xml.v100.ExceptionReport);
         org.geotoolkit.ows.xml.v100.ExceptionReport report100 = (org.geotoolkit.ows.xml.v100.ExceptionReport) obj;
         assertEquals("1.0.0", report100.getVersion());
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL_NO_SERV2);
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport report200 = (ExceptionReport) obj;
         assertEquals("2.0.0", report200.getVersion());
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL_NO_VERS);
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.WFSCapabilitiesType);
@@ -548,7 +549,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof FeatureCollectionType);
 
     }
-    
+
     @Test
     @Order(order=3)
     public void testWFSGetFeaturePOSTV2() throws Exception {
@@ -613,9 +614,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         org.geotoolkit.wfs.xml.v200.FeatureCollectionType feat = (org.geotoolkit.wfs.xml.v200.FeatureCollectionType) obj;
         assertEquals(1, feat.getMember().size());
-        
+
         MemberPropertyType member = feat.getMember().get(0);
-        
+
         final JAXBElement element = (JAXBElement) member.getContent().get(0);
 
         assertTrue("expected samplingPoint but was:" +  element.getValue(), element.getValue() instanceof SamplingPointType);
@@ -623,7 +624,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         // assertEquals("10972X0137-PONT", sp.getName()); TODO name attribute is moved to namespace GML 3.2 so the java binding does not match
     }
-    
+
     @Test
     @Order(order=6)
     public void testWFSGetFeatureGETStoredQuery() throws Exception {
@@ -645,7 +646,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         domCompare(xmlExpResult, xmlResult);
     }
 
-    
+
     /**
      */
     @Test
@@ -664,7 +665,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
-        
+
         assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
 
         try {
@@ -679,9 +680,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("was:" + obj, obj instanceof Schema);
 
         schema = (Schema) obj;
-        
+
         assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
-        
+
 
     }
 
@@ -731,7 +732,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
 
         // for a POST request
@@ -862,10 +863,10 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         String xmlExpResult = getStringFromFile("org/constellation/xml/namedPlacesCollection-1.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=10)
     public void testWFSListStoredQueries() throws Exception {
@@ -883,7 +884,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof ListStoredQueriesResponseType);
 
     }
-    
+
     @Test
     @Order(order=11)
     public void testWFSDescribeStoredQueries() throws Exception {
@@ -901,7 +902,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof DescribeStoredQueriesResponseType);
 
     }
-    
+
     @Test
     @Order(order=12)
     public void testWFSGetPropertyValue() throws Exception {
@@ -923,7 +924,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         Object result = unmarshallResponse(conec);
 
         assertTrue("unexpected type: " + result.getClass().getName() + "\n" + result, result instanceof ValueCollectionType);
-        
+
         assertTrue(result instanceof ValueCollection);
         assertEquals(12, ((ValueCollection)result).getNumberReturned());
 
@@ -952,7 +953,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         domCompare(expectedResult, sresult);
 
     }
-    
+
     @Test
     @Order(order=13)
     public void testWFSGetCapabilitiesREST() throws Exception {
@@ -960,15 +961,15 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0");
-        
+
         Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WFSCapabilitiesType);
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0");
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof org.geotoolkit.wfs.xml.v200.WFSCapabilitiesType);
     }
-    
+
     @Test
     @Order(order=14)
     public void testWFSDescribeFeatureREST() throws Exception {
@@ -999,16 +1000,16 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("was:" + obj, obj instanceof Schema);
 
         schema = (Schema) obj;
-        
+
         assertEquals(3, schema.getIncludeOrImportOrRedefine().size());
-        
+
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test/2.0.0/BasicPolygons.xsd");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
         }
-        
+
          obj = unmarshallResponse(getfeatsUrl);
 
         assertTrue("was:" + obj, obj instanceof Schema);
@@ -1018,16 +1019,16 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         Assert.assertNotNull(schema.getElementByName("BasicPolygons"));
 
     }
-    
-    private static final String WFS_GETFEATURE_FILTER = 
+
+    private static final String WFS_GETFEATURE_FILTER =
               "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
             + "%3Cogc:PropertyIsEqualTo%3E"
             + "%3Cogc:PropertyName%3Egml:name%3C/ogc:PropertyName%3E"
             + "%3Cogc:Literal%3E10972X0137-PONT%3C/ogc:Literal%3E"
             + "%3C/ogc:PropertyIsEqualTo%3E"
             + "%3C/ogc:Filter%3E";
-    
-    private static final String WFS_GETFEATURE_FILTER_V2 = 
+
+    private static final String WFS_GETFEATURE_FILTER_V2 =
             "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
             + "%3Cfes:PropertyIsEqualTo%3E"
             + "%3Cfes:ValueReference%3Egml:name%3C/fes:ValueReference%3E"
@@ -1057,8 +1058,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         SamplingPointType sp = (SamplingPointType) feat.getFeatureMember().get(0).getAbstractFeature();
 
         assertEquals("10972X0137-PONT", sp.getName().getCode());
-   
-        
+
+
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint?" + WFS_GETFEATURE_FILTER_V2);
         } catch (MalformedURLException ex) {
@@ -1072,9 +1073,9 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         org.geotoolkit.wfs.xml.v200.FeatureCollectionType feat2 = (org.geotoolkit.wfs.xml.v200.FeatureCollectionType) obj;
         assertEquals(1, feat2.getMember().size());
-        
+
         MemberPropertyType member = feat2.getMember().get(0);
-        
+
         final JAXBElement element = (JAXBElement) member.getContent().get(0);
 
         assertTrue("expected samplingPoint but was:" +  element.getValue(), element.getValue() instanceof SamplingPointType);
@@ -1082,7 +1083,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         //assertEquals("10972X0137-PONT", sp.getName()); //TODO name attribute is moved to namespace GML 3.2 so the java binding does not match
     }
-    
+
     @Test
     @Order(order=16)
     public void testWFSTransactionInsertREST() throws Exception {
@@ -1115,22 +1116,22 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
-    private static final String WFS_REPLACE_FILTER = 
+
+    private static final String WFS_REPLACE_FILTER =
             "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
             + "%3Cfes:PropertyIsEqualTo%3E"
             + "%3Cfes:ValueReference%3Ename%3C/fes:ValueReference%3E"
             + "%3Cfes:Literal%3E10972X0137-SOUPAS%3C/fes:Literal%3E"
             + "%3C/fes:PropertyIsEqualTo%3E"
             + "%3C/fes:Filter%3E";
-    
+
     @Test
     @Order(order=17)
     public void testWFSTransactionReplaceREST() throws Exception {
-        
+
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint?" + WFS_REPLACE_FILTER);
 
 
@@ -1147,7 +1148,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 0, 1);
         List<CreatedOrModifiedFeatureType> insertedFeatures = new ArrayList<>();
         insertedFeatures.add(new CreatedOrModifiedFeatureType(new ResourceIdType("station-014"), null));
-        
+
          ActionResultsType act = new ActionResultsType(insertedFeatures);
         org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, act, "2.0.0");
 
@@ -1160,23 +1161,23 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
-    private static final String WFS_DELETE_FILTER = 
+
+    private static final String WFS_DELETE_FILTER =
             "filter=%3Cfes:Filter%20xmlns:fes=%22http://www.opengis.net/fes/2.0%22%20xmlns:gml=%22http://www.opengis.net/gml/3.2%22%3E"
             + "%3Cfes:PropertyIsEqualTo%3E"
             + "%3Cfes:ValueReference%3Ename%3C/fes:ValueReference%3E"
             + "%3Cfes:Literal%3E10972X0137-CALOS%3C/fes:Literal%3E"
             + "%3C/fes:PropertyIsEqualTo%3E"
             + "%3C/fes:Filter%3E";
-    
-    
+
+
     @Test
     @Order(order=18)
     public void testWFSTransactionDeleteREST() throws Exception {
-        
+
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint?" + WFS_DELETE_FILTER);
 
 
@@ -1190,7 +1191,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         org.geotoolkit.wfs.xml.v200.TransactionResponseType result = (org.geotoolkit.wfs.xml.v200.TransactionResponseType) obj;
 
         org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 1, 0);
-        
+
         org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, null, "2.0.0");
 
         assertEquals(ExpResult, result);
@@ -1202,14 +1203,14 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=19)
     public void testWFSGetFeatureByIDREST() throws Exception {
-        
+
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/1.1.0/SamplingPoint/station-014");
 
 
@@ -1218,14 +1219,14 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=20)
     public void testWFSTransactionReplaceByIdREST() throws Exception {
-        
+
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/station-014");
 
 
@@ -1242,7 +1243,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 0, 1);
         List<CreatedOrModifiedFeatureType> insertedFeatures = new ArrayList<>();
         insertedFeatures.add(new CreatedOrModifiedFeatureType(new ResourceIdType("station-014"), null));
-        
+
          ActionResultsType act = new ActionResultsType(insertedFeatures);
         org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, act, "2.0.0");
 
@@ -1255,15 +1256,15 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=21)
     public void testWFSTransactionDeleteByIdREST() throws Exception {
-        
-         
+
+
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/station-014");
 
 
@@ -1277,7 +1278,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         org.geotoolkit.wfs.xml.v200.TransactionResponseType result = (org.geotoolkit.wfs.xml.v200.TransactionResponseType) obj;
 
         org.geotoolkit.wfs.xml.v200.TransactionSummaryType sum        = new org.geotoolkit.wfs.xml.v200.TransactionSummaryType(0, 0, 1, 0);
-        
+
         org.geotoolkit.wfs.xml.v200.TransactionResponseType ExpResult = new org.geotoolkit.wfs.xml.v200.TransactionResponseType(sum, null, null, null, "2.0.0");
 
         assertEquals(ExpResult, result);
@@ -1289,10 +1290,10 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=22)
     public void testWFSGetPropertyValueREST() throws Exception {
@@ -1302,11 +1303,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
          */
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/property/sampledFeature?resultType=hits");
 
-        
+
         Object result = unmarshallResponse(getCapsUrl.openConnection());
 
         assertTrue("unexpected type: " + result.getClass().getName() + "\n" + result, result instanceof ValueCollectionType);
-        
+
         assertTrue(result instanceof ValueCollection);
         assertEquals(12, ((ValueCollection)result).getNumberReturned());
 
@@ -1314,7 +1315,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
          * Test 2 : query on typeName samplingPoint with RESULTS
          */
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/SamplingPoint/property/sampledFeature");
-        
+
         String sresult = getStringResponse(getCapsUrl.openConnection());
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.embedded.ValueCollectionOM1.xml"));
@@ -1331,16 +1332,16 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         domCompare(expectedResult, sresult);
 
     }
-    
-    private static final String WFS_UPDATE_FILTER = 
+
+    private static final String WFS_UPDATE_FILTER =
               "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
             + "%3Cogc:PropertyIsEqualTo%3E"
             + "%3Cogc:PropertyName%3ENAME%3C/ogc:PropertyName%3E"
             + "%3Cogc:Literal%3EAshton%3C/ogc:Literal%3E"
             + "%3C/ogc:PropertyIsEqualTo%3E"
             + "%3C/ogc:Filter%3E";
-    
-    
+
+
     @Test
     @Order(order=23)
     public void testWFSTransactionUpdateREST() throws Exception {
@@ -1375,10 +1376,10 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/namedPlacesCollection-6.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=23)
     public void testWFSGetPropertyValueByIdREST() throws Exception {
@@ -1404,7 +1405,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         domCompare(expectedResult, sresult);
 
     }
-    
+
     @Test
     @Order(order=24)
     public void testWFSTransactionUpdateByIdREST() throws Exception {
@@ -1439,7 +1440,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/namedPlacesCollection-1.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
 
@@ -1475,10 +1476,10 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/namedPlacesCollection-7.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
     }
-    
+
     @Test
     @Order(order=26)
     public void testWFSListStoredQueriesREST() throws Exception {
@@ -1486,13 +1487,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
 
-        
+
         Object obj = unmarshallResponse(getCapsUrl.openConnection());
 
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof ListStoredQueriesResponseType);
 
     }
-    
+
     @Test
     @Order(order=27)
     public void testWFSAdhocStoredQueriesREST() throws Exception {
@@ -1501,18 +1502,18 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
-        
+
         postRequestFile(conec, "org/constellation/wfs/xml/embedded/AdhocQuery1.xml");
-        
+
         Object obj = unmarshallResponse(conec);
 
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof CreateStoredQueryResponseType);
-        
+
         // TODO at this point i don"t know how to retrieve the identifier
         // SO i use the list operation
         ListStoredQueriesResponseType listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
         assertEquals(3, listQuery.getStoredQuery().size());
-        
+
         String id = null;
         for (StoredQueryListItemType item : listQuery.getStoredQuery()) {
             if (!item.getId().equals("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById") &&
@@ -1521,40 +1522,40 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
             }
         }
         Assert.assertNotNull(id);
-        
+
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/" + id);
-        
+
         String xmlResult    = getStringResponse(getCapsUrl.openConnection());
         String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/embedded/singleNamedPlaces.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
-        
+
         Object response = unmarshallResponseDelete(getCapsUrl.openConnection());
-        
+
         assertTrue(response instanceof DropStoredQueryResponseType);
-        
+
         // verify that the query is removed
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
-        
+
         listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
         assertEquals(2, listQuery.getStoredQuery().size());
     }
-    
+
     @Test
     @Order(order=28)
     public void testWFSStoredQueriesREST() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1");
 
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
-        
+
         postRequestFile(conec, "org/constellation/wfs/xml/embedded/StoredQuery1.xml");
-        
+
         Object obj = unmarshallResponse(conec);
 
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof CreateStoredQueryResponseType);
@@ -1563,49 +1564,49 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
         ListStoredQueriesResponseType listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
         assertEquals(3, listQuery.getStoredQuery().size());
-        
+
         // execute it
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1?param1=Goose%20Island");
-        
+
         String xmlResult    = getStringResponse(getCapsUrl.openConnection());
         String xmlExpResult = getStringFromFile("org/constellation/wfs/xml/embedded/singleNamedPlaces.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
-        
+
         // replace
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1");
         conec = getCapsUrl.openConnection();
-        
+
         putRequestFile(conec, "org/constellation/wfs/xml/embedded/StoredQuery2.xml");
-        
+
         obj = unmarshallResponse(conec);
-        
+
         assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof CreateStoredQueryResponseType);
-        
+
         // execute it
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query/STquery1?param1=Goose%20Island");
-        
+
         xmlResult    = getStringResponse(getCapsUrl.openConnection());
         xmlExpResult = getStringFromFile("org/constellation/wfs/xml/embedded/singleNamedPlaces2.xml");
         xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
         xmlResult    = xmlResult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(xmlExpResult, xmlResult);
-        
+
         // remove
         Object response = unmarshallResponseDelete(getCapsUrl.openConnection());
-        
+
         assertTrue(response instanceof DropStoredQueryResponseType);
-        
+
         // verify that the query is removed
         getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default/2.0.0/query");
-        
+
         listQuery = (ListStoredQueriesResponseType) unmarshallResponse(getCapsUrl.openConnection());
         assertEquals(2, listQuery.getStoredQuery().size());
     }
-    
+
     @Test
     @Order(order=29)
     public void testWFSGetFeatureCITET() throws Exception {
@@ -1624,7 +1625,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         FeatureCollectionType feat = (FeatureCollectionType) obj;
         assertEquals(1, feat.getFeatureMember().size());
-        
+
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETFEATURE_CITE2);
         } catch (MalformedURLException ex) {
@@ -1638,7 +1639,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         feat = (FeatureCollectionType) obj;
         assertEquals(1, feat.getFeatureMember().size());
-        
+
 
     }
 

@@ -41,7 +41,7 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(Stroke.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.binding");
 
     private String color   = "#000000";
     private String opacity = "1.0";

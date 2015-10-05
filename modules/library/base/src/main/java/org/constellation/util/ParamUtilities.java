@@ -48,7 +48,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  */
 public final class ParamUtilities extends Static {
 
-    private static final Logger LOGGER = Logging.getLogger(ParamUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.util");
 
     /**
      * Reads an {@link java.io.InputStream} to build a {@link org.opengis.parameter.GeneralParameterValue}

@@ -64,8 +64,8 @@ import static org.constellation.security.ActionPermissions.NEW_SERVICE;
  */
 public final class JServicesPane extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private static final Logger LOGGER = Logging.getLogger(JServicesPane.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.swing");
+
     private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
     private final ConstellationClient cstlV2;
@@ -193,7 +193,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
-        } 
+        }
 
         Collections.sort(instances,new Comparator<Entry<Instance,String>>(){
             @Override

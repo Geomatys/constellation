@@ -79,7 +79,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Testing wms service value parsing.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
@@ -87,10 +87,10 @@ import org.springframework.test.context.ContextConfiguration;
 @ActiveProfiles({"standard"})
 public class WMSServiceTest implements ApplicationContextAware {
 
-    private static final Logger LOGGER = Logging.getLogger(WMSServiceTest.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.map.ws.rs");
+
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -98,16 +98,16 @@ public class WMSServiceTest implements ApplicationContextAware {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     private static final double DELTA = 0.00000001;
     private static WMSService service;
     private final BasicUriInfo info = new BasicUriInfo(null, null);
@@ -115,12 +115,12 @@ public class WMSServiceTest implements ApplicationContextAware {
     private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void start() {
         ConfigDirectory.setupTestEnvironement("WMSServiceTest");
     }
-    
+
     @PostConstruct
     public void init() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -131,7 +131,7 @@ public class WMSServiceTest implements ApplicationContextAware {
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
-                
+
                 // coverage-file datastore
                 final File rootDir                  = AbstractGrizzlyServer.initDataDirectory();
                 final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
@@ -148,7 +148,7 @@ public class WMSServiceTest implements ApplicationContextAware {
 
                 providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
                 dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);
-                
+
 
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
                 final File outputDir = AbstractGrizzlyServer.initDataDirectory();
@@ -201,11 +201,11 @@ public class WMSServiceTest implements ApplicationContextAware {
                 service = new WMSService();
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WMSServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
-    
+
     @AfterClass
     public static void finish() {
         service.destroy();
@@ -231,20 +231,20 @@ public class WMSServiceTest implements ApplicationContextAware {
             Logger.getAnonymousLogger().log(Level.WARNING, ex.getMessage());
         }
     }
-    
+
     public void setFields() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
         //do not use this in real code, just for testing
         Field privateStringField = AbstractWebService.class.getDeclaredField("uriContext");
         privateStringField.setAccessible(true);
         privateStringField.set(service, info);
-        
+
         info.setPathParameters(pathParameters);
         info.setQueryParameters(queryParameters);
     }
 
     private GetMap callGetMap() throws IllegalAccessException, IllegalArgumentException,
                                        InvocationTargetException, NoSuchMethodException{
-        
+
         //do not use this in real code, just for testing
         final Worker worker = WSEngine.getInstance("WMS", "default");
         final Method adaptGetMapMethod = WMSService.class.getDeclaredMethod(
@@ -337,7 +337,7 @@ public class WMSServiceTest implements ApplicationContextAware {
         assertEquals(156.789d, env4D.getMaximum(2), DELTA);
         assertEquals(time.getTime(), env4D.getMinimum(3), DELTA);
         assertEquals(time.getTime(), env4D.getMaximum(3), DELTA);
-        
+
 
 //        TODO
 //        getMap.getBackground();
@@ -374,7 +374,7 @@ public class WMSServiceTest implements ApplicationContextAware {
         queryParameters.putSingle("WIDTH", "800");
         queryParameters.putSingle("VERSION", "1.3.0");
         setFields();
-        
+
         final GetFeatureInfo parsedQuery = callGetFeatureInfo();
 
         //azimuth

@@ -33,17 +33,17 @@ import java.util.logging.Logger;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.geotoolkit.processing.quartz.ProcessJobDetail;
 /**
- * 
+ *
  * @author Quentin Boileau (Geomatys)
  */
 public class WPSScheduler {
 
-    private static final Logger LOGGER  = Logging.getLogger(WPSScheduler.class);
-    
+    private static final Logger LOGGER  = Logging.getLogger("org.constellation.wps.ws");
+
     public static WPSScheduler INSTANCE;
-    
+
     private Scheduler quartzScheduler;
-    
+
     private WPSScheduler() throws CstlServiceException {
         final SchedulerFactory schedFact = new StdSchedulerFactory();
         try {
@@ -53,14 +53,14 @@ public class WPSScheduler {
             throw new CstlServiceException(" Failed to start WPS quartz scheduler", ex, NO_APPLICABLE_CODE);
         }
     }
-    
+
     public static synchronized WPSScheduler getInstance() throws CstlServiceException{
         if(INSTANCE == null){
             INSTANCE = new WPSScheduler();
         }
         return INSTANCE;
     }
-    
+
     public void addProcessJob(final org.geotoolkit.process.Process process) throws CstlServiceException{
         try {
             final ProcessJobDetail job = new ProcessJobDetail(process);
@@ -70,15 +70,14 @@ public class WPSScheduler {
             throw new CstlServiceException(ex);
         }
     }
-    
-    public void stop() {        
+
+    public void stop() {
         try {
             quartzScheduler.shutdown();
         } catch (SchedulerException ex) {
             LOGGER.log(Level.SEVERE, "Failed to stop WPS quartz scheduler");
             return;
         }
-        LOGGER.log(Level.WARNING, "WPS Scheduler sucessfully stopped");    
+        LOGGER.log(Level.WARNING, "WPS Scheduler sucessfully stopped");
     }
 }
-    

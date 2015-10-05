@@ -43,7 +43,7 @@ import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -54,11 +54,11 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
 
     @Inject
     private ServiceBusiness serviceBusiness;
-    
+
     private static DefaultDataSource ds2 = null;
 
     private static String url2;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         url2 = "jdbc:derby:memory:MDTest200;create=true";
@@ -86,10 +86,10 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
         CSWDirectory.mkdir();
         final File instDirectory = new File(CSWDirectory, "default");
         instDirectory.mkdir();
-        
+
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -99,14 +99,14 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
             BDD smBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url2, "", "");
             SMLConfiguration.setBdd(smBdd);
             SMLConfiguration.setFormat("mdweb");
-            
+
             Automatic OMConfiguration  = new Automatic();
-            
+
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.NONE);
             configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setObservationFilterType(DataSourceType.NONE);
-            
+
             configuration.setSMLType(DataSourceType.MDWEB);
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
@@ -114,7 +114,7 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 serviceBusiness.create("sos", "default", configuration, null, null);
 
@@ -124,7 +124,7 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             } else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
-                
+
                 serviceBusiness.create("sos", "default", configuration, null, null);
 
                 init();
@@ -133,10 +133,10 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(MDWebSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public void initWorker() {
         worker = new SOSworker("default");
@@ -223,7 +223,7 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
     public void DeleteSensorTest() throws Exception {
         super.DeleteSensorTest();
     }
-    
+
     /**
      * Tests the destroy method
      *

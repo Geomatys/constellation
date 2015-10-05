@@ -43,7 +43,7 @@ public final class RasterSymbolizer implements Symbolizer {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(RasterSymbolizer.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.binding");
 
 	private String name;
     private double opacity                          = 1.0;

@@ -69,7 +69,7 @@ import static org.constellation.json.util.StyleFactories.FF;
  */
 public final class StyleUtilities extends Static {
 
-    private static final Logger LOGGER = Logging.getLogger(StyleUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.util");
 
     /**
      * Parse given string as CQL and returns Expression.

@@ -78,7 +78,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.utility.parameter.ParametersExt.createGroup;
@@ -92,6 +91,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import org.junit.BeforeClass;
 import org.opengis.util.GenericName;
+import org.apache.sis.util.logging.Logging;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -111,24 +111,24 @@ import org.springframework.test.context.ActiveProfiles;
 public class WMSRequestsTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-    
+
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     /**
      * The layer to test.
      */
@@ -167,12 +167,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                                       "layers=Lakes&styles=&" +
                                       "query_layers=Lakes&info_format=text/plain&" +
                                       "X=60&Y=60";
-    
+
     private static final String WMS_GETFEATUREINFO3 = "QuErY_LaYeRs=BasicPolygons&I=50&"
                                                     + "LaYeRs=BasicPolygons&StYlEs=&WiDtH=100&CrS=CRS:84&"
                                                     + "ReQuEsT=GetFeatureInfo&InFo_fOrMaT=text/plain&BbOx=-2,2,2,6"
                                                     + "&HeIgHt=100&J=50&VeRsIoN=1.3.0&FoRmAt=image/gif";
-    
+
     private static final String WMS_GETLEGENDGRAPHIC = "request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
 
@@ -198,12 +198,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     "TrAnSpArEnT=TRUE&CrS=CRS:84&FoRmAt=image%2Fgif&VeRsIoN=1.3.0&HeIgHt=100&WiDtH=200&StYlEs=&LaYeRs=cite%3ALakes&ReQuEsT=GetMap&BbOx=0,-0.0020,0.0040,0";
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void startup() {
         ConfigDirectory.setupTestEnvironement("WMSRequestTest");
     }
-    
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -219,7 +219,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                     dataBusiness.deleteAll();
                     providerBusiness.removeAll();
                 } catch (Exception ex) {}
-                
+
                 // coverage-file datastore
                 final File rootDir                   = AbstractGrizzlyServer.initDataDirectory();
                 final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
@@ -253,7 +253,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                     path = outputDir.getAbsolutePath();
                 }
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+path + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                
+
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
                 final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
@@ -327,14 +327,14 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 serviceFre.setServiceConstraints(cstr);
                 serviceFre.setServiceContact(ct);
                 serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
-                
+
                 serviceBusiness.setInstanceDetails("wms", "wms1", serviceFre, "fre", false);
 
                 final LayerContext config3 = new LayerContext();
                 config3.getCustomParameters().put("shiroAccessible", "false");
                 config3.getCustomParameters().put("supported_versions", "1.3.0");
                 config3.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-                final Details details3 = new Details(); 
+                final Details details3 = new Details();
                 details3.setIdentifier("wms2");
                 details3.setName("wms2");
                 details3.setVersions(Arrays.asList("1.3.0"));
@@ -373,7 +373,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 DataProviders.getInstance().reload();
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WMSRequestsTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded").log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -398,7 +398,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 provider.removeAll();
             }
         } catch (Exception ex) {
-            Logger.getLogger(WMSRequestsTest.class.getName()).log(Level.WARNING, ex.getMessage());
+            Logging.getLogger("org.constellation.ws.embedded").log(Level.WARNING, ex.getMessage());
         }
         ConfigDirectory.shutdownTestEnvironement("WMSRequestTest");
         finish();
@@ -453,7 +453,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertEquals(1024, image.getWidth());
         assertEquals(512,  image.getHeight());
         assertTrue  (ImageTesting.getNumColors(image) > 8);
-        
+
     }
 
     /**
@@ -626,7 +626,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
         assertTrue(bboxGeo.getEastBoundLongitude() ==  180d);
         assertTrue(bboxGeo.getNorthBoundLatitude() ==   90d);
-        
+
 
         String currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
 
@@ -649,7 +649,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         // The layer test must be excluded
         layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.tip().toString());
         assertNull(layer);
-        
+
 
         // The layer lake must be included
         layer = (Layer) responseCaps.getLayerFromName("http://www.opengis.net/gml:Lakes");
@@ -848,7 +848,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertNotNull(fullResponse, value);
         assertTrue   (value.startsWith("28.5"));
     }
-    
+
     @Test
     @Ignore
     @Order(order=12)

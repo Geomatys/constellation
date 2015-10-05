@@ -45,7 +45,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -56,12 +56,12 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     @Inject
     private ServiceBusiness serviceBusiness;
-    
+
     private static final File dbDirectory = new File("MDCSWWorkerTestDatabase");
     private static final File dbTHDirectory = new File("MDCSWWorkerTestThesaurusDatabase");
-    
+
     private static  String url;
-    
+
     private static String thUrl;
 
     @BeforeClass
@@ -123,7 +123,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         writer.writeConcept(new Concept("SDN:L231:3:EDMED", new Value("EDMED record", "en")));
         writer.writeConcept(new Concept("SDN:EDMERP::9585", new Value("OCEANOGRAPHIC DATA CENTER", "en")));
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -155,7 +155,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
                 worker = new CSWworker("default");
             }
         } catch (Exception ex) {
-            Logger.getLogger(MDwebCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.metadata").log(Level.SEVERE, null, ex);
         }
     }
 

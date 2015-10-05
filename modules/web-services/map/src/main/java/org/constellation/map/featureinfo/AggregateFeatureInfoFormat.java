@@ -66,7 +66,7 @@ import org.opengis.util.GenericName;
  */
 public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
 
-    public static final Logger LOGGER = Logging.getLogger(AggregateFeatureInfoFormat.class);
+    public static final Logger LOGGER = Logging.getLogger("org.constellation.map.featureinfo");
     public static final String PROVIDER_ID_PARAM = "providerID";
 
     private Map<String, List<GetFeatureInfoCfg>> layersConfig = null;

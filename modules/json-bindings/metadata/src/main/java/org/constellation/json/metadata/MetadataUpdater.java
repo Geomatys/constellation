@@ -75,7 +75,7 @@ final class MetadataUpdater {
      * to be deleted and the logging replaced by an exception or any other mechanism reporting error to the
      * user.
      */
-    private static final Logger LOGGER = Logging.getLogger(MetadataUpdater.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.metadata");
 
     /**
      * The metadata factory to use for creating new instances of ISO 19115 objects.
@@ -442,7 +442,7 @@ final class MetadataUpdater {
             String version   = null;
             int indice       =  np.indices[0];
             final Map<String, Object> extraParameters = new HashMap<>();
-            
+
             while (np.path.length >= 2 && np.path[0].equals("referenceSystemInfo") && np.indices[0] == indice) {
                 if (np.path[np.path.length - 2].equals("referenceSystemIdentifier")) {
                     switch (np.path[np.path.length - 1]) {
@@ -493,7 +493,7 @@ final class MetadataUpdater {
         }
         return false;
     }
-    
+
     private void specialMetadataCaseRemove(final Object metadata, final String identifier, final Iterator existingChildren) throws ParseException, FactoryException {
         if (identifier.equals("referenceSystemInfo") && (metadata instanceof Metadata)) {
             final List<ReferenceSystem> toRemove = new ArrayList<>();

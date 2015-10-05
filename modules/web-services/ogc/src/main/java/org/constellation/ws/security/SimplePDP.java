@@ -28,11 +28,11 @@ import java.util.logging.Logger;
 
 
 /**
- * Temporary implementation of a simple Policy Desicion Point. The full OASIS 
+ * Temporary implementation of a simple Policy Desicion Point. The full OASIS
  * implementation is already part of the engine/xacml module
  * (org.constellation.xacml.CstlPDP). It works with a simple constraint stored
  * in a string locally.
- * 
+ *
  * TODO: remove it when the OASIS PDP will be used.
  *
  * @author Cédric Briançon (Geomatys)
@@ -44,7 +44,7 @@ public final class SimplePDP {
     /**
      * The logger for the PDP.
      */
-    private static final Logger LOGGER = Logging.getLogger(SimplePDP.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.security");
 
     /**
      * Engine that will launch the evaluation of the rule.

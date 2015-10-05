@@ -85,7 +85,7 @@ import org.opengis.util.GenericName;
  */
 public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
-    private static final Logger LOGGER = Logging.getLogger(GMLFeatureInfoFormat.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.map.featureinfo");
 
     private final DataProviders dp = DataProviders.getInstance();
 
@@ -470,7 +470,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         if (maxValue == null) {
             maxValue = 1;
         }
-        
+
         for (String layerName : values.keySet()) {
 
             if (mode == 0) {

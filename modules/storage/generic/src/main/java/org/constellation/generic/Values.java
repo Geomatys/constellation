@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class Values {
 
-    private static final Logger LOGGER = Logging.getLogger(Values.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.generic");
     /**
      * A Map of (varName) - (list of values) refreshed at every request.
      */
@@ -86,7 +86,7 @@ public class Values {
         }
         return null;
     }
-    
+
     public Object getTypedVariable(final String variable) {
         final List<Object> result = values.get(variable);
         if (result != null && result.size() > 0) {
@@ -109,7 +109,7 @@ public class Values {
     public List<String> getVariables(final String variable) {
         return getVariables(variable, false);
     }
-    
+
     public List<String> getVariables(final String variable, final boolean acceptNull) {
         if (values != null) {
             final List<Object> typedResults = values.get(variable);
@@ -117,7 +117,7 @@ public class Values {
                 LOGGER.log(Level.WARNING, "there no such variable in the values:{0}", variable);
                 return new ArrayList<String>();
             }
-            final List<String> result = new ArrayList<String>(); 
+            final List<String> result = new ArrayList<String>();
             for (Object typedResult : typedResults) {
                 if (typedResult != null) {
                     result.add(typedResult.toString());
@@ -129,7 +129,7 @@ public class Values {
         }
         return null;
     }
-    
+
     public List<Object> getTypedVariables(final String variable) {
         if (values != null) {
             final List<Object> typedResults = values.get(variable);
@@ -154,7 +154,7 @@ public class Values {
         }
         values.get(varName).add(value);
     }
-    
+
     /**
      * Add all the map of the specified Values to the current map.
      *
@@ -178,5 +178,5 @@ public class Values {
         }
         return sb.toString();
     }
-    
+
 }

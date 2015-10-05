@@ -26,6 +26,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.NodeUtilities;
 import org.constellation.ws.MimeType;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
@@ -53,7 +54,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.constellation.metadata.FileSystemCSWworkerTest.writeDataFile;
 import static org.geotoolkit.csw.xml.TypeNames.RECORD_QNAME;
@@ -72,7 +72,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class TreeCloseTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -80,19 +80,19 @@ public class TreeCloseTest implements ApplicationContextAware {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static CSWworker worker;
 
     private static File configDir;
     private static File dataDirectory;
-    
+
     private boolean initialized = false;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -128,7 +128,7 @@ public class TreeCloseTest implements ApplicationContextAware {
                 initialized = true;
             }
         } catch (Exception ex) {
-            Logger.getLogger(TreeCloseTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.metadata").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -147,7 +147,7 @@ public class TreeCloseTest implements ApplicationContextAware {
      */
     @Test
     public void spatialSearchTest() throws Exception {
-     
+
         /*
          *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: BBOX
          */

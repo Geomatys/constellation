@@ -1,8 +1,6 @@
 package org.constellation.services.web.controller;
 
 import org.constellation.configuration.ConfigDirectory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +22,6 @@ import java.io.File;
 @Controller
 @RequestMapping("/resolveImage")
 public class ImageResolverController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImageResolverController.class);
 
     @RequestMapping(value = "/{mdIdentifierSHA1}", method = RequestMethod.GET)
     @ResponseBody

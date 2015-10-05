@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GridDecoration extends AbstractDecoration {
 
-    private static final Logger LOGGER = Logging.getLogger(GridDecoration.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.configuration");
     @XmlElement(name = "MainGrid")
     private Grid mainGrid;
     @XmlElement(name = "SecondGrid")
@@ -99,7 +99,7 @@ public class GridDecoration extends AbstractDecoration {
         final java.awt.Stroke mainLineStroke = mainGrid.getStroke() != null ? mainGrid.getStroke().toAwtStroke() : new BasicStroke(2);
         final Paint mainLinePaint = WMSPortrayalUtils.parseColor(mainGrid.getStroke().getStrokeColor(), mainGrid.getStroke().getStrokeOpacity(), Color.DARK_GRAY);
         final Font mainLineFont = mainGrid.getFont() != null ? Font.decode(mainGrid.getFont()) : new Font("serial", Font.BOLD, 14);
-        
+
         final java.awt.Stroke secondLineStroke = secondGrid.getStroke() != null ? secondGrid.getStroke().toAwtStroke()
                 : new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[]{5, 5}, 0);
         final Paint secondLinePaint = WMSPortrayalUtils.parseColor(secondGrid.getStroke().getStrokeColor(), secondGrid.getStroke().getStrokeOpacity(), Color.GRAY);

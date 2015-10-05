@@ -39,11 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
-// OpenOffice dependencies
-// OpenGIS dependencies
-// Geotools dependencies
-// Constellation dependencies
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -57,7 +53,7 @@ public class Observations extends Formulas implements XObservations {
     /**
      * The logger to use for all message to log in this package.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.openoffice");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.openoffice");
 
     /**
      * Le nom sous lequel sera enregistré cette composante.

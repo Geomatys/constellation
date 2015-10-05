@@ -35,7 +35,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.PostConstruct;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 @ContextConfiguration("classpath:/cstl/spring/test-context.xml")
 @ActiveProfiles({"standard" })
 public class MetadataBusinessTest {
-    
+
     @Autowired
     private IMetadataBusiness metadataBusiness;
 
@@ -78,7 +78,7 @@ public class MetadataBusinessTest {
                 mdBean.deleteAllMetadata();
             }
         } catch (ConfigurationException ex) {
-            Logger.getLogger(MetadataBusinessTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.admin").log(Level.SEVERE, null, ex);
         }
         ConfigDirectory.shutdownTestEnvironement("MetadataBusinessTest");
     }
@@ -86,14 +86,14 @@ public class MetadataBusinessTest {
     @Test
     public void createMetadata() throws ConfigurationException {
         final Metadata metadata = metadataBusiness.updateMetadata("test", BIG_XML);
-        
+
         final Metadata read = metadataBusiness.getMetadataById(metadata.getId());
-        
+
         Assert.assertEquals(BIG_XML.length(), read.getMetadataIso().length());
         Assert.assertEquals(BIG_XML, read.getMetadataIso());
     }
-    
-    
+
+
     private static String BIG_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
 "<gmd:MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\"\n" +
 "                 xmlns:gmd=\"http://www.isotc211.org/2005/gmd\"\n" +

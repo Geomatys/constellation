@@ -78,8 +78,8 @@ import org.constellation.business.IMetadataBusiness;
 @Primary
 public class MapContextBusiness implements IMapContextBusiness {
 
-    private static final Logger LOGGER = Logging.getLogger(MapContextBusiness.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
+
     @Inject
     private MapContextRepository mapContextRepository;
 
@@ -91,7 +91,7 @@ public class MapContextBusiness implements IMapContextBusiness {
 
     @Inject
     private IMetadataBusiness metadataBusiness;
-    
+
     @Inject
     private IDataBusiness dataBusiness;
 

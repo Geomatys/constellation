@@ -23,15 +23,14 @@ import org.apache.sis.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.logging.Logger;
 
 public class SpringHelper {
 
-    private static final Logger LOGGER = Logging.getLogger(SpringHelper.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
+
     private static ApplicationContext applicationContext;
 
     private static EventBus eventBus;

@@ -57,8 +57,8 @@ import java.net.URL;
 import java.sql.Connection;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.sis.util.logging.Logging;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
@@ -92,7 +92,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class WFSCustomSQLTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -100,16 +100,16 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL =
                "request=DescribeFeatureType"
              + "&service=WFS"
@@ -121,13 +121,13 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
     private static boolean localdb_active = true;
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WFSCustomSQLTest");
     }
-    
-    
+
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -140,7 +140,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
-                
+
                  final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
                 // Defines a PostGis data provider
@@ -172,7 +172,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "CustomSQLQuery"),      "postgisSrc", "VECTOR", false, true, null, null);
                 }
-                
+
                 final File outputDir = initDataDirectory();
                 final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourcef, "id").setValue("shapeSrc");
@@ -186,7 +186,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 final ParameterValueGroup layer2 = getOrCreateGroup(sourcef, "Layer");
                 getOrCreateValue(layer2, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer2, "style").setValue("cite_style_NamedPlaces");
-                
+
                 providerBusiness.storeProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
@@ -213,18 +213,18 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
 
                 final ParameterValueGroup sourceOM = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourceOM, "id").setValue("omSrc");
-                getOrCreateValue(sourceOM, "load_all").setValue(true);    
+                getOrCreateValue(sourceOM, "load_all").setValue(true);
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
                 final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                
+
                 providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
-                
+
                 DataProviders.getInstance().reload();
-                
+
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
@@ -261,7 +261,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                         ":org.apache.sis.internal.jaxb.geometry"), null);
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WFSCustomSQLTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded").log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -281,7 +281,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
     public void testWFSDescribeFeatureGET() throws Exception {
         waitForStart();
         assumeTrue(localdb_active);
-        
+
         final URL getfeatsUrl;
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" +WFS_DESCRIBE_FEATURE_TYPE_URL);

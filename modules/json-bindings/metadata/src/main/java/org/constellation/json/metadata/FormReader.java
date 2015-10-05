@@ -49,7 +49,7 @@ final class FormReader {
      * to be deleted and the logging replaced by an exception or any other mechanism reporting error to the
      * user.
      */
-    private final static Logger LOGGER = Logging.getLogger(FormReader.class);
+    private final static Logger LOGGER = Logging.getLogger("org.constellation.json.metadata");
 
     /**
      * For iterating over the lines of the JSON file to parse.

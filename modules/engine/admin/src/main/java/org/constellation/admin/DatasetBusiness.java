@@ -93,7 +93,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     /**
      * Used for debugging purposes.
      */
-    protected static final Logger LOGGER = Logging.getLogger(DatasetBusiness.class);
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
 
     /**
      * w3c document builder factory.
@@ -131,7 +131,7 @@ public class DatasetBusiness implements IDatasetBusiness {
      */
     @Inject
     protected IndexEngine indexEngine;
-    
+
     @Autowired(required = false)
     private IDataBusinessListener dataBusinessListener = new DefaultDataBusinessListener();
 
@@ -197,11 +197,11 @@ public class DatasetBusiness implements IDatasetBusiness {
     @Transactional
     public void updateMetadata(final String datasetIdentifier,
                                final DefaultMetadata metadata) throws ConfigurationException {
-        
+
         final Dataset dataset = datasetRepository.findByIdentifier(datasetIdentifier);
         if (dataset != null) {
             metadataBusiness.updateMetadata(metadata.getFileIdentifier(), metadata, null, dataset.getId(), null);
-            
+
             indexEngine.addMetadataToIndexForDataset(metadata, dataset.getId());
         } else {
             throw new TargetNotFoundException("Dataset :" + datasetIdentifier + " not found");
@@ -449,19 +449,19 @@ public class DatasetBusiness implements IDatasetBusiness {
                     FileUtilities.deleteDirectory(provDir);
                 }
             }
-            
+
             // 3. remove metadata
             metadataBusiness.deleteDatasetMetadata(ds.getId());
-            
+
             // 4. remove internal csw link
             datasetRepository.removeDatasetFromAllCSW(ds.getId());
-            
+
             // 5. remove dataset
             indexEngine.removeDatasetMetadataFromIndex(ds.getId());
             datasetRepository.remove(ds.getId());
         }
     }
-    
+
     @Override
     public DataSetBrief getDatasetBrief(Integer dataSetId, List<DataBrief> children) {
         final Dataset dataset = datasetRepository.findById(dataSetId);
@@ -496,7 +496,7 @@ public class DatasetBusiness implements IDatasetBusiness {
     public boolean existsById(int datasetId) {
         return datasetRepository.existsById(datasetId);
     }
-    
+
     @Override
     public DatasetItemWithData getSingletonDatasetItem(DatasetItem dsItem, List<DataItem> items) {
         return new DatasetItemWithData(dsItem, items);

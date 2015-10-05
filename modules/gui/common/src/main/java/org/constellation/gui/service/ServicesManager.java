@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public class  ServicesManager {
 
-    private static final Logger LOGGER = Logging.getLogger(ServicesManager.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.gui.service");
 
     /**
      * Constellation manager used to communicate with the Constellation server.

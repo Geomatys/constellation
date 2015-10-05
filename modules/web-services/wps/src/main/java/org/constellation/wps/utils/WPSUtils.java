@@ -85,7 +85,7 @@ import org.opengis.parameter.ParameterNotFoundException;
  */
 public class WPSUtils {
 
-    private static final Logger LOGGER = Logging.getLogger(WPSUtils.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.wps.utils");
 
     private WPSUtils() {
     }
@@ -341,7 +341,7 @@ public class WPSUtils {
      * @return true if process is supported, false if is not.
      */
     public static boolean isSupportedProcess(final ProcessDescriptor descriptor) {
-        
+
         //Inputs
         final GeneralParameterDescriptor inputDesc = descriptor.getInputDescriptor();
         if(!isSupportedParameter(inputDesc, WPSIO.IOType.INPUT)) {
@@ -349,13 +349,13 @@ public class WPSUtils {
         }
 
         //Outputs
-        GeneralParameterDescriptor outputDesc = descriptor.getOutputDescriptor();        
+        GeneralParameterDescriptor outputDesc = descriptor.getOutputDescriptor();
         if(!isSupportedParameter(outputDesc, WPSIO.IOType.OUTPUT)) {
             return false;
-        }        
+        }
         return true;
     }
-    
+
     /**
      * A function which test if the given parameter can be proceed by the WPS.
      * @param toTest The descriptor of the parameter to test.
@@ -393,7 +393,7 @@ public class WPSUtils {
      * @param attributeClass The java class to get complex type from.
      * @param ioType The type of parameter to describe (input or output).
      * @param type The complex type (complex, reference, etc.).
-     * @return SupportedComplexDataInputType 
+     * @return SupportedComplexDataInputType
      */
     public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type) {
         return describeComplex(attributeClass, ioType, type, null);
@@ -632,22 +632,22 @@ public class WPSUtils {
         final String separator = ", ";
 
         builder.append(begin);
-        
+
         builder.append("mimeType=");
         builder.append(requestedOuptut.getMimeType());
         builder.append(separator);
-        
+
         builder.append("encoding=");
         builder.append(requestedOuptut.getEncoding());
         builder.append(separator);
-        
+
         builder.append("schema=");
         builder.append(requestedOuptut.getSchema());
-       
+
         builder.append(end);
         return builder.toString();
     }
-    
+
     /**
      * A function to retrieve a Feature schema, and store it into the given file
      * as an xsd.

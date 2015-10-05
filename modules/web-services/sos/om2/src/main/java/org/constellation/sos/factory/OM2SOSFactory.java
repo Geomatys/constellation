@@ -46,8 +46,8 @@ import org.geotoolkit.observation.ObservationWriter;
  */
 public class OM2SOSFactory implements OMFactory {
 
-    private static final Logger LOGGER = Logging.getLogger(OM2SOSFactory.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.factory");
+
     /**
      * {@inheritDoc}
      */
@@ -58,7 +58,7 @@ public class OM2SOSFactory implements OMFactory {
         }
         return false;
     }
-    
+
     /**
      * {@inheritDoc}
      */

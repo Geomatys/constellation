@@ -19,9 +19,9 @@ import org.springframework.web.filter.GenericFilterBean;
 
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationTokenProcessingFilter.class);
-	
+
     private UnauthorizedHandler unauthorizedHandler = new UnauthorizedHandler() {
 
         @Override
@@ -59,7 +59,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = getAsHttpRequest(request);
 
         UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
-        
+
         if (userDetails == null) {
             if( ! unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
                 getAsHttpResponse(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -72,7 +72,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         if(LOGGER.isDebugEnabled()) {
             LOGGER.debug(userDetails.getUsername() + ": " + userDetails.getAuthorities());
         }
-        
+
         try {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));

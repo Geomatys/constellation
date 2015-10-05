@@ -52,9 +52,9 @@ import static org.constellation.sos.ws.SOSUtils.getTimestampValue;
  */
 public class DatablockParser {
 
-    private static final Logger LOGGER = Logging.getLogger(DatablockParser.class);
-    
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.ws");
+
+
     public static Values getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<Filter> eventTimes) throws DataStoreException {
         Values values;
 
@@ -202,7 +202,7 @@ public class DatablockParser {
         }
         return values;
     }
-    
+
     public static class Values {
         public StringBuilder values = new StringBuilder();
         public int nbBlock = 0;

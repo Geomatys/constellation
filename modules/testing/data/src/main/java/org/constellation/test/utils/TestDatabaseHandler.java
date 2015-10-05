@@ -33,16 +33,16 @@ import org.constellation.configuration.ConfigDirectory;
  * @author Guilhem Legal (Geomatys)
  */
 public class TestDatabaseHandler {
-    
-    private static final Logger LOGGER = Logging.getLogger(TestDatabaseHandler.class);
-    
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.test.utils");
+
     public static Properties testProperties = new Properties();
-    
+
     static {
         // load the properties
         hasLocalDatabase();
     }
-    
+
     public static boolean hasLocalDatabase() {
         final File home = ConfigDirectory.getUserHomeDirectory();
         if (home != null && home.isDirectory()) {

@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  */
 public class IdentifierIterator implements CloseableIterator<String> {
 
-    private static final Logger LOGGER = Logging.getLogger(IdentifierIterator.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io.filesystem.sql");
 
     private final Session session;
 

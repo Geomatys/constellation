@@ -72,12 +72,12 @@ public class CSWServicesRest {
 
     @Autowired
     protected IServiceBusiness serviceBusiness;
-    
+
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(CSWServicesRest.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
+
     @POST
     @Path("{id}/index/refresh")
     public Response refreshIndex(final @PathParam("id") String id, final ParameterValues values) throws Exception {
@@ -117,13 +117,13 @@ public class CSWServicesRest {
     public Response importRecord(final @PathParam("id") String id, final @PathParam("fileName") String fileName, final File record) throws Exception {
         return ok(getConfigurer().importRecords(id, record, fileName));
     }
-    
+
     @PUT
     @Path("{id}/records/data/{dataID}")
     public Response importInternalData(final @PathParam("id") String id, final @PathParam("dataID") String metadataID) throws Exception {
         return ok(getConfigurer().importInternalData(id, metadataID));
     }
-    
+
     @GET
     @Path("{id}/importInternaldata")
     public Response canImportInternalData(final @PathParam("id") String id) throws Exception {
@@ -142,7 +142,7 @@ public class CSWServicesRest {
     public Response removeMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().removeRecords(id, metaID));
     }
-    
+
     @DELETE
     @Path("{id}/records")
     public Response removeAllMetadata(final @PathParam("id") String id) throws Exception {
@@ -154,7 +154,7 @@ public class CSWServicesRest {
     public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().getMetadata(id, metaID));
     }
-    
+
     @GET
     @Path("{id}/clearCache")
     public Response clearCache(final @PathParam("id") String id) throws Exception {
@@ -165,7 +165,7 @@ public class CSWServicesRest {
         }
         return ok(AcknowlegementType.failure("Unable to find a csw service " + id));
     }
-    
+
     @GET
     @Path("{id}/record/exist/{metaID}")
     public Response metadataExist(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
@@ -191,7 +191,7 @@ public class CSWServicesRest {
     public Response getCSWDatasourceType() throws Exception {
         return ok(getConfigurer().getAvailableCSWDataSourceType());
     }
-    
+
     @POST
     @Path("{id}/federatedCatalog")
     public Response setFederatedCatalog(final @PathParam("id") String id, StringList url) throws Exception {
@@ -303,7 +303,7 @@ public class CSWServicesRest {
         s.append("</table></body></html>");
         return s.toString();
     }
-    
+
     @GET
     @Path("{serviceID}/tree")
     @Produces("text/plain")

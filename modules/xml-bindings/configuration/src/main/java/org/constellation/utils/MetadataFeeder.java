@@ -79,7 +79,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opengis.metadata.identification.ServiceIdentification;
 
 
 /**
@@ -92,7 +91,7 @@ import org.opengis.metadata.identification.ServiceIdentification;
  */
 public class MetadataFeeder {
 
-    private static final Logger LOGGER = Logging.getLogger(MetadataFeeder.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.utils");
 
     /**
      * metadata target
