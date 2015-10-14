@@ -65,15 +65,21 @@ angular.module('CstlIndexApp', [
     // -------------------------------------------------------------------------
     //  Controllers
     // -------------------------------------------------------------------------
+    .controller('HeaderController', function($scope, $http, $cookieStore, CstlConfig, AppConfigService, Account) {
 
-    .controller('HeaderController', function($scope, $http, $cookieStore) {
-        $http.get('app/conf').success(function(data) {
-            $cookieStore.put('cstlUrl', data.cstl);
-            if(data.cstlLoginURL){
-              $scope.cstlLoginUrl = data.cstlLoginURL;
-            }else{
-              $scope.cstlLoginUrl = 'login.html';
-            }
+        AppConfigService.getConfig(function(config) {
+            $scope.cstlURL  = config.cstl;
+            $cookieStore.put('cstlUrl', $scope.cstlURL, {});
+
+            $scope.cstlLoginUrl  = config.cstlLoginURL || 'login.html';
+
+            // default domain
+            $cookieStore.put(CstlConfig['cookie.domain.id'], '1', {});
+
+            Account.get({},function(response) {
+                //already authenticated, redirect to administration page
+                window.location.href="admin.html";
+            });
         });
     })
     .controller('FooterController', function($scope,CstlConfig,BuildService) {
@@ -88,4 +94,5 @@ angular.module('CstlIndexApp', [
         };
     })
 
-    .controller('RegisterController', function() { /* TODO */ });
+    .controller('RegisterController', function() { /* TODO */ })
+;

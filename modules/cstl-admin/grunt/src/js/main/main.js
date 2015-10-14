@@ -24,7 +24,8 @@ var dataNotReady = function(){alert("data not ready");};
 
 angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
-    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account, $idle, $modal, CstlConfig,Permission) {
+    .controller('HeaderController', function ($rootScope, $scope, $http, TokenService, Account, $idle, $modal, CstlConfig,
+                                              AppConfigService, Permission) {
 
         $scope.navigationArray = CstlConfig['cstl.navigation'];
 
@@ -74,26 +75,34 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
             TokenService.renew();
         });
 
-        $http.get("app/conf").success(function(data){
-            $scope.logout = function(){
-              $http.delete('@cstl/spring/auth/logout').then(function() {
+        $scope.logout = function(){
+            $http.delete($scope.cstlLogoutURL).then(function() {
                 TokenService.clear();
                 window.location.href="index.html";
-                });
-            };
-            if(data["token.life"]){
-              TokenService.setTokenLife(data["token.life"]);
-            }
-            Account.get(function(account){
-              $scope.firstname = account.firstname;
-              $scope.lastname = account.lastname;  
-              $rootScope.account = account;
-
-              $rootScope.hasMultipleDomains = function() {
-                 return false; //TODO since error happen due to domain refactoring, we return false temporarily, FIXME implements this function
-              };             
             });
-            
+        };
+
+        $rootScope.hasMultipleDomains = function() {
+            return false; //TODO since error happen due to domain refactoring, we return false temporarily, FIXME implements this function
+        };
+
+        AppConfigService.getConfig(function(config) {
+            $scope.cstlLogoutURL = config.cstlLogoutURL || '@cstl/spring/auth/logout';
+
+            var cstlRefreshURL = config.cstlRefreshURL;
+            if (cstlRefreshURL) {
+                TokenService.setRefreshURL(cstlRefreshURL);
+            }
+
+            if (config["token.life"]) {
+                TokenService.setTokenLife(config["token.life"]);
+            }
+
+            Account.get(function(account){
+                $scope.firstname = account.firstname;
+                $scope.lastname = account.lastname;
+                $rootScope.account = account;
+            });
         });
     })
 

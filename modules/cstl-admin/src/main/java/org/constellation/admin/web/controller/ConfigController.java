@@ -93,9 +93,19 @@ public class ConfigController {
         }
         properties.put("cstl", context);
         properties.put("token.life", TOKEN_LIFE);
-        properties.put("cstlLoginURL", env.getProperty("cstlLoginURL", cstlAdminLoginConfigurationService.getCstlLoginURL()));
         properties.put("cstl.import.empty", "true".equals(servletCtxt.getInitParameter("cstl.import.empty")));
         properties.put("cstl.import.custom", "true".equals(servletCtxt.getInitParameter("cstl.import.custom")));
+        properties.put("cstlLoginURL", env.getProperty("cstlLoginURL", cstlAdminLoginConfigurationService.getCstlLoginURL()));
+
+        final String logoutURL = cstlAdminLoginConfigurationService.getCstlLogoutURL();
+        if (logoutURL != null) {
+            properties.put("cstlLogoutURL", env.getProperty("cstlLogoutURL", logoutURL));
+        }
+
+        final String refreshURL = cstlAdminLoginConfigurationService.getCstlRefreshURL();
+        if (refreshURL != null) {
+            properties.put("cstlRefreshURL", env.getProperty("cstlRefreshURL", refreshURL));
+        }
         return properties;
     }
 

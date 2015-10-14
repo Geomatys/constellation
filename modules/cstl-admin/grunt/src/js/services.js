@@ -88,6 +88,7 @@ angular.module('cstl-services', ['cstl-restapi'])
         'cookie.domain.id':  'cstlActiveDomainId',
         'cookie.user.id':    'cstlUserId',
         'cookie.auth.token': 'access_token',
+        'cookie.auth.refresh': 'refresh_token',
 
         //cstl version.
         'cstl.version': (new Date()).getFullYear(),
@@ -245,17 +246,22 @@ angular.module('cstl-services', ['cstl-restapi'])
     .factory('TokenService', function ($rootScope, $http, CstlConfig, Account) {
         var lastCall = new Date().getTime();
         var tokenHalfLife = 30 * 60 * 1000;
+        var refreshURL = '@cstl/spring/auth/extendToken';
         return {
             setTokenLife : function(l){
               tokenHalfLife = 500 * 60 * l;
               console.log("Token life set to " + l + " minutes.");
+            },
+            setRefreshURL : function(url){
+                refreshURL = url;
+                console.log("Token refresh url set to " +url);
             },
             get : function(){
               console.log("TokenService.get: " + $.cookie(CstlConfig['cookie.auth.token']));
               return $.cookie(CstlConfig['cookie.auth.token']);
             },
             renew: function() {
-                $http.get('@cstl/spring/auth/extendToken').success(function(token){
+                $http.get(refreshURL).success(function(token){
                   $.cookie(CstlConfig['cookie.auth.token'], token, { path : '/' });
                   $rootScope.access_token = token;
                   console.log("Token extended: " + token);
@@ -983,4 +989,31 @@ angular.module('cstl-services', ['cstl-restapi'])
 
     .factory('BuildService', function(Build) {
         return Build.get();
+    })
+
+    // -------------------------------------------------------------------------
+    //  Application configuration service with cache
+    // -------------------------------------------------------------------------
+    .service('AppConfigService', function($http) {
+        var self = this;
+        self.config = null;
+
+        self.getConfig = function(callback) {
+            if (self.config === null) {
+                //synchronous call
+                $http.get('app/conf').success(function(data) {
+                    self.config = data;
+                    callback(data);
+                });
+            } else {
+                callback(self.config);
+            }
+        };
+
+        self.getConfigProperty = function(key, callback, fallback) {
+            self.getConfig(function (config) {
+                var value = config[key] || fallback;
+                callback(value);
+            });
+        };
     });

@@ -45,7 +45,7 @@ cstlLoginApp.directive('formAutofillFix', function() {
 /**
  * Login controller.
  */
-cstlLoginApp.controller("login", function($scope, $http, $modal){
+cstlLoginApp.controller("login", function($scope, $http, $modal, AppConfigService){
 
     var cstlUrl;
     $scope.formInputs = {
@@ -81,16 +81,15 @@ cstlLoginApp.controller("login", function($scope, $http, $modal){
 
     $scope.forgotPassword = function(){
         $modal.open({
-
             templateUrl: 'views/forgot-password.html',
             controller: 'forgotPasswordController as fpCtrl',
             size: 'sm'
         });
     };
 
-    $http.get('app/conf').success(function(conf) {
-        cstlUrl = conf.cstl;
-        $.cookie('cstlUrl', cstlUrl);
+    AppConfigService.getConfigProperty('cstl', function (val) {
+        cstlUrl = val;
+        $.cookie('cstlUrl', val);
     });
 })
 .controller("forgotPasswordController", function($scope, $modalInstance, $http, $translate, Growl){
