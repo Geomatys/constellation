@@ -61,12 +61,14 @@ public class FlywaySpring {
         try {
             final Flyway flyway = FlywayUtils.createFlywayConfig(dataSource);
 
+            //create schema_version table if not exist, even if database is not empty
+            flyway.setBaselineOnMigrate(true);
+
             //previous liquibase installation found but not up to date
             if (liquibaseInstalled) {
                 if (liquibaseUpToDate) {
                     //start after 1.1.0.0
                     flyway.setBaselineVersion(MigrationVersion.fromVersion("1.1.0.0"));
-                    flyway.setBaselineOnMigrate(true);
                     LOGGER.info("Previous installation with Liquibase detected and up to date, start migration from 1.1.0.0 patch");
                 } else {
                     throw new ConfigurationRuntimeException("Previous database installation found but not up to date, " +
