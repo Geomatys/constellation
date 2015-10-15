@@ -357,7 +357,7 @@ public class ProviderBusiness implements IProviderBusiness {
                         } else {
                             candidates = new File[]{file};
                         }
-
+                        Arrays.sort(candidates);
                         search:
                         for (File candidate : candidates) {
                             final String candidateName = candidate.getName().toLowerCase();
