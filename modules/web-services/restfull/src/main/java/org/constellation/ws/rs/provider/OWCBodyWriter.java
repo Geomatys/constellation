@@ -20,8 +20,6 @@ package org.constellation.ws.rs.provider;
 
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.utils.ISOMarshallerPool;
-import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.glassfish.jersey.jettison.JettisonConfig;
 import org.glassfish.jersey.jettison.JettisonJaxbContext;
 import org.glassfish.jersey.jettison.JettisonMarshaller;
@@ -61,7 +59,7 @@ public class OWCBodyWriter implements MessageBodyWriter {
         XML_TO_JSON_NAMESPACES.put("http://www.georss.org/georss",   "georss");
         XML_TO_JSON_NAMESPACES.put("http://www.opengis.net/gml",     "gml");
     }
-    private static final Logger LOGGER = Logging.getLogger(OWCBodyWriter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     @Override
     public boolean isWriteable(Class aClass, Type type, Annotation[] annotations, MediaType mediaType) {

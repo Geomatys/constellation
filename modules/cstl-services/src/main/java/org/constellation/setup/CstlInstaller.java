@@ -47,14 +47,14 @@ import java.util.logging.Logger;
  */
 public class CstlInstaller implements ServletContextListener {
 
-    private static final Logger LOGGER = Logging.getLogger(CstlInstaller.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.setup");
 
-    
+
     public static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
 
     public static final HealthCheckRegistry HEALTH_CHECK_REGISTRY = new HealthCheckRegistry();
 
-    
+
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
 
@@ -67,7 +67,7 @@ public class CstlInstaller implements ServletContextListener {
         LOGGER.log(Level.INFO, "=== Configuration ended ===");
     }
 
-    
+
     /**
      * Initializes Metrics.
      */
@@ -94,7 +94,7 @@ public class CstlInstaller implements ServletContextListener {
         metricsAdminServlet.addMapping("/metrics/*");
         metricsAdminServlet.setLoadOnStartup(2);
     }
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
     	LOGGER.info("Destroying Web application");

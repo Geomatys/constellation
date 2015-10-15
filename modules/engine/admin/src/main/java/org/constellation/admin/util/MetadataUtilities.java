@@ -85,6 +85,7 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.Identification;
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -96,7 +97,7 @@ import org.opengis.metadata.identification.Identification;
  */
 public final class MetadataUtilities {
 
-    private static final Logger LOGGER = Logger.getLogger(MetadataUtilities.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.util");
 
     private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
@@ -106,7 +107,7 @@ public final class MetadataUtilities {
         final ArrayList<SimplyMetadataTreeNode> results = new ArrayList<>();
         final SimplyMetadataTreeNode root = new SimplyMetadataTreeNode(fileName, true, "root", 11, null);
         results.add(root);
-        
+
         final SimplyMetadataTreeNode procedures = new SimplyMetadataTreeNode("Procedures:", true, "procedures", 10, "root");
         results.add(procedures);
         int i = 0;
@@ -115,7 +116,7 @@ public final class MetadataUtilities {
             procNode.setValue(procedure.tip().toString());
             results.add(procNode);
         }
-        
+
         final SimplyMetadataTreeNode variables = new SimplyMetadataTreeNode("Variables:", true, "variables", 10, "root");
         results.add(variables);
         i = 0;
@@ -125,7 +126,7 @@ public final class MetadataUtilities {
             results.add(phenNode);
             i++;
         }
-        
+
         final SimplyMetadataTreeNode times = new SimplyMetadataTreeNode("Temporal bounds:", true, "times", 10, "root");
         results.add(times);
         try {
@@ -149,7 +150,7 @@ public final class MetadataUtilities {
                 synchronized(FORMAT) {
                     beginNode.setValue(FORMAT.format(instant.getDate()));
                 }
-                results.add(beginNode);    
+                results.add(beginNode);
 
             } else {
                 final SimplyMetadataTreeNode timeNode = new SimplyMetadataTreeNode("Undefined", false, "time-undef", 9, "times");
@@ -164,11 +165,11 @@ public final class MetadataUtilities {
         }
         return results;
     }
-    
+
     /**
      * @param coverageReader
      * @param metadata
-     * @param dataType (raster, vector, ...)  
+     * @param dataType (raster, vector, ...)
      * @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
      * @throws org.opengis.util.NoSuchIdentifierException
@@ -189,7 +190,7 @@ public final class MetadataUtilities {
             // get Metadata as a List
             final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
             DefaultMetadata finalMetadata = null;
-            
+
             if (metadata != null) {
                 finalMetadata = (DefaultMetadata) mergeMetadata(fileMetadata, metadata);
             }
@@ -267,7 +268,7 @@ public final class MetadataUtilities {
      * @param dataProvider
      * @param dataName
      * @return
-     * @throws DataStoreException 
+     * @throws DataStoreException
      */
     public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider, final GenericName dataName) throws DataStoreException {
 
@@ -401,7 +402,7 @@ public final class MetadataUtilities {
      * @throws DataStoreException
      */
     public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final GenericName dataName) throws DataStoreException, TransformException {
-    	
+
     	final DataStore dataStore = dataProvider.getMainStore();
     	final FeatureStore featureStore = (FeatureStore) dataStore;
 
@@ -423,9 +424,9 @@ public final class MetadataUtilities {
         ident.getExtents().add(extent);
         return md;
     }
-    
+
     public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider) throws DataStoreException, TransformException {
-    	
+
     	final DataStore dataStore = dataProvider.getMainStore();
     	final FeatureStore featureStore = (FeatureStore) dataStore;
 
@@ -454,8 +455,8 @@ public final class MetadataUtilities {
 
     /**
      * @param fileMetadata
-     * @param metadataToMerge 
-     * 
+     * @param metadataToMerge
+     *
      * @throws NoSuchIdentifierException
      * @throws ProcessException
      */
@@ -472,7 +473,7 @@ public final class MetadataUtilities {
         resultMetadata = (DefaultMetadata) resultParameters.parameter(MergeDescriptor.RESULT_OUT_NAME).getValue();
         return resultMetadata;
     }
-    
+
     public static void merge(final MetadataStandard standard, final Object sourceMetadata, final Object targetMetadata) {
         //transfomr metadatas to maps
         final Map<String, Object> source = standard.asValueMap(sourceMetadata, KeyNamePolicy.JAVABEANS_PROPERTY, ValueExistencePolicy.NON_EMPTY);
@@ -515,7 +516,7 @@ public final class MetadataUtilities {
             }
         }
     }
-    
+
     public static String getTemplateMetadata(final Properties prop, final String templatePath) {
         try {
             final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
@@ -528,7 +529,7 @@ public final class MetadataUtilities {
         }
         return null;
     }
-    
+
     public static void overrideProperties(final Properties prop, final DataMetadata overridenValue, final GenericName dataName, final String formatName) {
         final String metadataId = CstlMetadatas.getMetadataIdForData(overridenValue.getDataName(), dataName);
         prop.put("fileId", metadataId);
@@ -541,7 +542,7 @@ public final class MetadataUtilities {
         synchronized (FORMAT){
             currentDate = FORMAT.format(new Date(System.currentTimeMillis()));
         }
-        
+
         final Date overridingDate = overridenValue.getDate();
         if (overridingDate != null) {
             final String date;
@@ -561,14 +562,14 @@ public final class MetadataUtilities {
         } else {
             prop.put("publicationDate", currentDate);
         }
-        
+
         prop.put("isoCreationDate", currentDate);
         prop.put("distributionFormat", formatName);
-        
+
         if (overridenValue.getKeywords() != null) {
             prop.put("keywords", overridenValue.getKeywords());
         }
-        
+
         final String localeData = overridenValue.getLocaleData();
         if (localeData != null) {
             try {
@@ -598,7 +599,7 @@ public final class MetadataUtilities {
         } else if (prop.get("dataTitle") == null) {
             prop.put("dataTitle", metadataId);
         }
-        final String topic = overridenValue.getTopicCategory(); 
+        final String topic = overridenValue.getTopicCategory();
         if (topic != null) {
             prop.put("topicCategory", buildProperCode(topic));
         }
@@ -606,7 +607,7 @@ public final class MetadataUtilities {
             prop.put("contactName", overridenValue.getUsername());
         }
     }
-    
+
     private static String buildProperCode(final String codeValue) {
         final String[] parts = codeValue.split(" ");
         final StringBuilder sb = new StringBuilder();
@@ -615,14 +616,14 @@ public final class MetadataUtilities {
         }
         return sb.toString();
     }
-    
+
     public static Long extractDatestamp(final DefaultMetadata metadata){
         if (metadata.getDateStamp() != null) {
             return metadata.getDateStamp().getTime();
         }
         return null;
     }
-    
+
     public static String extractTitle(final DefaultMetadata metadata){
         if (metadata.getIdentificationInfo() != null && !metadata.getIdentificationInfo().isEmpty()) {
             final Identification id = metadata.getIdentificationInfo().iterator().next();
@@ -632,7 +633,7 @@ public final class MetadataUtilities {
         }
         return null;
     }
-    
+
     public static String extractResume(final DefaultMetadata metadata){
         if (metadata.getIdentificationInfo() != null && !metadata.getIdentificationInfo().isEmpty()) {
             final Identification id = metadata.getIdentificationInfo().iterator().next();
@@ -651,7 +652,7 @@ public final class MetadataUtilities {
                 for (GeographicExtent geoEx : ex.getGeographicElements()) {
                     if (geoEx instanceof GeographicBoundingBox) {
                         GeographicBoundingBox geobox = (GeographicBoundingBox) geoEx;
-                        final MetadataBbox bbox = new MetadataBbox(null, geobox.getEastBoundLongitude(), 
+                        final MetadataBbox bbox = new MetadataBbox(null, geobox.getEastBoundLongitude(),
                                                                          geobox.getWestBoundLongitude(),
                                                                          geobox.getNorthBoundLatitude(),
                                                                          geobox.getSouthBoundLatitude());
@@ -662,7 +663,7 @@ public final class MetadataUtilities {
         }
         return results;
     }
-    
+
     public static String extractParent(final DefaultMetadata metadata){
         return metadata.getParentIdentifier();
     }

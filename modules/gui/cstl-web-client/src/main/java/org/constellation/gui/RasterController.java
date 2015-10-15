@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  */
 public class RasterController {
 
-    private static final Logger LOGGER = Logging.getLogger(RasterController.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.gui");
 
         private static final String[] SUFFIXES = new String[] {"nc", "ncml", "cdf", "grib", "grib1", "grib2", "grb", "grb1", "grb2", "grd"};
 

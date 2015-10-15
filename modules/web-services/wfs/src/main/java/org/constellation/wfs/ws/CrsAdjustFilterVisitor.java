@@ -20,27 +20,25 @@ package org.constellation.wfs.ws;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
-import org.geotoolkit.filter.visitor.FillCrsVisitor;
 import org.geotoolkit.geometry.DefaultBoundingBox;
 import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.referencing.CRS;
 import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
 public class CrsAdjustFilterVisitor extends DuplicatingFilterVisitor{
-    
+
     private final CoordinateReferenceSystem baseCrs;
     private final CoordinateReferenceSystem replacementCrs;
 
@@ -48,7 +46,7 @@ public class CrsAdjustFilterVisitor extends DuplicatingFilterVisitor{
         this.baseCrs = baseCrs;
         this.replacementCrs = replacementCrs;
     }
-    
+
     @Override
     public Object visit(final Literal expression, final Object extraData) {
         Object obj = expression.getValue();
@@ -59,7 +57,7 @@ public class CrsAdjustFilterVisitor extends DuplicatingFilterVisitor{
                     final Envelope e = CRS.transform(bbox, replacementCrs);
                     final BoundingBox rbbox = new DefaultBoundingBox(replacementCrs);
                     rbbox.setBounds(new DefaultBoundingBox(e));
-                    
+
                     obj = rbbox;
                 }
             }else if(obj instanceof Geometry){
@@ -76,13 +74,11 @@ public class CrsAdjustFilterVisitor extends DuplicatingFilterVisitor{
                 obj = geo;
 
             }
-        } catch (NoSuchAuthorityCodeException ex) {
-            Logger.getLogger(FillCrsVisitor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FactoryException | TransformException ex) {
-            Logger.getLogger(FillCrsVisitor.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.wfs.ws").log(Level.SEVERE, null, ex);
         }
-        
+
         return getFactory(extraData).literal(obj);
     }
-    
+
 }

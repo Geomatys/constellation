@@ -46,7 +46,7 @@ public final class LaunchTests implements Runnable {
     /**
      * The default logger.
      */
-    private static final Logger LOGGER = Logging.getLogger(LaunchTests.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
 
     /**
      * The running process.
@@ -54,9 +54,9 @@ public final class LaunchTests implements Runnable {
     private final Process process;
 
     private boolean hasCompleted = false;
-    
+
     public final static String CITE_EXECUTABLE_KEY = "org.constellation.cite.executable";
-    
+
     /**
      * Creates a new monitor for the given process.
      */
@@ -96,21 +96,21 @@ public final class LaunchTests implements Runnable {
     public static void main(String[] args) throws Exception {
         Class.forName("javax.servlet.ServletContext");
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
-        
+
         ConfigDirectory.setupTestEnvironement("CITE_CONFIGURATION");
-        
+
         GrizzlyServer server = new GrizzlyServer();
         applicationContext.getEnvironment().setActiveProfiles("standard");
-        
+
         applicationContext.setConfigLocation("classpath:/cstl/spring/test-context.xml");
         applicationContext.refresh();
         applicationContext.getAutowireCapableBeanFactory().autowireBean(server);
         applicationContext.getAutowireCapableBeanFactory().autowireBean(DataProviders.getConfigurator());
         SpringHelper.setApplicationContext(applicationContext);
-        
-        
-        
-        
+
+
+
+
         // Launch the server.
         server.initServer();
 
@@ -149,7 +149,7 @@ public final class LaunchTests implements Runnable {
             }
             process.destroy();
         }
-        
+
         // Then we can kill the server.
         GrizzlyServer.finish();
 

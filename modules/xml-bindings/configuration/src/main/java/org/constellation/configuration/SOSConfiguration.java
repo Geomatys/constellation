@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 @XmlRootElement(name = "SOSConfiguration")
 public class SOSConfiguration extends AbstractConfigurationObject {
 
-    private static final Logger LOGGER = Logging.getLogger(SOSConfiguration.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.configuration");
 
     /**
      * Informations about SensorML Datasource.

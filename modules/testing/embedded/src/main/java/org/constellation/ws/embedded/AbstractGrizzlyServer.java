@@ -60,9 +60,9 @@ import org.geotoolkit.util.FileUtilities;
  * @since 0.3
  */
 public abstract class AbstractGrizzlyServer {
-    
-    protected static final Logger LOGGER = Logging.getLogger(AbstractGrizzlyServer.class);
-    
+
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
+
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -143,11 +143,11 @@ public abstract class AbstractGrizzlyServer {
             cpt++;
         }
     }
-    
+
     public void waitForSoapStart(String instance) throws Exception {
         waitForSoapStart(instance, 100);
     }
-    
+
     public void waitForSoapStart(String instance, int max) throws Exception {
         boolean ex = true;
         int cpt = 0;
@@ -202,7 +202,7 @@ public abstract class AbstractGrizzlyServer {
         public Integer getCurrentPort() {
             return cstlServer.currentPort;
         }
-        
+
         public Integer getCurrentPortSoap() {
             return cstlServer.portsoap;
         }
@@ -278,7 +278,7 @@ public abstract class AbstractGrizzlyServer {
         wr.flush();
         in.close();
     }
-    
+
     protected static void putRequestFile(URLConnection conec, String filePath, String contentType) throws IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("PUT");
@@ -301,7 +301,7 @@ public abstract class AbstractGrizzlyServer {
     protected static void postRequestFile(URLConnection conec, String filePath) throws IOException {
         postRequestFile(conec, filePath, "text/xml");
     }
-    
+
     protected static void putRequestFile(URLConnection conec, String filePath) throws IOException {
         putRequestFile(conec, filePath, "text/xml");
     }
@@ -401,12 +401,12 @@ public abstract class AbstractGrizzlyServer {
         if (!styleJar.exists()) {
             throw new IOException("Unable to find the style folder: "+ styleJar);
         }
-        
+
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         File outputDir = new File(tmpDir, "Constellation");
         if (!outputDir.exists()) {
             outputDir.mkdir();
-        }    
+        }
         if (styleJar.isDirectory()) {
             FileUtilities.copy(styleJar, outputDir);
         } else {
@@ -420,7 +420,7 @@ public abstract class AbstractGrizzlyServer {
     protected static void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
         postRequestObject(conec, request, pool);
     }
-    
+
     protected static void postRequestObject(URLConnection conec, Object request, MarshallerPool pool) throws IOException, JAXBException {
         conec.setDoOutput(true);
         conec.setRequestProperty("Content-Type", "application/xml");
@@ -432,7 +432,7 @@ public abstract class AbstractGrizzlyServer {
         wr.write(sw.toString());
         wr.flush();
     }
-    
+
     protected static void putRequestObject(URLConnection conec, Object request, MarshallerPool pool) throws IOException, JAXBException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("PUT");
@@ -452,19 +452,19 @@ public abstract class AbstractGrizzlyServer {
         httpCon.setRequestMethod("PUT");
         return unmarshallStream(conec.getInputStream());
     }
-    
+
     protected static Object unmarshallResponsePost(final URLConnection conec) throws JAXBException, IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("POST");
         return unmarshallStream(conec.getInputStream());
     }
-    
+
     protected static Object unmarshallResponseDelete(final URLConnection conec) throws JAXBException, IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("DELETE");
         return unmarshallStream(conec.getInputStream());
     }
-    
+
     protected static Object unmarshallResponse(final URLConnection conec) throws JAXBException, IOException {
         return unmarshallStream(conec.getInputStream());
     }
@@ -479,12 +479,12 @@ public abstract class AbstractGrizzlyServer {
         }
         return unmarshallStream(is);
     }
-    
+
     private static Object unmarshallStream(final InputStream is) throws IOException, JAXBException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         StringWriter writer = new StringWriter();
         IOUtils.copy(is, writer, "UTF-8");
-        
+
         Object obj;
         try {
             obj = unmarshaller.unmarshal(new StringReader(writer.toString()));

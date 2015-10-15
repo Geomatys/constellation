@@ -32,10 +32,7 @@ import org.geotools.openoffice.Formulas;
 import org.geotools.openoffice.MethodInfo;
 
 import java.util.logging.Logger;
-
-// OpenOffice dependencies
-// Geotools dependencies
-// Constellation dependencies
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -49,7 +46,7 @@ public class Numeric extends Formulas implements XNumeric {
     /**
      * The logger to use for all message to log in this package.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.openoffice");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.openoffice");
 
     /**
      * Le nom sous lequel sera enregistré cette composante.

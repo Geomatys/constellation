@@ -30,7 +30,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.sis.util.logging.Logging;
 import org.constellation.database.api.DomainUser;
 import org.constellation.database.api.User;
 import org.constellation.database.api.repository.UserRepository;
@@ -38,19 +37,13 @@ import org.mdweb.model.auth.MDwebRole;
 
 import javax.inject.Inject;
 import java.util.HashSet;
-import java.util.logging.Logger;
 
 /**
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  * @since 0.8
  */
 public final class DefaultCstlRealm extends AuthorizingRealm {
-
-    /**
-     * Logger used for debugging and event notification.
-     */
-    private static final Logger LOGGER = Logging.getLogger(DefaultCstlRealm.class);
 
     @Inject
     private UserRepository userRepository;

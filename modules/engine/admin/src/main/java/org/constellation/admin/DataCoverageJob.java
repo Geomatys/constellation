@@ -70,7 +70,7 @@ public class DataCoverageJob implements IDataCoverageJob {
     /**
      * Used for debugging purposes.
      */
-    protected static final Logger LOGGER = Logging.getLogger(DataCoverageJob.class);
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
 
     public static final String STATE_PENDING    = "PENDING";
     public static final String STATE_ERROR      = "ERROR";

@@ -36,6 +36,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 
 /**
@@ -52,7 +53,7 @@ import java.util.logging.Logger;
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class AbstractGeometryReader implements MessageBodyReader<AbstractGeometry> {
 
-    private static final Logger LOGGER = Logger.getLogger(AbstractGeometryReader.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -66,9 +67,9 @@ public class AbstractGeometryReader implements MessageBodyReader<AbstractGeometr
 
             if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
                 /*
-                
+
                 TODO
-                
+
                 Map<String, String> nSMap = new HashMap<String, String>(0);
                 nSMap.put("http://www.constellation.org/config", "constellation-config");
                 JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
@@ -79,7 +80,7 @@ public class AbstractGeometryReader implements MessageBodyReader<AbstractGeometr
                         "org.geotoolkit.gml.xml.v311");
                 JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
                 context = jsonUnmarshaller.unmarshalFromJSON(entityStream, LayerContext.class);*/
-                
+
             } else {
                 final Unmarshaller m = GMLMarshallerPool.getInstance().acquireUnmarshaller();
                 Object obj = m.unmarshal(entityStream);

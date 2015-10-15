@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 public class RecordIterator implements CloseableIterator<Node> {
 
-    private static final Logger LOGGER = Logging.getLogger(IdentifierIterator.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io.filesystem.sql");
 
     private final DocumentBuilder docBuilder;
     private final Session session;

@@ -39,8 +39,8 @@ import java.util.logging.Logger;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ImageDecoration extends PositionableDecoration {
 
-    private static final Logger LOGGER = Logging.getLogger(ImageDecoration.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.configuration");
+
     @XmlElement(name = "Source")
     private String source;
 

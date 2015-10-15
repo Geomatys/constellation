@@ -27,14 +27,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * @author bgarcia
  */
 public class CorsFilter implements Filter {
-
-    private static final Logger LOGGER = Logger.getLogger(CorsFilter.class.getName());
 
     @Override
     public void init(final FilterConfig filterConfig) throws ServletException {

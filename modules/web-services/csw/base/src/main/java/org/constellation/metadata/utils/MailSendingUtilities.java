@@ -56,7 +56,7 @@ import java.util.logging.Logger;
  */
 public final class MailSendingUtilities {
 
-    private static final Logger LOGGER = Logging.getLogger(MailSendingUtilities.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.utils");
     private static final String FROM;
     private static final String MAILHOST;
     private static final String MAILER;
@@ -68,7 +68,7 @@ public final class MailSendingUtilities {
     private static final Session SESSION;
 
     private MailSendingUtilities() {}
-    
+
     static{
 
         MailingProperties mailProp = null;
@@ -84,7 +84,7 @@ public final class MailSendingUtilities {
         if (mailProp == null) {
             mailProp = new MailingProperties();
         }
-        
+
         FROM        = mailProp.getFrom();
         MAILHOST    = mailProp.getMailhost();
         MAILER      = mailProp.getMailer();

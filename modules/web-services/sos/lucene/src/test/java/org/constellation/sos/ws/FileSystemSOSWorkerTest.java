@@ -26,17 +26,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 
+import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -59,10 +58,10 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
-    private static File instDirectory; 
-    
-    
+
+    private static File instDirectory;
+
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
@@ -159,15 +158,15 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         sensor9.createNewFile();
         File sensor10        = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:10.xml");
         sensor10.createNewFile();
-        
+
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 //we write the configuration file
                 Automatic SMLConfiguration = new Automatic();
@@ -197,7 +196,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
                 serviceBusiness.delete("sos", "default");
 
                 setUpClass();
-                
+
                 // we write the configuration file
                 Automatic SMLConfiguration = new Automatic();
 
@@ -223,7 +222,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(FileSystemSOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -335,14 +334,14 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
-    
+
     @Test
     @Override
     @Order(order=6)
     public void GetObservationMeasurementTest() throws Exception {
         super.GetObservationMeasurementTest();
     }
-            
+
     /**
      * Tests the GetObservationById method
      *
@@ -427,7 +426,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         super.GetFeatureOfInterestTimeTest();
     }
 
-    
+
     /**
      * Tests the destroy method
      *

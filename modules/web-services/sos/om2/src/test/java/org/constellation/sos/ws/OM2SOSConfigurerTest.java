@@ -22,7 +22,6 @@ package org.constellation.sos.ws;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
@@ -40,6 +39,7 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.apache.sis.util.logging.Logging;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,16 +51,16 @@ import org.junit.runner.RunWith;
  */
 @RunWith(SpringTestRunner.class)
 public class OM2SOSConfigurerTest extends SOSConfigurerTest {
-    
+
     private static DefaultDataSource ds = null;
-    
+
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static String url;
-    
+
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         url = "jdbc:derby:memory:OM2ConfigTest2;create=true";
@@ -80,13 +80,13 @@ public class OM2SOSConfigurerTest extends SOSConfigurerTest {
         ConfigDirectory.setupTestEnvironement("OM2SOSConfigurerTest");
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         SpringHelper.injectDependencies(configurer);
         try {
-            
+
             if (!initialized) {
                 serviceBusiness.deleteAll();
 
@@ -112,10 +112,10 @@ public class OM2SOSConfigurerTest extends SOSConfigurerTest {
                 initialized = true;
             }
         } catch (Exception ex) {
-            Logger.getLogger(OM2SOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         File derbyLog = new File("derby.log");
@@ -131,7 +131,7 @@ public class OM2SOSConfigurerTest extends SOSConfigurerTest {
         }
         ConfigDirectory.shutdownTestEnvironement("OM2SOSConfigurerTest");
     }
-    
+
     @Test
     @Override
     @Order(order=1)
@@ -139,7 +139,7 @@ public class OM2SOSConfigurerTest extends SOSConfigurerTest {
         super.getObservationsCsvTest();
 
     }
-    
+
     @Test
     @Override
     @Order(order=2)

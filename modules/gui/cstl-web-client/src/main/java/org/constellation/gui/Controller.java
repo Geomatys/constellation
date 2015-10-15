@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -77,7 +78,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class Controller {
 
 
-    private static final Logger LOGGER = Logger.getLogger(Controller.class.toString());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.gui");
     /**
      * Manager used to call constellation server side.
      */

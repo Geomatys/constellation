@@ -90,7 +90,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 @DependsOn("database-initer")
 public class SetupBusiness {
 
-    private static final Logger LOGGER = Logging.getLogger(SetupBusiness.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.webservice.map.component");
 
     private static final String DEFAULT_RESOURCES = "/org/constellation/map/setup.zip";
 
@@ -110,12 +110,12 @@ public class SetupBusiness {
         }
 
         SpringHelper.executeInTransaction(new TransactionCallbackWithoutResult() {
-            
+
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus arg0) {
 
                 WithDefaultResources defaultResourcesDeployed = deployDefaultResources(ConfigDirectory.getDataDirectory().toPath());
-                
+
                 LOGGER.log(Level.INFO, "initializing default styles ...");
                 defaultResourcesDeployed.initializeDefaultStyles();
                 LOGGER.log(Level.INFO, "initializing temporary styles ...");
@@ -126,7 +126,7 @@ public class SetupBusiness {
                 defaultResourcesDeployed.initializeDefaultRasterData();
                 LOGGER.log(Level.INFO, "initializing properties ...");
                 defaultResourcesDeployed.initializeDefaultProperties();
-                
+
             }
         });
     }
@@ -139,8 +139,8 @@ public class SetupBusiness {
         DataProviders.getInstance().dispose();
         StyleProviders.getInstance().dispose();
     }
-    
-    
+
+
     public static Path pathTransform(final Path dst, final Path zipath) {
         Path ret = dst;
         for (final Path component : zipath)

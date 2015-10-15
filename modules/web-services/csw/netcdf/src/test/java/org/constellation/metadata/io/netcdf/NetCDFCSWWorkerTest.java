@@ -53,8 +53,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.sis.util.logging.Logging;
 import static org.constellation.test.utils.MetadataUtilities.metadataEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -117,7 +117,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
                 initialized = true;
             }
         } catch (Exception ex) {
-            Logger.getLogger(NetCDFCSWWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.metadata.io.netcdf").log(Level.SEVERE, null, ex);
         }
 
     }

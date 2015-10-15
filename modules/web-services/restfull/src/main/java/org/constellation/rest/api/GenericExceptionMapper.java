@@ -47,22 +47,22 @@ import static org.constellation.utils.RESTfulUtilities.notFound;
  */
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Exception> {
-    
-    public static final Logger LOGGER = Logging.getLogger(GenericExceptionMapper.class);
-    
+
+    public static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Response toResponse(final Exception exception) {
-    
+
         if(exception instanceof CstlConfigurationRuntimeException) {
             //This exception hold an error code, will be handled by client.
             CstlConfigurationRuntimeException registryRuntimeException = (CstlConfigurationRuntimeException) exception;
             LOGGER.log(Level.WARNING, exception.getMessage() + '(' + registryRuntimeException.getErrorCode() + ')');
             return internalError(AcknowlegementType.failure(exception.getLocalizedMessage(), registryRuntimeException.getErrorCode()));
         }
-        
+
         LOGGER.log(Level.WARNING, exception.getMessage(), exception);
         /*
          * Runtime exception that defines the response to be returned.
@@ -70,7 +70,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
         if (exception instanceof WebApplicationException) {
             return ((WebApplicationException) exception).getResponse();
         }
-        
+
         /*
          * Others. Simply return the response message with an appropriate HTTP status code.
          */

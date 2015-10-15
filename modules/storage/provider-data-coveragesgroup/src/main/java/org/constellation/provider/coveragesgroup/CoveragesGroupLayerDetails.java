@@ -66,7 +66,7 @@ import org.opengis.util.GenericName;
  * @author Quentin Boileau (Geomatys)
  */
 public class CoveragesGroupLayerDetails extends AbstractData {
-    private static final Logger LOGGER = Logging.getLogger(CoveragesGroupLayerDetails.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.coveragesgroup");
 
     private MapContext ctxt;
 

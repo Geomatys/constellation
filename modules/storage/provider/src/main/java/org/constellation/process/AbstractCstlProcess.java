@@ -32,18 +32,18 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractCstlProcess extends AbstractProcess {
-    
-    protected static final Logger LOGGER = Logging.getLogger(AbstractCstlProcess.class);
-    
+
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.process");
+
     protected static final boolean X364_SUPPORTED = X364.isSupported();
 
     public AbstractCstlProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
         SpringHelper.injectDependencies(this);
     }
-    
+
     // affichage console ///////////////////////////////////////////////////////
-    
+
     protected static void console(Object ... texts){
         final String text;
         if (texts.length == 1) {

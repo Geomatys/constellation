@@ -59,7 +59,7 @@ import java.util.logging.Logger;
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public final class LayerContextWriter implements MessageBodyWriter {
 
-    private static final Logger LOGGER = Logging.getLogger(LayerContextWriter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     @Override
     public boolean isWriteable(Class type, Type type1, Annotation[] antns, MediaType mt) {

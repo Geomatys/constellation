@@ -49,8 +49,8 @@ import java.util.logging.Logger;
  */
 public abstract class FsResource implements Resource, MoveableResource, CopyableResource, LockableResource, DigestResource {
 
-    protected static final Logger LOGGER = Logging.getLogger(FsResource.class);
-    
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.webdav");
+
     protected File file;
     protected final String host;
     protected String ssoPrefix;
@@ -59,7 +59,7 @@ public abstract class FsResource implements Resource, MoveableResource, Copyable
     private final SecurityManager securityManager;
     protected final long maxAgeSecond;
     protected final WebdavContext context;
-    
+
 
     protected abstract void doCopy(File dest);
 

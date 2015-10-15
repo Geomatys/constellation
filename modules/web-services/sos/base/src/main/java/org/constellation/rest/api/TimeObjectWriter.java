@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public final class TimeObjectWriter implements MessageBodyWriter {
 
-    private static final Logger LOGGER = Logging.getLogger(TimeObjectWriter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     @Override
     public boolean isWriteable(Class type, Type type1, Annotation[] antns, MediaType mt) {

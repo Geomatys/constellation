@@ -37,12 +37,12 @@ import java.util.logging.Logger;
  */
 public class Session implements Closeable {
 
-    private static final Logger LOGGER = Logging.getLogger(Session.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io.filesystem.sql");
+
     private final Connection con;
 
     private PreparedStatement insertStatement = null;
-    
+
     private PreparedStatement updateStatement = null;
 
     public Session(final Connection con) {
@@ -93,7 +93,7 @@ public class Session implements Closeable {
             LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema(id=" + identifier + " path=" + path +")", unexpected);
         }
     }
-    
+
     public void updateRecord(final String identifier, final String path) throws SQLException {
         try {
             if (updateStatement == null) {
@@ -119,7 +119,7 @@ public class Session implements Closeable {
             LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema.", unexpected);
         }
     }
-    
+
     public int getCount() throws SQLException {
         int count = 0;
         try {
@@ -150,7 +150,7 @@ public class Session implements Closeable {
 
         } catch (SQLException unexpected) {
             LOGGER.log(Level.WARNING, "Unexpected error occurred while reading in csw database schema.", unexpected);
-        } 
+        }
         return result;
     }
 

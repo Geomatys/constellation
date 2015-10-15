@@ -48,8 +48,8 @@ import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.sis.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
@@ -69,7 +69,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class WMTSWorkerTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -77,7 +77,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static MarshallerPool pool;
     private static WMTSWorker worker ;
 
@@ -85,7 +85,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WMTSWorkerTest");
     }
-    
+
     @PostConstruct
     public void setUpClass(){
         SpringHelper.setApplicationContext(applicationContext);
@@ -96,7 +96,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
             } catch (ConfigurationException ex) {}
 
             pool = WMTSMarshallerPool.getInstance();
-            
+
             serviceBusiness.create("wmts", "default", new LayerContext(), null);
 
             worker = new DefaultWMTSWorker("default");
@@ -104,7 +104,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
             worker.setServiceUrl("http://geomatys.com/constellation/WS/");
             worker.setShiroAccessible(false);
         } catch (ConfigurationException ex) {
-            Logger.getLogger(WMTSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.wmts.ws").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -124,7 +124,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
     @After
     public void tearDown() throws Exception {
     }
-    
+
     /**
      * test the feature marshall
      *
@@ -145,8 +145,8 @@ public class WMTSWorkerTest implements ApplicationContextAware {
                 FileUtilities.getFileFromResource("org.constellation.wmts.xml.WMTSCapabilities1-0-0-cont.xml")), sw.toString());
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
-        
-        
+
+
         request = new GetCapabilities("WMTS");
         result = worker.getCapabilities(request);
 

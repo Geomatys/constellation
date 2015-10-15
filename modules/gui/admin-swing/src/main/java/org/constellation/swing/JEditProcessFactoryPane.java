@@ -54,7 +54,7 @@ import java.util.logging.Logger;
  */
 public class JEditProcessFactoryPane extends javax.swing.JPanel {
 
-    private static final Logger LOGGER = Logging.getLogger(JEditProcessFactoryPane.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.swing");
 
     private static final String EMPTY_ITEM = "empty";
 
@@ -253,20 +253,20 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     /**
-     * 
+     *
      * @param server
      * @param processFactory
-     * @return 
+     * @return
      */
     public static ProcessFactoryModel showDialog(final ConstellationClient serverV2, final ProcessFactoryModel processFactory){
-        
+
         final JEditProcessFactoryPane pane = new JEditProcessFactoryPane(serverV2, processFactory);
-                
-        int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
+
+        int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
                 ProcessFactoryRowModel.BUNDLE.getString("createProcessFactoryMsg"),
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, 
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null,
                 null);
-        
+
         ProcessFactoryModel processFactoryModel = null;
         if (res != JOptionPane.CANCEL_OPTION && res != JOptionPane.CLOSED_OPTION) {
             processFactoryModel = pane.getProcessFactoryEntry();

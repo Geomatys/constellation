@@ -42,7 +42,7 @@ public class NodeUtilities {
 
     private static final String NULL_VALUE = "null";
 
-    private static final Logger LOGGER = Logging.getLogger(NodeUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.util");
 
     public static List<Node> getNodes(final String propertyName, final List<Node> nodes, final int ordinal, final boolean create) {
         final List<Node> result = new ArrayList<>();
@@ -173,7 +173,7 @@ public class NodeUtilities {
             if (!pathType.equals("*") && !pathType.equals(parent.getLocalName())) {
                 continue;
             }
-            
+
             final List<Node> nodes = getNodeFromPath(parent, xpath);
             for (Node n : nodes) {
                 results.add(n.getTextContent());

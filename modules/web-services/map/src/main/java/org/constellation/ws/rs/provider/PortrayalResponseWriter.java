@@ -45,24 +45,24 @@ import java.util.logging.Logger;
 
 /**
  * Write a portrayal response in the stream.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 @Provider
 public final class PortrayalResponseWriter implements MessageBodyWriter<PortrayalResponse> {
 
-    private static final Logger LOGGER = Logging.getLogger(PortrayalResponseWriter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     private int prepare(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) throws IOException{
-        
+
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        
+
         OutputDef outdef = r.getOutputDef();
         if(outdef == null){
             outdef = new OutputDef(mt.toString(), out);
         }
         outdef.setOutput(out);
-        
+
         BufferedImage img = r.getImage();
         if(img != null){
             DefaultPortrayalService.writeImage(img, outdef);
@@ -70,7 +70,7 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
             final CanvasDef cdef = r.getCanvasDef();
             final SceneDef sdef = r.getSceneDef();
             final ViewDef vdef = r.getViewDef();
-            
+
             if(LOGGER.isLoggable(Level.FINE)){
                 final long before = System.nanoTime();
                 try {
@@ -91,7 +91,7 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
                 }
             }
         }
-        
+
         final byte[] result = out.toByteArray();
         r.setBuffer(result);
         return result.length;
@@ -121,5 +121,5 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
     public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
         return PortrayalResponse.class.isAssignableFrom(type);
     }
-        
+
 }

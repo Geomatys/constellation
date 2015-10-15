@@ -32,33 +32,33 @@ import java.util.logging.Logger;
  */
 public interface Configurator {
 
-    public static final Logger LOGGER = Logging.getLogger(Configurator.class);
+    public static final Logger LOGGER = Logging.getLogger("org.constellation.provider.configuration");
 
     /**
      * Get a list of all provider configurations.
      * @return List of entry<providerId,parameters>
      * @throws org.constellation.configuration.ConfigurationException
-     * 
+     *
      *  @deprecated use getProviderInformations()
      */
-    @Deprecated 
+    @Deprecated
     List<Entry<String,ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException;
-    
+
     /**
      * Get a list of all provider configurations.
      * @return List of entry<providerId,parameters>
      * @throws org.constellation.configuration.ConfigurationException
      */
     List<ProviderInformation> getProviderInformations() throws ConfigurationException;
-    
+
     /**
      * Get configuration for one provider.
-     * @param providerId 
+     * @param providerId
      * @return Configuration or null
      * @throws org.constellation.configuration.ConfigurationException
      */
     ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException;
-    
+
     /**
      * Store a new provider configuration.
      * @param providerId
@@ -81,30 +81,30 @@ public interface Configurator {
                                   final ParameterValueGroup config,
                                   final Integer datasetId,
                                   final boolean createDatasetIfNull) throws ConfigurationException;
-    
+
     /**
      * Save an existing provider updated configuration.
      * @param providerId
      * @param config
-     * @throws ConfigurationException 
+     * @throws ConfigurationException
      */
     void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException;
-    
+
     /**
      * Remove a provider configuration.
      * @param providerId
-     * @throws ConfigurationException 
+     * @throws ConfigurationException
      */
     void removeProviderConfiguration(String providerId) throws ConfigurationException;
-    
+
     public static class ProviderInformation {
-        
+
         public String id;
-        
+
         public String impl;
-        
+
         public ParameterValueGroup config;
-        
+
         public ProviderInformation(final String id, final String impl, final ParameterValueGroup config) {
             this.config = config;
             this.id     = id;

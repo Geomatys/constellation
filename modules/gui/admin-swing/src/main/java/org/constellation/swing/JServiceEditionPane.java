@@ -18,13 +18,11 @@
  */
 package org.constellation.swing;
 
-import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.logging.Logger;
 
 /**
  *
@@ -32,21 +30,19 @@ import java.util.logging.Logger;
  */
 public abstract class JServiceEditionPane extends JPanel {
 
-    protected static final Logger LOGGER = Logging.getLogger(JServiceEditionPane.class);
-
     //icones
     protected static final ImageIcon ICON_EDIT = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit.png"));
     protected static final ImageIcon ICON_DELETE = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit_remove.png"));
-    
+
     public JServiceEditionPane() {
         setLayout(new BorderLayout());
     }
-    
+
     /**
      * Return the configuration of the service.
-     * @return 
+     * @return
      */
     public abstract AbstractConfigurationObject getConfiguration();
-    
+
     public abstract DataSourceType getDatasourceType();
 }

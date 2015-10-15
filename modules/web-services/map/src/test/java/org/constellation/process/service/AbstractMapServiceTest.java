@@ -25,7 +25,6 @@ import org.constellation.configuration.LayerContext;
 
 import javax.inject.Inject;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.constellation.process.service.ServiceProcessTest.serviceName;
 
 /**
@@ -69,7 +68,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
 
     /**
      * Create a custom instance.
-     * 
+     *
      * @param identifier
      * @param context
      */
@@ -100,7 +99,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
         try {
             layerBusiness.removeForService(serviceName, identifier);
         } catch (ConfigurationException ex) {
-            Logger.getLogger(AbstractMapServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 }

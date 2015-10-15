@@ -6,8 +6,6 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Context;
 
 import org.constellation.token.TokenExtender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -19,12 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class CstlAdminTokenController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CstlAdminTokenController.class);
-
     @Autowired
     private TokenExtender tokenExtender;
-    
-    
+
+
     @RequestMapping(value="/auth/extendToken", method=RequestMethod.GET)
     public @ResponseBody String extendToken(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         UserDetails userDetails = AuthController.extractUserDetail();
@@ -32,8 +28,8 @@ public class CstlAdminTokenController {
         return tokenExtender.extend(userDetails.getUsername(), httpServletRequest, httpServletResponse);
 
     }
-    
-    
+
+
     @RequestMapping(value="/auth/logout", method=RequestMethod.DELETE)
     public void logout(@Context HttpServletRequest request, @Context HttpServletResponse response) {
         HttpSession session = request.getSession(false);
@@ -42,5 +38,5 @@ public class CstlAdminTokenController {
         }
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
-    
+
 }

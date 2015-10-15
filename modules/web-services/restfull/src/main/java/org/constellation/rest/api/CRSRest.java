@@ -42,9 +42,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,7 +62,7 @@ import java.util.logging.Logger;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CRSRest {
 
-    private static final Logger LOGGER = Logging.getLogger(CRSRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     /**
      * @return All EPSG CRS

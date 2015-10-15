@@ -60,8 +60,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.sis.util.logging.Logging;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
@@ -81,24 +81,24 @@ import org.springframework.test.context.ActiveProfiles;
 public class WFSServiceTest implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-    
+
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     private static WFSService service;
 
     private static final BasicUriInfo info = new BasicUriInfo(null, null);
@@ -107,12 +107,12 @@ public class WFSServiceTest implements ApplicationContextAware {
     private static final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WFSServiceTest");
     }
-    
+
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -136,16 +136,16 @@ public class WFSServiceTest implements ApplicationContextAware {
 
                 final ParameterValueGroup sourceOM = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourceOM, "id").setValue("omSrc");
-                getOrCreateValue(sourceOM, "load_all").setValue(true);    
+                getOrCreateValue(sourceOM, "load_all").setValue(true);
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
                 final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                
+
                 providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
-                
+
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
@@ -166,7 +166,7 @@ public class WFSServiceTest implements ApplicationContextAware {
                 info.setQueryParameters(queryParameters);
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WFSServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.wfs").log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -174,7 +174,7 @@ public class WFSServiceTest implements ApplicationContextAware {
     @AfterClass
     public static void tearDownClass() throws Exception {
         ConfigDirectory.shutdownTestEnvironement("WFSServiceTest");
-        
+
         if (service != null) {
             service.destroy();
         }

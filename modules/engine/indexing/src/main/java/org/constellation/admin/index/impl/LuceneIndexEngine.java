@@ -27,7 +27,6 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -70,7 +69,7 @@ public class LuceneIndexEngine implements IndexEngine {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(LuceneIndexEngine.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.index.impl");
 
     private IndexWriter indexWriter;
 

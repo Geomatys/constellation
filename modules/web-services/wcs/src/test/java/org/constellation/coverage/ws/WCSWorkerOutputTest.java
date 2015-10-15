@@ -109,16 +109,16 @@ import org.springframework.test.context.ActiveProfiles;
 @ContextConfiguration("classpath:/cstl/spring/test-context.xml")
 @ActiveProfiles({"standard"})
 public class WCSWorkerOutputTest implements ApplicationContextAware {
-    
-    private static final Logger LOGGER = Logging.getLogger(WCSWorkerOutputTest.class);
-    
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage.ws");
+
     private ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-    
+
     /**
      * The layer to test.
      */
@@ -128,23 +128,23 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     private ILayerBusiness layerBusiness;
-    
+
     @Inject
     private IProviderBusiness providerBusiness;
-    
+
     @Inject
     private IDataBusiness dataBusiness;
-    
+
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WCSWorkerOutputTest");
     }
-    
+
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
@@ -161,7 +161,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
 
                 // coverage-sql datastore
                 final File rootDir = AbstractGrizzlyServer.initDataDirectory();
-                
+
                 final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
                 final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourceCF, "id").setValue("coverageTestSrc");
@@ -176,7 +176,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
 
                 providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
 
-                dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);  
+                dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);
 
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
@@ -188,12 +188,12 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
                 layerBusiness.add("SSTMDE200305", null, "coverageTestSrc", null, "test",    "wcs", null);
 
                 DataProviders.getInstance().reload();
-                
+
                 WORKER = new DefaultWCSWorker("default");
                 // Default instanciation of the worker' servlet context and uri context.
                 WORKER.setServiceUrl("http://localhost:9090");
                 initialized = true;
-                
+
                 WorldFileImageReader.Spi.registerDefaults(null);
 
                 //reset values, only allow pure java readers
@@ -205,7 +205,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
                 for(String jn : ImageIO.getWriterFormatNames()){
                     Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
                 }
-                
+
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -241,7 +241,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
             derbyLog.delete();
         }
     }
-    
+
     /**
      * Ensures that a PostGRID layer preconfigured is found in the GetCapabilities document
      * returned by the {@link WCSWorker}.
@@ -259,7 +259,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
         assertTrue(response instanceof WCSCapabilitiesType);
         WCSCapabilitiesType getCaps = (WCSCapabilitiesType) response;
 
-        
+
         // Verifies that the test layer is present into the GetCapabilities response.
         boolean find = false;
         final List<CoverageOfferingBriefType> offerings = getCaps.getContentMetadata().getCoverageOfferingBrief();
@@ -277,24 +277,24 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
         if (!find) {
             fail("Unable to find the layer "+ LAYER_TEST +" in the GetCapabilities document.");
         }
-        
+
         request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/Capability", null);
         getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
-        
+
         assertNotNull(getCaps.getCapability());
         assertNull(getCaps.getContentMetadata());
         assertNull(getCaps.getService());
-        
+
         request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/Service", null);
         getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
-        
+
         assertNull(getCaps.getCapability());
         assertNull(getCaps.getContentMetadata());
         assertNotNull(getCaps.getService());
-        
+
         request = new GetCapabilitiesType("1.0.0", "WCS", "/WCS_Capabilities/ContentMetadata", null);
         getCaps = (WCSCapabilitiesType) WORKER.getCapabilities(request);
-        
+
         assertNull(getCaps.getCapability());
         assertNotNull(getCaps.getContentMetadata());
         assertNull(getCaps.getService());
@@ -309,7 +309,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
      */
     @Test
     public void testDescribeCoverage() throws JAXBException, CstlServiceException {
-        
+
         final DescribeCoverage request = new DescribeCoverageType(LAYER_TEST);
         final DescribeCoverageResponse response = WORKER.describeCoverage(request);
         assertNotNull(response);
@@ -386,8 +386,8 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
         // TODO: the image should have indexed colors. Find the origin of the conversion from
         //       indexed color to RGB (int values).
 //        assertEquals(Commons.checksum(image), 3183786073L);
-        
-        
+
+
         request = new GetCoverageType(LAYER_TEST, domain, null, "WCS_INTERPLATION_METHOD_INVALID", new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
         boolean exLaunched = false;
         try {

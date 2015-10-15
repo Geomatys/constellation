@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * {@link javax.ws.rs.ext.MessageBodyReader} implementation when POST operation send a {@link org.constellation.configuration.LayerContext}
@@ -56,7 +57,7 @@ import java.util.logging.Logger;
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class LayerContextReader implements MessageBodyReader<LayerContext> {
 
-    private static final Logger LOGGER = Logger.getLogger(LayerContextReader.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

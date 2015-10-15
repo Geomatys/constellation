@@ -187,7 +187,7 @@ public class DataRest {
 
     private final XMLInputFactory xif = XMLInputFactory.newFactory();
 
-    private static final Logger LOGGER = Logging.getLogger(DataRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     private static final String RENDERED_PREFIX = "rendered_";
 

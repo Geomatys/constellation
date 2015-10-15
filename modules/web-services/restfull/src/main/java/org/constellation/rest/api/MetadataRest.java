@@ -77,14 +77,14 @@ public class MetadataRest {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(MetadataRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     /**
      * Inject metadata business
      */
     @Inject
     private IMetadataBusiness metadataBusiness;
-    
+
     /**
      * Inject configuration business
      */
@@ -365,7 +365,7 @@ public class MetadataRest {
     public Map searchIds(final PagedSearch pagedSearch,@Context HttpServletRequest req) {
         final List<MetadataLightBrief> list = new ArrayList<>();
         final Map<String,Object> filterMap = prepareFilters(pagedSearch, req);
-        
+
         final Map<Integer,String> map = metadataBusiness.filterAndGetWithoutPagination(filterMap);
         if(map!=null){
             for(final Map.Entry<Integer,String> entry : map.entrySet()){
@@ -513,7 +513,7 @@ public class MetadataRest {
         }
 
         Map<String,Integer> general = new HashMap<>();
-        
+
         final int total             = metadataBusiness.countTotal(filterMap);
         final int validated         = metadataBusiness.countValidated(true,filterMap);
         final int notValid          = metadataBusiness.countValidated(false, filterMap);
@@ -994,7 +994,7 @@ public class MetadataRest {
             // Get previously saved metadata
             final Metadata pojo      = metadataBusiness.getMetadataById(metadataId);
             if (pojo != null) {
-                
+
                 // detect profile change
                 final DefaultMetadata metadata;
                 if (!pojo.getProfile().equals(profile)) {
@@ -1100,10 +1100,10 @@ public class MetadataRest {
                     uploadDirectory.mkdir();
                 }
                 Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                
+
                 final String xml = FileUtilities.getStringFromFile(newFileMetaData);
                 final DefaultMetadata iso = (DefaultMetadata) metadataBusiness.unmarshallMetadata(xml);
-                
+
                 String identifier = iso.getFileIdentifier();
                 if (metadataBusiness.existInternalMetadata(identifier, true, false)) {
                     identifier = UUID.randomUUID().toString();

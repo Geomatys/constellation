@@ -26,11 +26,11 @@ import org.constellation.json.metadata.binding.SuperBlock;
  * @author guilhem
  */
 public class TemplateTree {
-    
-    private static final Logger LOGGER = Logging.getLogger(TemplateTree.class);
-    
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.metadata.v2");
+
     private final List<ValueNode> nodes = new ArrayList<>();
-    
+
     public ValueNode getNodeByPath(String path) {
         for (ValueNode node : nodes) {
             if (node.path.equals(path)) {
@@ -39,7 +39,7 @@ public class TemplateTree {
         }
         return null;
     }
-    
+
     public ValueNode getNodeByNumeratedPath(String numeratedPath, String blockName) {
         for (ValueNode node : nodes) {
             if (node.getNumeratedPath().equals(numeratedPath)
@@ -49,7 +49,7 @@ public class TemplateTree {
         }
         return null;
     }
-    
+
     public ValueNode getNodeByNumeratedPath(String numeratedPath) {
         for (ValueNode node : nodes) {
             if (node.getNumeratedPath().equals(numeratedPath)) {
@@ -58,7 +58,7 @@ public class TemplateTree {
         }
         return null;
     }
-    
+
     public List<ValueNode> getNodesByPath(String path) {
         final List<ValueNode> results = new ArrayList<>();
         for (ValueNode node : nodes) {
@@ -68,7 +68,7 @@ public class TemplateTree {
         }
         return results;
     }
-    
+
     public List<ValueNode> getNodesByPathAndType(String path, String type) {
         final List<ValueNode> results = new ArrayList<>();
         for (ValueNode node : nodes) {
@@ -78,7 +78,7 @@ public class TemplateTree {
         }
         return results;
     }
-    
+
     public List<ValueNode> getNodesByBlockName(String blockName) {
         final List<ValueNode> results = new ArrayList<>();
         for (ValueNode node : nodes) {
@@ -88,7 +88,7 @@ public class TemplateTree {
         }
         return results;
     }
-    
+
     public List<ValueNode> getNodesForBlock(Block block) {
         final List<ValueNode> results = new ArrayList<>();
         if (block.getPath() != null) {
@@ -103,8 +103,8 @@ public class TemplateTree {
         }
         return results;
     }
-    
-    
+
+
     public ValueNode getRoot() {
         for (ValueNode node : nodes) {
             if (node.parent == null) {
@@ -114,11 +114,11 @@ public class TemplateTree {
         return null;
     }
 
-    
+
     /**
      * Duplicate a node only it does not exist
      * @param node
-     * @return 
+     * @return
      */
     public ValueNode duplicateNode(ValueNode node, int i) {
         String numeratedPath = updateLastOrdinal(node.getNumeratedPath(), i);
@@ -137,12 +137,12 @@ public class TemplateTree {
             nodes.add(exist);
             for (ValueNode child : node.children) {
                 duplicateNode(child, exist);
-                
+
             }
         }
         return exist;
     }
-    
+
     private void duplicateNode(ValueNode node, ValueNode parent) {
         ValueNode newNode = new ValueNode(node, parent, node.ordinal);
         nodes.add(newNode);
@@ -160,7 +160,7 @@ public class TemplateTree {
         }
         return results;
     }
-    
+
     private String updateLastOrdinal(final String numeratedPath, int ordinal) {
         int i = numeratedPath.lastIndexOf('[');
         if (i != -1) {
@@ -168,10 +168,10 @@ public class TemplateTree {
         }
         throw new IllegalArgumentException(numeratedPath + " does not contain numerated value");
     }
-    
+
     private void addNode(ValueNode node, ValueNode ancestor, final RootObj template, String numPath) {
         nodes.add(node);
-        
+
         // for a new Node to add, we create all the missing parent nodes
         ValueNode child = node;
         String path     = node.path;
@@ -214,9 +214,9 @@ public class TemplateTree {
                 }
             }
         }
-        
+
     }
-    
+
     private void moveFollowingNumeratedPath(String path, int ordinal) {
         path = JsonMetadataConstants.cleanNumeratedPath(path);
         List<ValueNode> toUpdate = getNodesByPath(path);
@@ -226,7 +226,7 @@ public class TemplateTree {
             }
         }
     }
-    
+
     public static TemplateTree getTreeFromRootObj(RootObj template) {
         final TemplateTree tree = new TemplateTree();
         for (SuperBlock sb : template.getSuperBlocks()) {
@@ -235,13 +235,13 @@ public class TemplateTree {
                 updateTreeFromBlock(block, tree, template, blockPathOrdinal);
             }
         }
-        
+
         return tree;
     }
-    
+
     public static void updateTreeFromBlock(BlockObj blockO, TemplateTree tree, final RootObj template, Map<String, Integer> blockPathOrdinal) {
         final Block block = blockO.getBlock();
-        
+
         // Multiple Block
         ValueNode ancestor = null;
         if (block.getPath() != null) {
@@ -252,7 +252,7 @@ public class TemplateTree {
                 template.moveFollowingNumeratedPath(block, ordinal);
             }
             tree.addNode(ancestor, null, template, block.getPath());
-        } 
+        }
 
         // Fields
         final Map<String, Integer> fieldPathOrdinal = new HashMap<>();
@@ -264,14 +264,14 @@ public class TemplateTree {
             }
         }
     }
-    
+
     public static void updateTreeFromField(FieldObj fieldObj, TemplateTree tree, final ValueNode ancestor, final RootObj template, Map<String, Integer> fieldPathOrdinal) {
         final Field field = fieldObj.getField();
         int fieldOrdinal = updateOrdinal(fieldPathOrdinal, field.getPath());
         final ValueNode node = new ValueNode(field, fieldOrdinal);
         tree.addNode(node, ancestor, template, field.getPath());
     }
-    
+
     private static int updateOrdinal(Map<String, Integer> pathOrdinal, String path) {
         path = JsonMetadataConstants.removeLastNumeratedPathPart(path);
         int ordinal = 0;
@@ -281,10 +281,10 @@ public class TemplateTree {
         pathOrdinal.put(path, ordinal);
         return ordinal;
     }
-    
+
     public static RootObj getRootObjFromTree(final RootObj rootobj, final TemplateTree tree, final boolean prune) {
         final RootObj result = new RootObj(rootobj);
-        
+
         for (SuperBlock sb : result.getSuperBlocks()) {
             final List<BlockObj> children = new ArrayList<>(sb.getChildren());
             int blockCount = 0;
@@ -300,10 +300,10 @@ public class TemplateTree {
                 result.getRoot().remove(sb);
             }
         }
-        
+
         return result;
     }
-    
+
     private static int updateRootObjFromTree(final BlockObj blockObj, final IBlock owner, final TemplateTree tree, int blockCount) {
         Block block = blockObj.getBlock();
         final Block origBlock = new Block(block);
@@ -313,7 +313,7 @@ public class TemplateTree {
             owner.removeBlock(blockObj);
             blockCount--;
         }
-        
+
         for (int i = 0; i < blockNodes.size(); i++) {
             final ValueNode node = blockNodes.get(i);
             if (i > 0) {
@@ -337,15 +337,15 @@ public class TemplateTree {
         }
         return blockCount;
     }
-    
+
     private static int updateRootObjFromTree(final FieldObj fieldObj, final Block owner, final TemplateTree tree, final ValueNode node, int fieldCount) {
         Field field = fieldObj.getField();
         final List<ValueNode> fieldNodes = tree.getNodesByFieldAndParent(field.getName(), node);
-        
+
         if (fieldNodes.isEmpty()) {
             owner.removeField(fieldObj);
         }
-        
+
         for (int j = 0; j < fieldNodes.size(); j++) {
             final ValueNode childNode = fieldNodes.get(j);
             if (j > 0) {
@@ -362,7 +362,7 @@ public class TemplateTree {
         }
         return fieldCount;
     }
-    
+
     public static void pruneTree(TemplateTree tree, final ValueNode node) {
         List<ValueNode> toRemove = new ArrayList<>();
         for (ValueNode child : node.children) {

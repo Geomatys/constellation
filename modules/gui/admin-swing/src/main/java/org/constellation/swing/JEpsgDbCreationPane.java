@@ -37,8 +37,8 @@ import java.util.logging.Logger;
  */
 public class JEpsgDbCreationPane extends javax.swing.JPanel {
 
-    protected static final Logger LOGGER = Logging.getLogger(JEpsgDbCreationPane.class);
-    
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.swing");
+
     /**
      * Creates new form JEpsgDbCreationPane
      */
@@ -136,7 +136,7 @@ public class JEpsgDbCreationPane extends javax.swing.JPanel {
 
     private void installDbButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_installDbButtonActionPerformed
         EpsgInstaller installer = new EpsgInstaller();
-        
+
         final String className  = guiDriver.getText();
         final String connectURL = guiDbURL.getText();
         final String user       = guiUser.getText();
@@ -145,41 +145,41 @@ public class JEpsgDbCreationPane extends javax.swing.JPanel {
             connectURL.isEmpty() ||
             user.isEmpty()       ||
             password.isEmpty()) {
-            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("missingParameter"), 
+            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("missingParameter"),
                         LayerRowModel.BUNDLE.getString("missingParameterTitle"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         // try to connect first
         try {
             final Connection c = DriverManager.getConnection(connectURL, user, password);
             c.close();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("invalidConnection"), 
+            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("invalidConnection"),
                         LayerRowModel.BUNDLE.getString("invalidConnectionTitle"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         installer.setDatabase(connectURL, user, password);
-        
-        
+
+
         try {
             // look for existing database
             boolean exist = installer.exists();
-        
+
             // build the database if not exist
             if (!exist) {
                 installer.call();
             } else {
-                JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("alreadyExistingDatabase"), 
+                JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("alreadyExistingDatabase"),
                             LayerRowModel.BUNDLE.getString("alreadyExistingDatabaseTitle"), JOptionPane.ERROR_MESSAGE);
             }
         } catch (FactoryException ex) {
-            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("errorEPSGDatabase"), 
+            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("errorEPSGDatabase"),
                             LayerRowModel.BUNDLE.getString("errorEPSGDatabaseTitle"), JOptionPane.ERROR_MESSAGE);
             LOGGER.log(Level.WARNING, "Unable to create the EPSG database.", ex);
         }
-        
+
     }//GEN-LAST:event_installDbButtonActionPerformed
 
 

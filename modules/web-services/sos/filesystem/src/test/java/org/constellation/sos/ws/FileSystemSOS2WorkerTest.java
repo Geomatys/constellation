@@ -34,7 +34,6 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,7 +46,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -58,8 +57,8 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
-    private static File instDirectory; 
+
+    private static File instDirectory;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -79,35 +78,35 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         writeCommonDataFile(sensorDirectory, "system.xml",     "urn:ogc:object:sensor:GEOM:1");
         writeCommonDataFile(sensorDirectory, "component.xml",  "urn:ogc:object:sensor:GEOM:2");
         writeCommonDataFile(sensorDirectory, "component2.xml", "urn:ogc:object:sensor:GEOM:3");
-        
+
         pool.recycle(marshaller);
-            
+
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setDataDirectory(instDirectory.getPath() + "/sensors");
-            
+
             Automatic OMConfiguration  = new Automatic();
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.NONE);
             configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setObservationFilterType(DataSourceType.NONE);
-            
+
             configuration.setSMLType(DataSourceType.FILESYSTEM);
-            
+
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 serviceBusiness.create("sos", "default", configuration, null);
 
@@ -118,7 +117,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             } else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
-                
+
                 serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
@@ -127,7 +126,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(FileSystemSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -223,7 +222,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     public void DeleteSensorTest() throws Exception {
         super.DeleteSensorTest();
     }
-    
+
     /**
      * Tests the destroy method
      *

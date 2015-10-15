@@ -47,7 +47,7 @@ import java.util.Properties;
  */
 public final class Application {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("org.constellation.configuration");
 
     private static final Properties APP_PROPERTIES = new Properties();
 

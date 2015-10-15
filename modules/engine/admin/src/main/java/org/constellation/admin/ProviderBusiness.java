@@ -97,7 +97,7 @@ import org.opengis.util.GenericName;
 @Component("providerBusiness")
 @Primary
 public class ProviderBusiness implements IProviderBusiness {
-    private static final Logger LOGGER = Logging.getLogger(ProviderBusiness.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
 
     /**
      * Identifier of the possible provider types.

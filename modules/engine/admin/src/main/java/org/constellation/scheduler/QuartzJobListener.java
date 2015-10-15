@@ -50,13 +50,13 @@ import org.geotoolkit.processing.quartz.ProcessJobDetail;
 
 /**
  * Quartz Job listener attaching a listener on geotoolkit processes to track their state.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  * @author Christophe Mourette (Geomatys)
  */
 public class QuartzJobListener implements JobListener {
 
-    private static final Logger LOGGER = Logging.getLogger(QuartzJobListener.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.scheduler");
     private static final int ROUND_SCALE = 2;
 
     public static final String PROPERTY_TASK = "task";
@@ -68,7 +68,7 @@ public class QuartzJobListener implements JobListener {
     ////////////////////////////////////////////////////////////////////////////
     // Quartz listener /////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    
+
     @Override
     public String getName() {
         return "ConstellationJobTracker";
@@ -82,7 +82,7 @@ public class QuartzJobListener implements JobListener {
 
         final Job job = jec.getJobInstance();
         if(!(job instanceof ProcessJob)) return;
-        
+
         //attach a listener on the process
         final ProcessJob pj = (ProcessJob) job;
         final ProcessJobDetail detail = (ProcessJobDetail) jec.getJobDetail();
@@ -110,16 +110,16 @@ public class QuartzJobListener implements JobListener {
     public void jobWasExecuted(JobExecutionContext jec, JobExecutionException jee) {
     }
 
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // Geotk process listener //////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-      
+
     /**
      * Catch process events and set them in the TaskState.
      */
     private static class StateListener implements ProcessListener{
-    
+
         private final String taskId;
         private final String title;
         private final Task taskEntity;
@@ -136,7 +136,7 @@ public class QuartzJobListener implements JobListener {
             this.taskEntity = processBusiness.getTask(taskId);
             this.title = title;
         }
-        
+
         @Override
         public void started(ProcessEvent event) {
             taskEntity.setState(TaskState.RUNNING.name());

@@ -46,8 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.sis.util.logging.Logging;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
 import org.junit.BeforeClass;
@@ -63,7 +63,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class WPSSoapRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -71,15 +71,15 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WPSSoapRequestTest");
     }
-    
-    
+
+
     @PostConstruct
     public void initLayerList() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -88,7 +88,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 try {
                     serviceBusiness.deleteAll();
                 } catch (ConfigurationException ex) {}
-                
+
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
                 final Processes processes = new Processes(process);
                 final ProcessContext config = new ProcessContext(processes);
@@ -100,10 +100,10 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 final Map<String, Object> map = new HashMap<>();
                 map.put("wps", new WPSService());
                 initServer(null, map);
-                
+
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WPSSoapRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded.wps").log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -116,7 +116,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 service.deleteAll();
             }
         } catch (ConfigurationException ex) {
-            Logger.getLogger(WPSSoapRequestTest.class.getName()).log(Level.WARNING, ex.getMessage());
+            Logging.getLogger("org.constellation.ws.embedded.wps").log(Level.WARNING, ex.getMessage());
         }
         ConfigDirectory.shutdownTestEnvironement("WPSSoapRequestTest");
         finish();

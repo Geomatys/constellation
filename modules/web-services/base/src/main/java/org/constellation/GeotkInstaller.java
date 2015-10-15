@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  */
 public final class GeotkInstaller implements ServletContextListener{
 
-    private static final Logger LOGGER = Logging.getLogger(GeotkInstaller.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation");
 
     @Override
     public synchronized void contextInitialized(ServletContextEvent sce) {

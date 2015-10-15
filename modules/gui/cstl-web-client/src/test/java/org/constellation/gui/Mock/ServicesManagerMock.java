@@ -25,6 +25,7 @@ import org.constellation.gui.service.ServicesManager;
 import javax.enterprise.inject.Specializes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  * ServiceManager mock
@@ -37,7 +38,7 @@ import java.util.logging.Logger;
 @Specializes
 public class ServicesManagerMock extends ServicesManager{
 
-    private static final Logger LOGGER = Logger.getLogger(ServicesManagerMock.class.getName());
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.gui.Mock");
 
     /**
      * create service with {@link org.constellation.dto.Service} capabilities information

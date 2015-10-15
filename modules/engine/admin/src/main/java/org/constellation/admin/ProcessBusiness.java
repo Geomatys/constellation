@@ -124,7 +124,7 @@ public class ProcessBusiness implements IProcessBusiness {
     public static final String BEAN_NAME = "processBusiness";
 
     private static final DateFormat TASK_DATE = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessBusiness.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("org.constellation.admin");
 
     @Inject
     private TaskParameterRepository taskParameterRepository;
@@ -498,7 +498,7 @@ public class ProcessBusiness implements IProcessBusiness {
         }
         return result;
     }
-    
+
     public Identification buildIdentification(final String name) {
         final DefaultServiceIdentification ident = new DefaultServiceIdentification();
         final Identifier id = new DefaultIdentifier(name);
@@ -523,11 +523,11 @@ public class ProcessBusiness implements IProcessBusiness {
             throw new ConstellationException("Unable to marshall chain configuration",ex);
         }
         final ChainProcess process = new ChainProcess();
-        
+
         process.setAuth("constellation");
         process.setCode(code);
         process.setConfig(config);
-        
+
         chainRepository.create(process);
     }
 

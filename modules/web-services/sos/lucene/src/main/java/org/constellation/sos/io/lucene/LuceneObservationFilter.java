@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
 import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
@@ -49,13 +48,11 @@ import static org.constellation.sos.ws.SOSUtils.getLuceneTimeValue;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 /**
  * TODO
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class LuceneObservationFilter implements ObservationFilter {
 
-    private static final Logger LOGGER =Logger.getLogger("org.constellation.sos.io.lucene");
-    
     private StringBuilder luceneRequest;
 
     private LuceneObservationSearcher searcher;
@@ -103,7 +100,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest = new StringBuilder("type:observation AND template:FALSE AND procedure:\"" + procedure + "\" ");
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -287,7 +284,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setOfferings(final List<ObservationOffering> offerings) throws DataStoreException {
         // not used in this implementations
     }
-    
+
     /**
      * {@inheritDoc}
      */

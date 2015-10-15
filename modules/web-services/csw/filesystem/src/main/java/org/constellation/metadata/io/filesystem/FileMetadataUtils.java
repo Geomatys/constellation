@@ -38,7 +38,7 @@ import static org.constellation.metadata.CSWConstants.XML_EXT;
  */
 public class FileMetadataUtils {
 
-    private static final Logger LOGGER = Logging.getLogger(FileMetadataUtils.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io.filesystem");
 
     /**
      * Try to find a file named identifier.xml or identifier recursively
@@ -65,10 +65,10 @@ public class FileMetadataUtils {
         if (directory == null) {
             return null;
         } else if (!Files.isDirectory(directory)) {
-            Logging.getLogger(FileMetadataUtils.class).log(Level.WARNING, "{0} is not a valid directory", directory.toString());
+            LOGGER.log(Level.WARNING, "{0} is not a valid directory", directory.toString());
         }
         // 1) try to find the file in the current directory
-        
+
         Path metadataFile = directory.resolve(identifier + XML_EXT);
         // 2) trying without the extension
         if (!Files.exists(metadataFile)) {

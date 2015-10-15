@@ -32,14 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Primary
 public class ConfigurationBusiness implements IConfigurationBusiness {
 
-    private static final Logger LOGGER = Logging.getLogger(ConfigurationBusiness.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
 
     @Autowired
     private PropertyRepository propertyRepository;
-    
+
     @Autowired
     private ServiceRepository serviceRepository;
-    
+
     @Autowired
     private MetadataRepository metadataRepository;
 
@@ -70,7 +70,7 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
             updateServiceUrlForMetadata(value);
         }
     }
-    
+
     private void updateServiceUrlForMetadata(final String url) {
         try {
             final List<Service> records = serviceRepository.findAll();
@@ -88,7 +88,7 @@ public class ConfigurationBusiness implements IConfigurationBusiness {
             }
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
-        } 
+        }
     }
 
 }

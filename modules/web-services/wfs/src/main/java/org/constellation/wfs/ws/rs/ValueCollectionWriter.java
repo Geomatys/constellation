@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 @Provider
 public class ValueCollectionWriter<T extends ValueCollectionWrapper> implements MessageBodyWriter<T> {
 
-    private static final Logger LOGGER = Logging.getLogger(ValueCollectionWriter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.wfs.ws.rs");
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {

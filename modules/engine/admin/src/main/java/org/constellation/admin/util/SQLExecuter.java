@@ -38,7 +38,7 @@ public class SQLExecuter implements Closeable {
     /**
      * Logger used for debugging and event notification.
      */
-    private static final Logger LOGGER = Logging.getLogger(SQLExecuter.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.util");
 
     /**
      * Wrapper database {@link Connection} instance.

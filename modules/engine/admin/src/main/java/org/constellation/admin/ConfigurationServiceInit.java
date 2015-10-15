@@ -39,18 +39,17 @@ import java.lang.invoke.MethodHandles;
  * This class wires spring managed beans with legacy code.
  * {@link ConfigurationServiceInit#init()} method will inject a {@link WorkerFactory} to {@link WSEngine}
  * to allow Spring instantiation of OGC Workers.
- * 
+ *
  * @author Olivier NOUGUIER
  *
  */
 public class ConfigurationServiceInit implements ApplicationContextAware {
-    
-    
+
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Inject
     private IConfigurationService configurationService;
-    
+
     /**
      * Spring application context.
      */
@@ -58,7 +57,7 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
 
     public void init() {
         ConfigDirectory.init();
-        
+
     	SpringHelper.setApplicationContext(applicationContext);
         WSEngine.setWorkerFactory(new WorkerFactory() {
 
@@ -72,17 +71,17 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
                 if(beanNames.length > 1) {
                     LOGGER.warn("There is more than one bean definition for workerClass: " + workerClass.getName());
                 }
-                
+
                 return (Worker) applicationContext.getBean(beanNames[0], identifier);
 
             }
 
-            
+
         });
-        
-        
+
+
         ServiceConfigurer.setApplicationContext(applicationContext);
-        
+
 
     }
 

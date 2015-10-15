@@ -355,7 +355,7 @@ public final class FeatureInfoUtilities extends Static {
                         timeRange = org.geotoolkit.referencing.CRS.transform(timeRange, temporalCRS);
                     } catch (TransformException e) {
                         // Should never happen since temporalCRS is a component of layer CRS.
-                        Logging.unexpectedException(AbstractGraphicVisitor.class, "getCoverageValues", e);
+                        Logging.unexpectedException(null, AbstractGraphicVisitor.class, "getCoverageValues", e);
                         return null;
                     }
                     final double lastTime = timeRange.getMaximum(0);
@@ -366,7 +366,7 @@ public final class FeatureInfoUtilities extends Static {
                     } catch (ConversionException e) {
                         // Should never happen since TemporalCRS use time units. But if it happen
                         // anyway, use a time range of 1 of whatever units the temporal CRS use.
-                        Logging.unexpectedException(AbstractGraphicVisitor.class, "getCoverageValues", e);
+                        Logging.unexpectedException(null, AbstractGraphicVisitor.class, "getCoverageValues", e);
                         day = 1;
                     }
                     objCRS = new DefaultCompoundCRS(Collections.singletonMap(DefaultCompoundCRS.NAME_KEY,

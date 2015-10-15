@@ -37,13 +37,13 @@ import java.util.logging.Logger;
  */
 public final class WebdavService implements ResourceFactory {
 
-    private static final Logger LOGGER = Logging.getLogger(WebdavService.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.webdav");
 
     private final String contextPath;
-    
+
     public WebdavService() {
         final Map<String, Worker> workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
-        
+
         // all worker MUST have the same contextPath
         if (!workersMap.isEmpty()) {
             contextPath = ((WebdavWorker)workersMap.values().iterator().next()).getContextPath();
@@ -62,7 +62,7 @@ public final class WebdavService implements ResourceFactory {
         }
         final String instanceName = getInstanceName(url);
         if (instanceName == null) {
-            return null; 
+            return null;
         }
         final WebdavWorker currentWorker = (WebdavWorker) workersMap.get(instanceName);
         if (currentWorker != null) {

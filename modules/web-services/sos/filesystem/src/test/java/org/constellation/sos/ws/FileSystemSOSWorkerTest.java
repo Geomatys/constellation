@@ -34,7 +34,6 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -47,7 +46,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -59,8 +58,8 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
     @Inject
     private IServiceBusiness serviceBusiness;
 
-    private static File instDirectory; 
-    
+    private static File instDirectory;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
@@ -79,12 +78,12 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         writeCommonDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setDataDirectory(instDirectory.getPath() + "/sensors");
 
@@ -102,32 +101,32 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 //we write the configuration file
-                
+
                 serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);
                 worker.setLogLevel(Level.FINER);
-                
+
             } else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
-                
+
                 setUpClass();
-                
+
                 serviceBusiness.create("sos", "default", configuration, null);
 
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);
                 worker.setLogLevel(Level.FINER);
-                 
+
             }
         } catch (Exception ex) {
-            Logger.getLogger(FileSystemSOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
 

@@ -57,7 +57,7 @@ import java.util.logging.Logger;
  */
 public class ProviderManager {
 
-    private static final Logger LOGGER = Logging.getLogger(ProviderManager.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.gui.service");
     /**
      * Constellation manager used to communicate with the Constellation server.
      */

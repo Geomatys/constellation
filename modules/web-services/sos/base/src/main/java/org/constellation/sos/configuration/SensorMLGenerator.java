@@ -42,9 +42,9 @@ import java.util.logging.Level;
  * @author Guilhem Legal (Geomatys)
  */
 public class SensorMLGenerator {
-    
+
     private static final Logger LOGGER = Logger.getLogger(SensorMLGenerator.class);
-    
+
     public static String getTemplateSensorMLString(final Properties prop, final String type) {
         try {
             final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
@@ -56,18 +56,18 @@ public class SensorMLGenerator {
             } else {
                 throw new IllegalArgumentException("unexpected sml type");
             }
-            
+
             final File templateFile = File.createTempFile("smlTemplate", ".xml");
             FileUtilities.buildFileFromStream(stream, templateFile);
             final String templateApplied = templateEngine.apply(templateFile, prop);
-            
+
             return templateApplied;
         } catch (TemplateEngineException | IOException ex) {
            LOGGER.log(Level.WARNING, null, ex);
         }
         return null;
     }
-    
+
     public static AbstractSensorML getTemplateSensorML(final Properties prop, final String type) {
         try {
             final String templateApplied = getTemplateSensorMLString(prop, type);

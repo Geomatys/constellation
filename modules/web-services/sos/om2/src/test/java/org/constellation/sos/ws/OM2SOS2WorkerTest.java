@@ -46,7 +46,7 @@ import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -56,14 +56,14 @@ import java.util.logging.Logger;
 public class OM2SOS2WorkerTest extends SOS2WorkerTest {
 
     private static DefaultDataSource ds = null;
-    
+
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static String url;
-    
+
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         url = "jdbc:derby:memory:OM2Test2;create=true";
@@ -81,15 +81,15 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         Marshaller marshaller =  pool.acquireMarshaller();
 
         ConfigDirectory.setupTestEnvironement("OM2SOSWorkerTest2");
-        
+
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             if (!initialized) {
                 serviceBusiness.deleteAll();
 
@@ -119,10 +119,10 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
                 initialized = true;
             }
         } catch (Exception ex) {
-            Logger.getLogger(OM2SOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @Override
     public void initWorker() {
         worker = new SOSworker("default");
@@ -196,7 +196,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     @Override
     @Order(order=4)
     public void GetObservationTest() throws Exception {
-        super.GetObservationTest(); 
+        super.GetObservationTest();
     }
 
     /**
@@ -210,7 +210,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
-    
+
     /**
      * Tests the GetObservation method
      *
@@ -222,7 +222,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationProfileTest() throws Exception {
         super.GetObservationProfileTest();
     }
-    
+
     /**
      * Tests the GetObservationById method
      *
@@ -234,7 +234,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
-    
+
     /**
      * Tests the GetResultTemplate method
      *
@@ -313,14 +313,14 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     public void insertResultTest() throws Exception {
         super.insertResultTest();
     }
-    
+
     @Test
     @Override
     @Order(order=15)
     public void GetFeatureOfInterestObservedPropertiesTest() throws Exception {
         super.GetFeatureOfInterestObservedPropertiesTest();
     }
-    
+
     /**
      * Tests the destroy method
      *

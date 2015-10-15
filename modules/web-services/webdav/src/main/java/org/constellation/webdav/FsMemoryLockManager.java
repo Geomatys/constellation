@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class FsMemoryLockManager implements LockManager {
 
-    private static final Logger LOGGER = Logging.getLogger(FsMemoryLockManager.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.webdav");
     /**
      * maps current locks by the file associated with the resource
      */

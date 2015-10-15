@@ -51,10 +51,10 @@ import java.util.logging.Logger;
  */
 public class JEditLayerPane extends javax.swing.JPanel {
 
-    private static final Logger LOGGER = Logging.getLogger(JEditLayerPane.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.swing");
+
     private static final String EMPTY_ITEM = "empty";
-    
+
     private LayerModel layerModel;
 
     /**
@@ -66,14 +66,14 @@ public class JEditLayerPane extends javax.swing.JPanel {
     public JEditLayerPane(final ConstellationClient serverV2, final String serviceType, final LayerModel layerModel) {
         this.layerModel = layerModel;
         initComponents();
-        
+
         guiCQLError.getParent().setVisible(false);
-        
+
         //create combobox items (dataReference string)
         final List<String> providerList = new ArrayList<>();
         final List<DataReference> styleList = new ArrayList<>();
         styleList.add(null);
-        
+
         try {
             final ProvidersReport providersReport = serverV2.providers.listProviders();
             final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
@@ -121,14 +121,14 @@ public class JEditLayerPane extends javax.swing.JPanel {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        
+
         guiLayerDataCBox.setModel(new ListComboBoxModel(providerList));
         Collections.sort(styleList);
         guiLayerStyleCBox.setModel(new ListComboBoxModel(styleList));
         final ListCellRenderer renderer = new CBoxRenderer();
         guiLayerStyleCBox.setRenderer(renderer);
         guiLayerDataCBox.setRenderer(renderer);
-        
+
         //enable style choice only for WMS
         if (!"WMS".equals(serviceType)) {
             guiLayerStyleCBox.setEnabled(false);
@@ -138,14 +138,14 @@ public class JEditLayerPane extends javax.swing.JPanel {
             guiLayerStyleCBox.setVisible(false);
             guiLayerStyleLabel.setVisible(false);
         }
-        
+
         if (layerModel != null) {
             final Layer layer = layerModel.getLayer();
             //init alias name
             if (layer.getAlias() != null) {
                 guiLayerAliasText.setText(layer.getAlias());
             }
-            
+
             //filter
             if (layer.getFilter() != null) {
                 try {
@@ -157,22 +157,22 @@ public class JEditLayerPane extends javax.swing.JPanel {
                     LOGGER.log(Level.INFO, ex.getMessage(),ex);
                 }
             }
-            
+
             //data
             final String providerId = layerModel.getProviderId();
             final QName layerName = layer.getName();
             final String dataRef = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerId, layerName.toString()).getReference();
             guiLayerDataCBox.setSelectedItem(dataRef);
-            
+
             //style only the first !!! TODO handle a list of styles in GUI.
             if (!layer.getStyles().isEmpty()) {
-                
+
                 final DataReference styleRef = layer.getStyles().get(0);
                 guiLayerStyleCBox.setSelectedItem(styleRef);
             }
-            
+
         }
-        
+
     }
 
     /**
@@ -281,18 +281,18 @@ public class JEditLayerPane extends javax.swing.JPanel {
         guiCQLError.setText(error);
         guiCQLError.getParent().setVisible(true);
     }
-    
+
     public LayerModel getLayerEntry() throws CQLException {
-        if (layerModel == null) { 
+        if (layerModel == null) {
             layerModel = new LayerModel(new Layer(), null);
         }
-        
+
         //data
         final DataReference data = new DataReference((String) guiLayerDataCBox.getSelectedItem());
         final QName qname = new QName(data.getLayerId().getNamespaceURI(), data.getLayerId().getLocalPart());
         layerModel.getLayer().setName(qname);
         layerModel.setProviderId(data.getProviderOrServiceId());
-        
+
         //alias
         final String alias = guiLayerAliasText.getText();
         if (alias != null && !alias.isEmpty()) {
@@ -300,7 +300,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
         } else {
             layerModel.getLayer().setAlias(null);
         }
-        
+
         //style
         final DataReference style = (DataReference) guiLayerStyleCBox.getSelectedItem();
         if (!EMPTY_ITEM.equals(style)) {
@@ -310,13 +310,13 @@ public class JEditLayerPane extends javax.swing.JPanel {
             if (!layerModel.getLayer().getStyles().contains(style)) {
                 //TODO handle multi style with the default one.
                 //remove old style and add the new one
-                
+
                 //currently new style replace the old one
                 layerModel.getLayer().getStyles().clear();
                 layerModel.getLayer().getStyles().add(style);
             }
         }
-        
+
         //filter
         final String cql = guiFilterArea.getText();
         if (cql != null && !cql.trim().isEmpty()) {
@@ -327,34 +327,34 @@ public class JEditLayerPane extends javax.swing.JPanel {
         } else {
             layerModel.getLayer().setFilter(null);
         }
-        
+
         return layerModel;
     }
-    
+
     /**
-     * 
+     *
      * @param server
      * @param serviceType
      * @param layer
-     * @return 
+     * @return
      */
     public static LayerModel showDialog(final ConstellationClient serverV2, final String serviceType, final LayerModel layer){
-        
+
         final JEditLayerPane pane = new JEditLayerPane(serverV2, serviceType, layer);
-                
-        int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
-                LayerRowModel.BUNDLE.getString("createLayerMsg"), 
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, 
+
+        int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
+                LayerRowModel.BUNDLE.getString("createLayerMsg"),
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null,
                 null);
-        
-        
+
+
         LayerModel layerModel = null;
         boolean cqlValid = false;
         while (!cqlValid) {
             if (res == JOptionPane.CANCEL_OPTION || res == JOptionPane.CLOSED_OPTION) {
                 break;
             }
-            
+
             try {
                 layerModel = pane.getLayerEntry();
                 cqlValid = true;
@@ -367,10 +367,10 @@ public class JEditLayerPane extends javax.swing.JPanel {
                         null);
             }
         }
-        
+
         return layerModel;
     }
-    
+
     /**
      * Combobox renderer.
      */
@@ -379,7 +379,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             final JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-           
+
             if (value instanceof String) {
                 final String val = (String) value;
                 if (!val.trim().isEmpty() && !val.equals(EMPTY_ITEM)) {
@@ -391,6 +391,6 @@ public class JEditLayerPane extends javax.swing.JPanel {
             }
             return label;
         }
-        
+
     }
 }

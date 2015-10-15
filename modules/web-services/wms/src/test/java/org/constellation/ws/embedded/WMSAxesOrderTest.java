@@ -67,6 +67,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import org.junit.BeforeClass;
 import org.opengis.util.GenericName;
+import org.apache.sis.util.logging.Logging;
 import org.springframework.test.context.ActiveProfiles;
 
 // JUnit dependencies
@@ -88,7 +89,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -96,16 +97,16 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     /**
      * The layer to test.
      */
@@ -149,12 +150,12 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                                       "layers="+ LAYER_TEST +"&styles=";
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void startup() {
         ConfigDirectory.setupTestEnvironement("WMSAxesOrderTest");
     }
-    
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -186,8 +187,8 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
 
                 providerBusiness.storeProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
                 dataBusiness.create(new QName("SSTMDE200305"), "coverageTestSrc", "COVERAGE", false, true, null, null);
-                
-                
+
+
                 DataProviders.getInstance().reload();
 
                 final LayerContext config = new LayerContext();
@@ -223,7 +224,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 // Get the list of layers
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WMSAxesOrderTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded").log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -306,7 +307,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Order(order = 2)
     public void testCRSGeographique111() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -332,7 +333,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Order(order = 3)
     public void testGetMap111Epsg4326() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -364,7 +365,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Order(order = 4)
     public void testGetMap130Epsg4326() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -395,7 +396,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Order(order = 5)
     public void testGetMap111Crs84() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -430,7 +431,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Order(order = 6)
     public void testGetMap130Crs84() throws Exception {
         waitForStart();
-        
+
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {

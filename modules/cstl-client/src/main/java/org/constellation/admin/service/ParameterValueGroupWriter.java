@@ -32,7 +32,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -57,8 +57,8 @@ public class ParameterValueGroupWriter<T extends ParameterValueGroup> implements
             writer.setOutput(out);
             writer.write(t);
         } catch (XMLStreamException ex) {
-            Logger.getLogger(ParameterValueGroupWriter.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.admin.service").log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }

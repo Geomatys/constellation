@@ -126,7 +126,7 @@ public class StyleBusiness implements IStyleBusiness {
     /**
      * Logger used for debugging and event notification.
      */
-    private static final Logger LOGGER = Logging.getLogger(StyleBusiness.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin");
 
     /**
      * Ensures that a style provider with the specified identifier really
@@ -334,7 +334,7 @@ public class StyleBusiness implements IStyleBusiness {
     }
 
     /**
-     * 
+     *
      * @param providerId
      *            the style provider identifier
      * @param styleName

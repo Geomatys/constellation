@@ -32,8 +32,6 @@ import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.LayerSummary;
-import org.constellation.configuration.StyleBrief;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
@@ -107,7 +105,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -133,7 +130,7 @@ import org.opengis.util.GenericName;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class StyleRest {
-    
+
     @Inject
     private IStyleBusiness styleBusiness;
 
@@ -152,7 +149,7 @@ public final class StyleRest {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(StyleRest.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     /**
      * @FIXME remove this cache used for demo and add more generic cache management (Spring).
@@ -564,7 +561,7 @@ public final class StyleRest {
         return ok(new Style(mutableStyle));
     }
 
-    
+
     /**
      * @see StyleBusiness#getAvailableStyles(String)
      */
@@ -655,7 +652,7 @@ public final class StyleRest {
         styleBusiness.unlinkFromData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.get("dataId") + "\"."));
     }
-    
+
     @GET
     @Path("restart")
     public Response restartStyleProviders() throws Exception {

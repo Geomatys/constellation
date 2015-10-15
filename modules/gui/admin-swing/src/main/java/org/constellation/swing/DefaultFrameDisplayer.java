@@ -71,7 +71,7 @@ import java.util.logging.Logger;
  */
 public class DefaultFrameDisplayer implements FrameDisplayer {
 
-    private static final Logger LOGGER = Logging.getLogger(DefaultFrameDisplayer.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.swing");
 
     @Override
     public void display(final JComponent edit) {
@@ -129,19 +129,19 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             if(!(desc instanceof ParameterDescriptorGroup)) {
                 return;
             }
-            
+
             // parameters needed to build the store.
             final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
             final ParameterValueGroup gpv;
             try {
                 gpv = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(pr.getId(), sourceDesc);
-                
+
                 MapContext context = getProviderLayers(gpv);
                 display(context);
             } catch (IOException | XMLStreamException | DataStoreException ex) {
                 LOGGER.log(Level.WARNING, ex.getMessage(),ex);
             }
-            
+
         } catch (IOException | XMLStreamException | ClassNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         }

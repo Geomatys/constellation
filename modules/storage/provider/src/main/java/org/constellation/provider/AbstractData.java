@@ -62,7 +62,7 @@ import org.opengis.util.GenericName;
  */
 public abstract class AbstractData implements Data{
 
-    protected static final Logger LOGGER = Logging.getLogger(AbstractData.class);
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     /**
      * Favorites styles associated with this layer.
@@ -127,7 +127,7 @@ public abstract class AbstractData implements Data{
         MutableStyle mutableStyle = null;
         if (style != null) {
             mutableStyle = (MutableStyle) style;
-        } 
+        }
 
         final MapItem mapItem = getMapLayer(mutableStyle, null);
 

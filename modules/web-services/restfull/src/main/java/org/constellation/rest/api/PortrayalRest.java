@@ -52,11 +52,11 @@ import java.util.logging.Logger;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Produces("image/png")
 public class PortrayalRest {
-    
+
     @Inject
     LayerProviders layerProviders;
-    
-    private static final Logger LOGGER = Logging.getLogger(PortrayalRest.class);
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
 
     /**
      * @see LayerProviders#portray(String, String, String, String, int, int, String, String, String)
@@ -79,10 +79,10 @@ public class PortrayalRest {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
-    
-    
-    
-    
+
+
+
+
     /**
      * @see LayerProviders#portray(String, String, String, String, int, int, String, String, String, String)
      */
@@ -98,7 +98,7 @@ public class PortrayalRest {
                             @QueryParam("SLDPROVIDER") final String sldProvider,
                             @QueryParam("SLDID") final String styleId,
                             @QueryParam("CQLFILTER") final String filter) {
-                           
+
         try {
             return Response.ok(layerProviders.portray(providerId, dataName, crs, bbox, width, height, sldVersion, sldProvider, styleId, filter)).build();
         } catch (CstlServiceException | TargetNotFoundException | JAXBException ex) {

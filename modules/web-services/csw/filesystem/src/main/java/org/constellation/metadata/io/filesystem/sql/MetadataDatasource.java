@@ -44,7 +44,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
  */
 public class MetadataDatasource {
 
-    private static final Logger LOGGER = Logging.getLogger(MetadataDatasource.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io.filesystem.sql");
 
     /**
      * CSW database {@link DefaultDataSource} instance.
@@ -89,7 +89,7 @@ public class MetadataDatasource {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
 
-        
+
         final File configDirectory = ConfigDirectory.getInstanceDirectory("CSW", serviceID);
 
         // Read or create default configuration.

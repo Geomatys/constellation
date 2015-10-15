@@ -86,11 +86,11 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
  * @since 0.4
  */
 
-public final class GrizzlyServer { 
+public final class GrizzlyServer {
     /**
      * The default logger for this server.
      */
-    private static final Logger LOGGER = Logging.getLogger(GrizzlyServer.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
 
     /**
      * The grizzly server that will received some HTTP requests.
@@ -99,16 +99,16 @@ public final class GrizzlyServer {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     /**
      * Prevents instanciation.
      */
@@ -125,7 +125,7 @@ public final class GrizzlyServer {
         if (grizzly != null) {
             return;
         }
-        
+
         final File outputDir = initDataDirectory();
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSPortrayal.setEmptyExtension(true);
@@ -133,7 +133,7 @@ public final class GrizzlyServer {
         // setup configuration database
         TestDatabaseHandler.hasLocalDatabase();
         final File configDir = ConfigDirectory.setupTestEnvironement("CITE_CONFIGURATION");
-        
+
         //SHAPEFILE
         final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
         final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
@@ -217,8 +217,8 @@ public final class GrizzlyServer {
         pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
         providerBusiness.storeProvider("aggGMLSrc", null, ProviderType.LAYER, "feature-store", source);
         dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "aggGMLSrc", "VECTOR", false, true, null, null);
-          
-        
+
+
         final ProviderFactory covFilefactory = DataProviders.getInstance().getFactory("coverage-store");
         final ParameterValueGroup sourceCF = covFilefactory.getProviderDescriptor().createValue();
         getOrCreateValue(sourceCF, "id").setValue("postgridSrc");
@@ -234,14 +234,14 @@ public final class GrizzlyServer {
         providerBusiness.storeProvider("postgridSrc", null, ProviderType.LAYER, "coverage-store", sourceCF);
 
         dataBusiness.create(new QName("SSTMDE200305"), "postgridSrc", "COVERAGE", false, true, null, null);
-                
-        
+
+
         DataProviders.getInstance().reload();
 
         /*---------------------------------------------------------------*/
         /*------------------------- CSW ---------------------------------*/
         /*---------------------------------------------------------------*/
-        
+
         final File dataDirectory = new File(configDir, "dataCSW");
         dataDirectory.mkdir();
 
@@ -261,7 +261,7 @@ public final class GrizzlyServer {
         final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
         config.putParameter("transactionSecurized", "false");
         config.putParameter("shiroAccessible", "false");
-        
+
         serviceBusiness.create("csw", "default", config, null);
 
         /*---------------------------------------------------------------*/
@@ -280,7 +280,7 @@ public final class GrizzlyServer {
         writeDataFile(sensorDirectory, "urn-ogc-object-sensor-GEOM-9");
 
         final Automatic smlConfig = new Automatic(null, sensorDirectory.getPath());
-        
+
         String sosurl = "jdbc:derby:memory:CITEOM2Test2;create=true";
         DefaultDataSource ds = new DefaultDataSource(sosurl);
 
@@ -290,7 +290,7 @@ public final class GrizzlyServer {
         sr.setEncoding("UTF-8");
         sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2-cite.sql"));
-        
+
         Automatic OMConfiguration  = new Automatic();
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", sosurl, "", "");
         OMConfiguration.setBdd(bdd);
@@ -318,9 +318,9 @@ public final class GrizzlyServer {
         wcsConfig.getCustomParameters().put("shiroAccessible", "false");
 
         serviceBusiness.create("wcs", "default", wcsConfig, null);
-        
+
         layerBusiness.add("SSTMDE200305", null, "postgridSrc", null, "default", "wcs", null);
-        
+
         /*---------------------------------------------------------------*/
         /*------------------------- WFS ---------------------------------*/
         /*---------------------------------------------------------------*/
@@ -330,20 +330,20 @@ public final class GrizzlyServer {
         wfsConfig.getCustomParameters().put("multipleVersion", "false");
         wfsConfig.getCustomParameters().put("transactionSecurized", "false");
         wfsConfig.getCustomParameters().put("transactionnal", "true");
-        
+
         //wfsConfig.getCustomParameters().put("requestValidationActivated", "true");
         //wfsConfig.getCustomParameters().put("requestValidationSchema", "http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
-        
+
         final Contact contact = new Contact("john", "doe", "doe Inc.", "CEO", "369988", "455114", "john.doe@hotmail.com", "12 main street", "New York", "NY", "34000", "USA", "http://doe.com", "pause at lunch", "call me");
         final AccessConstraint access = new AccessConstraint("NONE", "NONE", 24, 400, 400);
         Details details = new Details("default", "default", Arrays.asList("kw1", "kw2"), "some description", Arrays.asList("1.1.0"), contact, access, true, "en");
-                         
+
         serviceBusiness.create("wfs", "default", wfsConfig, details);
-        
+
         layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
         layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
         layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "entGMLSrc", null, "default", "wfs", null);
-        
+
 
         /*---------------------------------------------------------------*/
         /*------------------------- WMS ---------------------------------*/
@@ -353,7 +353,7 @@ public final class GrizzlyServer {
         wmsConfig.getCustomParameters().put("shiroAccessible", "false");
         wmsConfig.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
         serviceBusiness.create("wms", "default", wmsConfig, null);
-        
+
         layerBusiness.add("BuildingCenters",     "cite",           "shapeSrc",   null, "default", "wms", null);
         layerBusiness.add("BasicPolygons",       "cite",           "shapeSrc",   null, "default", "wms", null);
         layerBusiness.add("Bridges",             "cite",           "shapeSrc",   null, "default", "wms", null);
@@ -387,13 +387,13 @@ public final class GrizzlyServer {
         }
 
         LOGGER.info("Configuration context set");
-        
+
         /* Instanciates the Grizzly server, but not start it at this moment.
          * The implementation waits for the data provider to be defined for
          * starting the server.
          */
         grizzly = new GrizzlyThread();
-        
+
         // Starting the grizzly server
         grizzly.start();
 

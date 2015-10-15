@@ -38,6 +38,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.apache.sis.util.logging.Logging;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -75,31 +76,31 @@ import org.springframework.test.context.ActiveProfiles;
 public class AdminRequestTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-    
+
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
-    
+
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void startup() {
         ConfigDirectory.setupTestEnvironement("AdminRequestTest");
     }
-    
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -113,7 +114,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
-                
+
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
                 final File outputDir = initDataDirectory();
                 final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
@@ -176,7 +177,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
                 pool = GenericDatabaseMarshallerPool.getInstance();
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(AdminRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+                Logging.getLogger("org.constellation.ws.embedded").log(Level.SEVERE, null, ex);
             }
         }
     }

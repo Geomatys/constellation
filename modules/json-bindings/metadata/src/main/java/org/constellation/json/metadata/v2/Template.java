@@ -28,9 +28,9 @@ import org.geotoolkit.sml.xml.v101.SensorMLStandard;
  * @author Guilhem Legal (Geomatys)
  */
 public class Template {
-    
-    private static final Logger LOGGER = Logging.getLogger(Template.class);
-    
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.metadata.v2");
+
     /**
      * Pre-defined instances. This map shall not be modified after class initialization,
      * in order to allow concurrent access without synchronization.
@@ -53,7 +53,7 @@ public class Template {
             throw new ExceptionInInitializerError(e); // Should never happen.
         }
     }
-    
+
     /**
      * Creates a pre-defined template from resource files of the given names.
      *
@@ -79,7 +79,7 @@ public class Template {
         }
         return templates;
     }
-    
+
     /**
      * Returns the template of the given name.
      * Currently recognized names are:
@@ -100,7 +100,7 @@ public class Template {
         }
         return instance;
     }
-    
+
     /**
      * Returns the names of available templates.
      *
@@ -109,33 +109,33 @@ public class Template {
     public static Set<String> getAvailableNames() {
         return Collections.unmodifiableSet(INSTANCES.keySet());
     }
-    
+
     /**
      * @todo current implementation is unsafe (not thread-safe, no check for existing instances).
      */
     public static void addTemplate(final String name, Template t) {
         INSTANCES.put(name, t);
     }
-    
-    
+
+
     private final MetadataStandard standard;
-    
+
     private final RootObj rootObj;
-    
+
     private final Map<Class<?>, Class<?>> specialized;
-    
+
     public Template(final MetadataStandard standard, final RootObj rootObj) {
         this.standard = standard;
         this.rootObj  = rootObj;
         this.specialized = AbstractTemplateHandler.DEFAULT_SPECIALIZED;
     }
-    
+
     public Template(final MetadataStandard standard, final RootObj rootObj, Map<Class<?>, Class<?>> specialized) {
         this.standard    = standard;
         this.rootObj     = rootObj;
         this.specialized = specialized;
     }
-    
+
     /**
      * Writes the values of the given metadata object using the template given at construction time.
      *
@@ -169,19 +169,19 @@ public class Template {
         json.setNodeTypes(rootObj.getNodeTypes());
         reader.readTemplate(json, destination);
     }
-    
+
     public String getCompletion(final Object metadata) throws IOException {
         final TemplateWriter writer = new TemplateWriter(standard);
         final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false, false);
         return getCompletion(rootFilled);
     }
-    
+
     public String getCompletion(final RootObj metadataValues) {
         Map<String, Boolean> completions = new HashMap<>();
         completions.put("ELEMENTARY", Boolean.TRUE);
         completions.put("EXTENDED",   Boolean.TRUE);
         completions.put("COMPLETE",   Boolean.TRUE);
-        
+
         final List<SuperBlockObj> superblocks = metadataValues.getRoot().getChildren();
         for(final SuperBlockObj sb:superblocks){
             final List<BlockObj> blocks = sb.getSuperblock().getChildren();
@@ -217,13 +217,13 @@ public class Template {
         }
         return "NONE";
     }
-    
+
     public int calculateMDCompletion(final Object metadata) throws IOException {
         final TemplateWriter writer = new TemplateWriter(standard);
         final RootObj rootFilled    = writer.writeTemplate(rootObj, metadata, false, false);
         return calculateMDCompletion(rootFilled);
     }
-    
+
     public int calculateMDCompletion(final RootObj metadataValues) {
         int result = 0;
         int fieldsCount=0;

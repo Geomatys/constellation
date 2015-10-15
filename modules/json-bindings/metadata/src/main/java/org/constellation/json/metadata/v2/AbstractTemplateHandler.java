@@ -2,13 +2,10 @@
 package org.constellation.json.metadata.v2;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import org.apache.sis.metadata.KeyNamePolicy;
 import org.apache.sis.metadata.MetadataStandard;
-import org.apache.sis.metadata.TypeValuePolicy;
 import org.apache.sis.metadata.ValueExistencePolicy;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.json.metadata.ParseException;
@@ -32,13 +29,13 @@ import org.opengis.metadata.spatial.VectorSpatialRepresentation;
  * @author guilhem
  */
 public class AbstractTemplateHandler {
-    
-    protected static final Logger LOGGER = Logging.getLogger(AbstractTemplateHandler.class);
+
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.json.metadata.v2");
     /**
      * The metadata standard.
      */
     protected final MetadataStandard standard;
-    
+
     /**
      * The default value to give to the {@code specialized} of {@link FormReader} constructor.
      */
@@ -54,27 +51,27 @@ public class AbstractTemplateHandler {
         specialized.put(Element.class,               DomainConsistency.class);
         DEFAULT_SPECIALIZED = specialized;
     }
-    
+
     protected Map<Class<?>, Class<?>> specialized;
-    
+
     public AbstractTemplateHandler(final MetadataStandard standard) {
         this.standard = standard;
         this.specialized = DEFAULT_SPECIALIZED;
     }
-    
+
     public AbstractTemplateHandler(final MetadataStandard standard, Map<Class<?>, Class<?>> specialized) {
         this.standard = standard;
         this.specialized = specialized;
     }
-    
+
     protected Map<String,Object> asMap(final Object metadata) {
         return standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY);
     }
-    
+
     protected Map<String,Object> asFullMap(final Object metadata) {
         return standard.asValueMap(metadata, KeyNamePolicy.UML_IDENTIFIER, ValueExistencePolicy.NON_EMPTY);
     }
-    
+
     protected Class readType(ValueNode node) throws ParseException {
         Class type;
         try {

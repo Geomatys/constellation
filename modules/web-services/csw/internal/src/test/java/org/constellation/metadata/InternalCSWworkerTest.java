@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.StringWriter;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -46,6 +45,7 @@ import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.apache.sis.util.logging.Logging;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,12 +70,12 @@ public class InternalCSWworkerTest extends CSWworkerTest {
     private static File configDirectory;
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         configDirectory = ConfigDirectory.setupTestEnvironement("InternalCSWWorkerTest");
     }
-    
+
     @PostConstruct
     public void setUpClass() {
         onlyIso = true;
@@ -119,7 +119,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
                 initialized = true;
             }
         } catch (Exception ex) {
-            Logger.getLogger(InternalCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.metadata").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -251,7 +251,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
-        DefaultMetadata meta = (DefaultMetadata) obj; 
+        DefaultMetadata meta = (DefaultMetadata) obj;
         pool.recycle(u);
 
         Marshaller m = pool.acquireMarshaller();
@@ -259,8 +259,8 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         final StringWriter sw = new StringWriter();
         m.marshal(meta, sw);
         pool.recycle(m);
-        
-        
+
+
         metadataBusiness.updateMetadata(identifier, sw.toString());
     }
 }

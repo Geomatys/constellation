@@ -46,7 +46,7 @@ import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 /**
  *
@@ -59,14 +59,14 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
 
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     private static String url;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         url = "jdbc:derby:memory:OM2Test1;create=true";
         ds = new DefaultDataSource(url);
-            
+
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
@@ -84,18 +84,18 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
         CSWDirectory.mkdir();
         final File instDirectory = new File(CSWDirectory, "default");
         instDirectory.mkdir();
-        
+
         pool.recycle(marshaller);
     }
-    
+
     @PostConstruct
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            
+
             //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
-            
+
             Automatic OMConfiguration  = new Automatic();
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             OMConfiguration.setBdd(bdd);
@@ -110,7 +110,7 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
-            
+
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
                 serviceBusiness.create("sos", "default", configuration, null);
                 init();
@@ -126,7 +126,7 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
                 worker.setLogLevel(Level.FINER);
             }
         } catch (Exception ex) {
-            Logger.getLogger(OM2SOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logging.getLogger("org.constellation.sos.ws").log(Level.SEVERE, null, ex);
         }
     }
 
@@ -136,7 +136,7 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }
-    
+
     @AfterClass
     public static void tearDownClass() throws Exception {
         if (worker != null) {
@@ -219,14 +219,14 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
     public void GetObservationSamplingCurveTest() throws Exception {
         super.GetObservationSamplingCurveTest();
     }
-    
+
     @Test
     @Override
     @Order(order=6)
     public void GetObservationMeasurementTest() throws Exception {
         super.GetObservationMeasurementTest();
     }
-    
+
     /**
      * Tests the GetObservationById method
      *
@@ -311,7 +311,7 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
     public void GetFeatureOfInterestTimeTest() throws Exception {
         super.GetFeatureOfInterestTimeTest();
     }
-    
+
     /**
      * Tests the destroy method
      *

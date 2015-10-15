@@ -41,7 +41,7 @@ public final class Fill implements StyleElement<org.opengis.style.Fill> {
     /**
      * Used for debugging purposes.
      */
-    private static final Logger LOGGER = Logging.getLogger(Fill.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.json.binding");
 
     private String color   = "#555555";
     private String opacity = "1.0";

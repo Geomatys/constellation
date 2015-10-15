@@ -95,10 +95,10 @@ import org.springframework.test.context.ContextConfiguration;
 @ActiveProfiles({"standard"})
 public class WFSCIteWorkerTest implements ApplicationContextAware {
 
-    private static final Logger LOGGER = Logging.getLogger(WFSCIteWorkerTest.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.cite");
+
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -107,26 +107,26 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
     private static WFSWorker worker;
 
     private XmlFeatureWriter featureWriter;
-    
+
     @Inject
     protected IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
 
     private static boolean initialized = false;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WFSCiteWorkerTest");
     }
-    
+
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -145,7 +145,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 } else {
                     path = outputDir.getAbsolutePath();
                 }
-                
+
                 final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
 
                 // Defines a GML data provider
@@ -165,8 +165,8 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
                 providerBusiness.storeProvider("primGMLSrc", null, ProviderType.LAYER, "feature-store", source);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "primGMLSrc", "VECTOR", false, true, null, null);
-                
-                
+
+
                 source = factory.getProviderDescriptor().createValue();
                 source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                 source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("entGMLSrc");
@@ -182,7 +182,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
                 providerBusiness.storeProvider("entGMLSrc", null, ProviderType.LAYER, "feature-store", source);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "entGMLSrc", "VECTOR", false, true, null, null);
-                
+
 
                 source = factory.getProviderDescriptor().createValue();
                 source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
@@ -199,16 +199,16 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 pgconfig.parameter("namespace").setValue("http://cite.opengeospatial.org/gmlsf");
                 providerBusiness.storeProvider("aggGMLSrc", null, ProviderType.LAYER, "feature-store", source);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "aggGMLSrc", "VECTOR", false, true, null, null);
-                
+
 
                 DataProviders.getInstance().reload();
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
                 config.getCustomParameters().put("transactionnal", "true");
-                
+
                 Details details = new Details("default", "default", null, null, Arrays.asList("1.1.0"), null, null, true, "en");
-                         
+
                 serviceBusiness.create("wfs", "default", config, details);
                 layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "aggGMLSrc", null, "default", "wfs", null);
                 layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "primGMLSrc", null, "default", "wfs", null);
@@ -218,7 +218,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 worker.setLogLevel(Level.FINER);
                 initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WFSCIteWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -287,7 +287,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
-        
+
         collection = ((FeatureCollectionWrapper)result).getFeatureCollection();
 
         writer = new StringWriter();
@@ -297,21 +297,21 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         System.out.println(xmlResult);
 
         assertEquals(5, collection.size());
-        
+
         /**
          * Test 1 : query on typeName aggragateGeofeature
          */
 
         queries = new ArrayList<>();
         BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:ogc:def:crs:EPSG:4326");
-        
+
         /* TODO restore when geotk will be updated
-        
+
         PropertyIsEqualToType propEqual = new PropertyIsEqualToType(new LiteralType("name-f015"), new PropertyNameType("http://www.opengis.net/gml:name"), Boolean.TRUE);
         AndType and = new AndType(bbox, propEqual);
         f = new FilterType(and);*/
         f = new FilterType(bbox);
-                
+
         query = new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
         //query.setSrsName("urn:ogc:def:crs:EPSG:6.11:32629");
         queries.add(query);
@@ -320,7 +320,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
-        
+
         collection = ((FeatureCollectionWrapper)result).getFeatureCollection();
 
         writer = new StringWriter();
@@ -330,11 +330,11 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         System.out.println(xmlResult);
 
         assertEquals(1, collection.size());
-        
+
         String url = "http://localhost:8180/constellation/WS/wfs/ows11?service=WFS&version=1.1.0&request=GetFeature&typename=sf:PrimitiveGeoFeature&namespace=xmlns%28sf=http://cite.opengeospatial.org/gmlsf%29&filter=%3Cogc:Filter%20xmlns:gml=%22http://www.opengis.net/gml%22%20xmlns:ogc=%22http://www.opengis.net/ogc%22%3E%3Cogc:PropertyIsEqualTo%3E%3Cogc:PropertyName%3E//gml:description%3C/ogc:PropertyName%3E%3Cogc:Literal%3Edescription-f008%3C/ogc:Literal%3E%3C/ogc:PropertyIsEqualTo%3E%3C/ogc:Filter%3E";
 
     }
-    
+
     /**
      * Initialises the data directory in unzipping the jar containing the resources
      * into a temporary directory.
@@ -376,5 +376,5 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
         return outputDir;
     }
 
-    
+
 }

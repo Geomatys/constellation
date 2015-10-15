@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  */
 public class WPSProcessListener implements ProcessListener{
 
-    private static final Logger LOGGER = Logging.getLogger(WPSProcessListener.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.wps.ws");
     private static final int TIMEOUT = 20000; //processing time step
 
     private final Execute request;
@@ -76,7 +76,7 @@ public class WPSProcessListener implements ProcessListener{
         this.nextTimestamp = System.currentTimeMillis() + TIMEOUT;
         this.useStatus = this.request.getResponseForm().getResponseDocument().isStatus();
     }
-    
+
     @Override
     public void started(final ProcessEvent event) {
         LOGGER.log(Level.INFO, "Process {0} is started.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
@@ -127,7 +127,7 @@ public class WPSProcessListener implements ProcessListener{
         } catch (CstlServiceException ex) {
             writeException(ex);
         }
-               
+
     }
 
     @Override
@@ -175,10 +175,10 @@ public class WPSProcessListener implements ProcessListener{
             WPSUtils.storeResponse(responseDoc, folderPath, fileName);
         }
     }
-    
+
     /**
      * Write the occurred exception in the response file.
-     * 
+     *
      * @param ex exception
      */
     private void writeException(final CstlServiceException ex){
@@ -189,11 +189,11 @@ public class WPSProcessListener implements ProcessListener{
         } else {
             codeRepresentation = ex.getExceptionCode().name();
         }
-        
+
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), codeRepresentation, ex.getLocator(),
                                                      def.exceptionVersion.toString());
-        
+
         WPSUtils.storeResponse(report, folderPath, fileName);
     }
-    
+
 }

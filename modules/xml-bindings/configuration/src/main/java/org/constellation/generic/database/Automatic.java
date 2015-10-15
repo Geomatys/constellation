@@ -53,7 +53,7 @@ public class Automatic extends AbstractConfigurationObject {
     @XmlTransient
     public static final int BYID        = 2;
 
-    private static final Logger LOGGER = Logging.getLogger(Automatic.class);
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.generic.database");
 
     /**
      * The database connection informations.
@@ -630,7 +630,7 @@ public class Automatic extends AbstractConfigurationObject {
         }
         return defaultValue;
     }
-    
+
     public List<String> getParameterList(final String key) {
         final List<String> result = new ArrayList<>();
         if (customparameters == null) {
@@ -643,7 +643,7 @@ public class Automatic extends AbstractConfigurationObject {
         }
         return result;
     }
-    
+
     public void setParameterList(final String key, List<String> list) {
         if (customparameters == null) {
             customparameters = new HashMap<>();

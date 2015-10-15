@@ -115,7 +115,7 @@ import org.apache.sis.util.logging.Logging;
  */
 final class TemplateApplicator {
 
-    public static final Logger LOGGER = Logging.getLogger(TemplateApplicator.class);
+    public static final Logger LOGGER = Logging.getLogger("org.constellation.json.metadata");
 
     /**
      * A path to be handled in a special way.

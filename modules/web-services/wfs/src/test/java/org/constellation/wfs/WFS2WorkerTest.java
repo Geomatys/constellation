@@ -171,27 +171,27 @@ import org.springframework.test.context.ContextConfiguration;
 @ActiveProfiles({"standard"})
 public class WFS2WorkerTest implements ApplicationContextAware {
 
-    private static final Logger LOGGER = Logging.getLogger(WFS2WorkerTest.class);
-    
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.wfs");
+
     protected ApplicationContext applicationContext;
-    
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-    
+
     private static MarshallerPool pool;
     private static WFSWorker worker ;
-    
+
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
     @Inject
     protected ILayerBusiness layerBusiness;
-    
+
     @Inject
     protected IProviderBusiness providerBusiness;
-    
+
     @Inject
     protected IDataBusiness dataBusiness;
 
@@ -211,14 +211,14 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     private static final List<QName> alltypes = new ArrayList<>();
 
     private static boolean initialized = false;
-    
+
     private static boolean mdweb_active = true;
-    
+
     @BeforeClass
     public static void initTestDir() {
         ConfigDirectory.setupTestEnvironement("WFS2WorkerTest");
     }
-    
+
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -229,7 +229,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
-                
+
                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
                 final File outputDir = AbstractGrizzlyServer.initDataDirectory();
@@ -260,7 +260,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
-                
+
                 final String url = "jdbc:derby:memory:TestWFS2WorkerOM";
                 final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                 Connection con = ds.getConnection();
@@ -272,16 +272,16 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
                 final ParameterValueGroup sourceOM = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourceOM, "id").setValue("omSrc");
-                getOrCreateValue(sourceOM, "load_all").setValue(true);    
+                getOrCreateValue(sourceOM, "load_all").setValue(true);
 
                 final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
                 final ParameterValueGroup omconfig = getOrCreateGroup(choiceOM, " SOSDBParameters");
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                
+
                 providerBusiness.storeProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
-                
+
                 // MDWEB store
                 mdweb_active = Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql") != null;
                 if (mdweb_active) {
@@ -301,7 +301,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
                     final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
                     getOrCreateValue(sourceSML, "id").setValue("smlSrc");
-                    getOrCreateValue(sourceSML, "load_all").setValue(true);             
+                    getOrCreateValue(sourceSML, "load_all").setValue(true);
 
                     final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
                     final ParameterValueGroup smlconfig = getOrCreateGroup(choiceSML, "SMLParameters");
@@ -316,9 +316,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
                 }
                 initAllTypes();
-                
+
                 DataProviders.getInstance().reload();
-                
+
                 final LayerContext config2 = new LayerContext();
                 config2.getCustomParameters().put("shiroAccessible", "false");
                 config2.getCustomParameters().put("transactionSecurized", "false");
@@ -364,7 +364,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 serviceBusiness.setExtraConfiguration("wfs", "test1", "StoredQueries.xml", queries, pool);
 
                 EPSG_VERSION = CRS.getVersion("EPSG").toString();
-                
+
                 worker = new DefaultWFSWorker("test1");
                 worker.setLogLevel(Level.FINER);
                 worker.setServiceUrl("http://geomatys.com/constellation/WS/");
@@ -377,7 +377,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     }
 
     public static void initAllTypes() {
-        
+
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","BuildingCenters"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","BasicPolygons"));
         if (mdweb_active) alltypes.add(new QName("http://www.opengis.net/sml/1.0","System"));
@@ -397,7 +397,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         if (mdweb_active) alltypes.add(new QName("http://www.opengis.net/sml/1.0","ProcessChain"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","Ponds"));
         Collections.sort(alltypes, new QNameComparator());
-        
+
     }
     @AfterClass
     public static void tearDownClass() throws Exception {
@@ -475,8 +475,8 @@ public class WFS2WorkerTest implements ApplicationContextAware {
             domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-ftl.xml"),
                 sw.toString());
         }
-        
-        
+
+
         request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType();
         request.setAcceptVersions(new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0"));
         result = worker.getCapabilities(request);
@@ -560,7 +560,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         marshaller.marshal(result, sw);
         domCompare(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-sp.xml"),
                 sw.toString());
-        
+
         acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("10.0.0","2.0.0","1.1.0");
         request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
 
@@ -637,7 +637,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
-        
+
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
         domCompare(expectedResult, sresult);
@@ -680,7 +680,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -707,7 +707,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -734,7 +734,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -761,7 +761,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -785,7 +785,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
-        
+
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
 
@@ -817,7 +817,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -844,7 +844,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -871,7 +871,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -981,20 +981,20 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.ValueCollectionOM2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
         domCompare(expectedResult, writer.toString());
-        
+
         /**
          * Test 4 : empty value reference
          */
         valueReference = "";
         request.setValueReference(valueReference);
-        
+
         boolean exLaunched = false;
         try {
             worker.getPropertyValue(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
         }
-        
+
         assertTrue(exLaunched);
     }
 
@@ -1007,7 +1007,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     public void getPropertyValueSMLTest() throws Exception {
 
         if (!mdweb_active) return;
-        
+
         /**
          * Test 1 : query on typeName System with HITS
          */
@@ -1070,7 +1070,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     public void getFeatureSMLTest() throws Exception {
 
         if (!mdweb_active) return;
-        
+
         /**
          * Test 1 : query on typeName sml:System
          */
@@ -1094,7 +1094,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -1116,13 +1116,13 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        
+
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -1151,9 +1151,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
         /**
          * Test 4 : query on typeName sml:System filter on name = 'Piezometer Test'
          */
@@ -1181,9 +1181,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
         /**
          * Test 5 : same test xpath style
          */
@@ -1211,9 +1211,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
         /**
          * Test 6 : query on typeName sml:System filter on input name = 'height' (xpath style)
          */
@@ -1241,12 +1241,12 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
         /**
          * Test 7 : query on typeName sml:System with bad xpath NOT WORKING
-        
+
         pe1     = new PropertyIsEqualToType(new LiteralType("height"), "/inputs/inputation/namein", Boolean.TRUE);
         filter         = new FilterType(pe1);
         queries = new ArrayList<>();
@@ -1271,7 +1271,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         domCompare(expectedResult, writer.toString());
          */
-        
+
         /**
          * Test 8 : query on typeName sml:System filter on input name = 'height' (xpath style) prefixed with featureType name
          */
@@ -1299,9 +1299,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
          /**
          * Test 8 : query on typeName sml:System aliased as "a" filter on input name = 'height' (xpath style) prefixed with featureType name
          */
@@ -1330,10 +1330,10 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
     }
-    
+
      /**
      * test the feature marshall
      *
@@ -1375,7 +1375,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         domCompare(expectedResult, writer.toString());
     }
-    
+
     /**
      * test the feature marshall
      *
@@ -1446,7 +1446,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollectionv2.xml"),
                 sresult);
@@ -1472,7 +1472,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2v2.xml"),
                 sresult);
@@ -1497,7 +1497,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1v2.xml"),
                 sresult);
@@ -1538,7 +1538,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1_reprojv2.xml"),
                 sresult);
@@ -1553,7 +1553,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
-        
+
         result = worker.getFeature(request);
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
@@ -1562,15 +1562,15 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        
+
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-5v2.xml"),
                 sresult);
-            
-        
+
+
 
         /**
          * Test 7 : query on typeName NamedPlaces with ASC sortBy on NAME property (not supported)
@@ -1590,10 +1590,10 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        
+
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1v2.xml"),
                 sresult);
@@ -1776,18 +1776,18 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3v2.xml"),
                 sresult);
 
    }
-    
+
     @Test
     @Order(order=12)
     public void TransactionReplaceTest() throws Exception {
-    
-    
+
+
 
         /**
          * Test 1 : transaction replace for Feature type NamedPlaces
@@ -1797,7 +1797,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         final JAXPStreamFeatureReader fr = new JAXPStreamFeatureReader(ft);
         fr.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
         final Feature feature = (Feature) fr.read(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlaces.xml"));
-        
+
         PropertyIsEqualToType pe = new PropertyIsEqualToType(new LiteralType("Goose Island"), "NAME", Boolean.TRUE);
         FilterType filter   = new FilterType(pe);
         TransactionType request  = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new ReplaceType(null, filter, feature, "application/gml+xml; version=3.2", null));
@@ -1832,19 +1832,19 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-4v2.xml"),
                 sresult);
 
     }
-    
+
     @Test
     @Order(order=13)
     public void TransactionDeleteTest() throws Exception {
-     
-    
-   
+
+
+
         /**
          * Test 1 : transaction delete for Feature type bridges with a bad property in filter
          */
@@ -1897,7 +1897,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2v2.xml"),
                 sresult);
@@ -2140,7 +2140,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         assertEquals(expResultlsq, resultlsq);
 
     }
-    
+
     @Test
     @Order(order=18)
     public void getFeatureOMFeatureIdTest() throws Exception {
@@ -2151,7 +2151,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
         final FilterType filter = new org.geotoolkit.ogc.xml.v200.FilterType(new org.geotoolkit.ogc.xml.v200.ResourceIdType("station-001"));
         final QueryType query = new QueryType(filter, null, "2.0.0");
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, null, Integer.MAX_VALUE, Arrays.asList(query), ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
-        
+
         Object result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
@@ -2167,7 +2167,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
     }
 
@@ -2201,9 +2201,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
         /**
          * Test 2 : query on typeName samplingPoint with id parameter
          */
@@ -2228,7 +2228,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
         /**
@@ -2259,9 +2259,9 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
-        
+
         /**
          * Test 4 : query with typeName parameter
          */
@@ -2286,7 +2286,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
     }
 
@@ -2319,11 +2319,11 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         String sresult = writer.toString();
         sresult = sresult.replaceAll("timeStamp=\"[^\"]*\" ", "timeStamp=\"\" ");
-        
+
         domCompare(expectedResult, sresult);
 
     }
-    
+
     @Test
     @Order(order=21)
     public void schemaLocationTest() throws Exception {
@@ -2335,11 +2335,11 @@ public class WFS2WorkerTest implements ApplicationContextAware {
 
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
-        
+
         final Map<String, String> expResult = new HashMap<>();
         expResult.put("http://www.opengis.net/gml/3.2", "http://geomatys.com/constellation/WS/wfs/test1?request=DescribeFeatureType&version=2.0.0&service=WFS&namespace=xmlns(ns1=http://www.opengis.net/gml/3.2)&typenames=ns1:NamedPlaces");
         assertEquals(wrapper.getSchemaLocations(), expResult);
-        
+
     }
 
     public static void domCompare(final Object actual, final Object expected) throws Exception {

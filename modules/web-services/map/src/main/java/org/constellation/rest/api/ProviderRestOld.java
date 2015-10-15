@@ -87,15 +87,15 @@ public class ProviderRestOld {
 
     @Inject
     private IDataBusiness dataBusiness;
-    
-    private static final Logger LOGGER = Logging.getLogger(ProviderRestOld.class);
-    
+
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.rest.api");
+
     private final ProviderOperationListener providerListener = new DefaultProviderOperationListener(); // TODO overrding mecanism
-    
+
     private final Map<String, ProviderFactory> services = new HashMap<>();
 
     public ProviderRestOld() {
-        
+
         final Collection<DataProviderFactory> availableLayerServices = org.constellation.provider.DataProviders.getInstance().getFactories();
         for (DataProviderFactory service: availableLayerServices) {
             this.services.put(service.getName(), service);
@@ -105,14 +105,14 @@ public class ProviderRestOld {
             this.services.put(service.getName(), service);
         }
     }
-    
+
     @GET
     @Path("restart")
     public Response restartLayerProviders() throws Exception {
         org.constellation.provider.DataProviders.getInstance().reload();
         return ok(new AcknowlegementType("Success", "All layer providers have been restarted."));
     }
-    
+
     @GET
     @Path("{id}/restart")
     public Response restartProvider(final @PathParam("id") String id) throws Exception{
@@ -136,7 +136,7 @@ public class ProviderRestOld {
            throw new CstlServiceException(ex);
         }
     }
-    
+
     @DELETE
     @Path("{id}/{deleteData}")
     public Response deleteProvider(final @PathParam("id") String providerId, final @PathParam("deleteData") boolean deleteData) throws ConfigurationException {
@@ -185,7 +185,7 @@ public class ProviderRestOld {
            throw new ConfigurationException(ex);
         }
     }
-    
+
     @POST
     @Path("{serviceName}")
     public Response createProvider(final @PathParam("serviceName") String serviceName, final InputStream providerConfig) throws ConfigurationException {
@@ -223,7 +223,7 @@ public class ProviderRestOld {
             throw new ConfigurationException("No provider service for: " + serviceName + " has been found");
         }
     }
-    
+
     @POST
     @Path("{serviceName}/{id}")
     public Response updateProvider(final @PathParam("serviceName") String serviceName, final @PathParam("id") String currentId, final Object objectRequest) throws ConfigurationException{
@@ -258,13 +258,13 @@ public class ProviderRestOld {
 
             } catch (NoSuchIdentifierException | XMLStreamException | IOException | InvalidParameterValueException ex) {
                 throw new ConfigurationException(ex);
-            } 
+            }
         } else {
             throw new ConfigurationException("No descriptor for: " + serviceName + " has been found");
         }
     }
-    
-    
+
+
     @GET
     @Path("{id}/configuration")
     public Object getProviderConfiguration(final @PathParam("id") String id) throws ConfigurationException {
@@ -287,7 +287,7 @@ public class ProviderRestOld {
             throw new ConfigurationException(ex);
         }
     }
-    
+
     @GET
     @Path("providers")
     public Response listProviderServices(){
@@ -329,8 +329,8 @@ public class ProviderRestOld {
 
         return ok(new ProvidersReport(providerServ));
     }
-    
-  
+
+
     @GET
     @Path("service/descriptor/{serviceName}")
     public Response getServiceDescriptor(final @PathParam("serviceName") String serviceName) throws ConfigurationException {
