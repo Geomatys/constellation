@@ -456,6 +456,16 @@
                                         <span translate="service.edit.dashboard.wmts.action.addnewlayer.button">Add new layer</span>
                                     </a>
                                 </div>
+                                <div ng-if="service.type.toLowerCase() === 'wps'">
+                                    <a id="showProcessToAdd"
+                                       data-toggle="modal"
+                                       class="btn btn-add btn-lg btn-block"
+                                       ng-click="showProcessToAdd()">
+                                        <span class="fa fa-plus"
+                                              style="margin-right:5px;"></span>
+                                        <span translate="service.edit.dashboard.action.add.button">Add new process</span>
+                                    </a>
+                                </div>
                                 <div class="sous-block-information sous-block-information-service">
                                     <div id="wmtsPreviewMap"
                                          class="dashboardmap data-dashboardmap"

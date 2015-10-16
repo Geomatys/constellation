@@ -1,0 +1,139 @@
+<div id="chooseProcessModal" class="modal-dialog modal-dialog-resp-height"
+     ng-class="{'modal-dialog-sld':service.type.toLowerCase() != 'sos'}">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="dismiss()">×</button>
+            <h4 class="modal-title" translate="service.edit.dashboard.action.add.process">Add Process</h4>
+        </div>
+        <div class="modal-body modal-body-style">
+            <div class="row">
+                <div class="col-xs-12 col-sm-4">
+                    <div style="padding:10px; background-color:#d3d3d3; border-radius:5px; margin-top:10px; margin-bottom:10px;">
+                        <p><b translate="service.edit.dashboard.wps.authority">Sélectionner une autorité</b></p>
+
+                        <select id="selectProcessAuthority" ng-if="task.id == null" ng-model="option.authIndex" class="form-control">
+                            <option ng-repeat="auth in processes track by $index" ng-selected="$index==option.authIndex" value="{{$index}}">{{auth.auth}}</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div style="padding-left: 0;padding-right: 0;" class="col-xs-12 col-sm-8">
+                    <div class="dashboard dashboard-internal list-style-modal">
+                        <div class="navbar sort-navbar" style="margin-bottom: 6px;">
+                            <div class="navbar-inner" style="padding-right: 10px;">
+                                <ul class="nav nav-style">
+                                    <li ng-click="clickFilter('Name')">
+                                        <a style="padding:10px;">
+                                            <span translate="label.title">Title</span>
+                                            <i class="fa fa-caret-up"
+                                               ng-if="wrap.ordertype === 'Name' && wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-down"
+                                               ng-if="wrap.ordertype === 'Name' && !wrap.orderreverse"></i>
+                                        </a>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                    <li ng-click="clickFilter('Type')">
+                                        <a style="padding:10px;">
+                                            <span translate="service.edit.dashboard.header.type">Type</span>
+                                            <i class="fa fa-caret-up"
+                                               ng-if="wrap.ordertype === 'Type' && wrap.orderreverse"></i>
+                                            <i class="fa fa-caret-down"
+                                               ng-if="wrap.ordertype === 'Type' && !wrap.orderreverse"></i>
+                                        </a>
+                                    </li>
+                                    <li class="divider-vertical"></li>
+                                </ul>
+                                <button type="button"
+                                        ng-click="wrap.ordertype='Name';wrap.orderreverse=false;wrap.filtertext='';"
+                                        class="btn btn-xs btn-task">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                                <button type="button"
+                                        ng-click="searchVisible= !searchVisible"
+                                        class="btn btn-xs btn-task">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                                <div class="pull-right col-xs-5 col-sm-5 col-md-3 col-lg-4"
+                                     style="padding-right:0;padding-left: 10px;"
+                                     ng-if="searchVisible">
+                                    <div style="position:relative;">
+                                        <input type="text"
+                                               ng-model="wrap.filtertext"
+                                               class="search-query form-control form-control-fix"
+                                               style="height: 30px;"
+                                               placeholder="{{'label.search' | translate}}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dash-inner">
+                            <div id="list" data-role="list">
+                                <div class="pagination-wrapper pagination-task">
+                                    <div class="col-xs-12" style="padding: 0;">
+                                        <strong class="col-xs-8" style="padding-right: 0;">
+                                            <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
+                                            <span class="nb-results"
+                                                  translate="label.count.process">available data</span>
+                                        </strong>
+                                        <div ng-if="service.type.toLowerCase() !== 'sos'"
+                                             class="pull-right col-xs-4"
+                                             style="padding-right:0;padding-left: 0">
+                                            <input type="checkbox"
+                                                   ng-model="dataSelect.all"
+                                                   id="selectAll"
+                                                   ng-change="selectAllData()"/>
+                                            <span translate="label.select.all">Select all</span>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-left: 0; margin-right: 0;">
+                                        <div class="col-sm-9" style="padding: 0; margin-top: 5px;"
+                                             page-switcher="{page:wrap.currentpage,size:wrap.nbbypage,count:wrap.countdata}"
+                                             on-select-page="displayPage(page)"></div>
+                                        <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                                style="padding-left: 5px;padding-right: 5px; margin-top: 5px;"
+                                                ng-model="wrap.nbbypage">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="item-list">
+                                        <div ng-repeat="process in processes[option.authIndex].processes track by $index">
+                                            <div class="item  registry"
+                                                 ng-class="{'selected':isInSelected(process)}"
+                                                 ng-click="toggleDataInArray(process)"
+                                                 data-name="{{process}}">
+                                                <div class="top">
+                                                    <span class="item-title title-modal">{{truncate(process,40)}}</span>
+                                                </div>
+                                                <div class="bottom">
+                                                    <span class="block">{{data.Type}}</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer modal-footer-list-data">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="dismiss()"
+                    translate="label.close">Close</button>
+            <button id="chooseButton"
+                    type="button"
+                    class="btn btn-add"
+                    ng-click="choose()"
+                    translate="data.modal.choose">Choose</button>
+        </div>
+    </div>
+</div>

@@ -23,7 +23,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
     .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider,
                                                      csw, sos, $modal, textService, Dashboard, Growl, $filter,
                                                      DomainResource,StyleSharedService, style, $cookieStore, $translate,
-                                                     $window) {
+                                                     $window, TaskService) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -373,6 +373,30 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                         $scope.showLayerDashboardMap();
                     }
                 );
+            });
+        };
+
+        $scope.showProcessToAdd = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/process/modalProcessChoose.html',
+                controller: 'ProcessModalController',
+                resolve: {
+                    exclude: function() { return $scope.layers; },
+                    service: function() { return $scope.service; },
+
+                    'processes' : function(){return TaskService.listProcess().$promise;}
+
+                }
+            });
+            modal.result.then(function() {
+                if ($scope.type.toLowerCase() !== 'sos') {
+                    $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
+                        Dashboard($scope, response, true);
+                        $scope.selected = null;
+                    });
+                } else {
+                    $scope.initScope();
+                }
             });
         };
 

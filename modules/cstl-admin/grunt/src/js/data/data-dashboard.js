@@ -1283,5 +1283,173 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
             }
         };
 
+    })
+
+
+    .controller('ProcessModalController', function($scope, dataListing, webService, Dashboard, $modalInstance,
+                                                service, exclude, Growl,provider,$cookieStore,$filter, TaskService, processes) {
+        /**
+         * To fix angular bug caused by nested scope issue in modal.
+         */
+        $scope.wrap = {};
+
+        $scope.wrap.nbbypage = 5;
+
+        $scope.dataSelect={all:false};
+
+        $scope.service = service;
+
+        $scope.exclude = exclude;
+
+        $scope.values = {
+            listSelect : []
+        };
+
+        $scope.dismiss = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.close = function() {
+            $modalInstance.close();
+        };
+
+        $scope.clickFilter = function(ordType){
+            $scope.wrap.ordertype = ordType;
+            $scope.wrap.orderreverse = !$scope.wrap.orderreverse;
+        };
+
+        $scope.getDefaultFilter = function() {
+            if ($scope.service.type.toLowerCase() === 'wcs') {
+                return 'coverage';
+            }
+            if ($scope.service.type.toLowerCase() === 'wfs') {
+                return 'vector';
+            }
+            return undefined;
+        };
+
+        $scope.initData = function() {
+            dataListing.listAll({}, function (response) {
+                Dashboard($scope, response, true);
+                $scope.wrap.filtertype = $scope.getDefaultFilter();
+            });
+        };
+
+        /**
+         * Proceed to select all items of modal dashboard
+         * depending on the property of checkbox selectAll.
+         */
+        $scope.selectAllData = function() {
+            var array = $filter('filter')($scope.wrap.fullList, {'Type':$scope.wrap.filtertype, '$': $scope.wrap.filtertext},$scope.wrap.matchExactly);
+            $scope.values.listSelect = ($scope.dataSelect.all) ? array.slice(0) : [];
+        };
+
+        /**
+         * binding call when clicking on each row item.
+         */
+        $scope.toggleDataInArray = function(item){
+            var itemExists = false;
+            for (var i = 0; i < $scope.values.listSelect.length; i++) {
+                if ($scope.values.listSelect[i] === item) {
+                    itemExists = true;
+                    $scope.values.listSelect.splice(i, 1);//remove item
+                    break;
+                }
+            }
+            if(!itemExists){
+                $scope.values.listSelect.push(item);
+            }
+            $scope.dataSelect.all=($scope.values.listSelect.length === $scope.wrap.fullList.length);
+        };
+
+        /**
+         * Returns true if item is in the selected items list.
+         * binding function for css purposes.
+         * @param item
+         * @returns {boolean}
+         */
+        $scope.isInSelected = function(item){
+            for(var i=0; i < $scope.values.listSelect.length; i++){
+                if($scope.values.listSelect[i] === item){
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        /**
+         * function to add data to service
+         */
+        $scope.choose = function() {
+            if ($scope.values.listSelect.length === 0) {
+                Growl('warning', 'Warning', 'No data selected!');
+                return;
+            }
+            //using angular.forEach to avoid jsHint warning when declaring function in loop
+            angular.forEach($scope.values.listSelect, function(value, key){
+                var providerId = value.Provider;
+                webService.addLayer({type: $scope.service.type, id: $scope.service.identifier},
+                    {layerAlias: value.Name,
+                        layerId: value.Name,
+                        serviceType: $scope.service.type,
+                        serviceId: $scope.service.identifier,
+                        providerId: providerId,
+                        layerNamespace: value.Namespace},
+                    function(response) {//on success
+                        Growl('success', 'Success', response.message);
+                        $scope.close();
+                    },
+                    function(response) {//on error
+                        Growl('error', 'Error', response.message);
+                        $scope.dismiss();
+                    }
+                );
+            });
+        };
+
+        $scope.truncate = function(text,length){
+            if(text) {
+                return (text.length > length) ? text.substr(0, length) + "..." : text;
+            }
+        };
+
+
+        // Private function
+        function parseProcessDefaultName(processName) {
+            var authEnd = processName.indexOf(':');
+            return [processName.substring(0, authEnd), processName.substring(authEnd+1)];
+        }
+
+        function createProcesses(processesList) {
+
+            var tree = {};
+            for (var p in processesList) {
+                if(processesList.hasOwnProperty(p)){
+                    var process = parseProcessDefaultName(processesList[p]);
+                    tree[process[0]] = tree[process[0]] || [];
+                    var codeInd = tree[process[0]].push(process[1])-1;
+                }
+            }
+
+            var procTree = [];
+            for (var auth in tree) {
+                if(tree.hasOwnProperty(auth)){
+                    var indAuth = procTree.push({
+                        'auth' : auth,
+                        'processes' : tree[auth]
+                    })-1;
+                }
+            }
+            console.log(procTree);
+            return procTree;
+        }
+
+        $scope.option = {
+            authIndex : 0
+        };
+
+        $scope.processes = createProcesses(processes.list);
+
+        $scope.initData();
     });
 
