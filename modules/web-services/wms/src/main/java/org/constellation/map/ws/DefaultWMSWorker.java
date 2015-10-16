@@ -169,6 +169,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.storage.coverage.CoverageReference;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createBoundingBox;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createDimension;
@@ -355,10 +357,25 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 continue;
             }
-            /*
-             *  TODO
-             * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
-             */
+
+            // Get default CRS for the layer supported crs.
+            Envelope layerNativeEnv = null;
+            String nativeCrs = null;
+            try {
+                layerNativeEnv = layer.getEnvelope();
+                if(layerNativeEnv!=null){
+                    CoordinateReferenceSystem crs = layerNativeEnv.getCoordinateReferenceSystem();
+                    if(crs!=null){
+                        final Integer epsgCode = IdentifiedObjects.lookupEpsgCode(crs, true);
+                        if(epsgCode!=null){
+                            nativeCrs = "EPSG:"+epsgCode;
+                        }
+                    }
+                }
+            } catch (DataStoreException | FactoryException ex) {
+                LOGGER.log(Level.INFO, "Error retrieving data crs for the layer :"+ layer.getName(), ex);
+            }
+
             GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
@@ -597,20 +614,33 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             }
 
             final AbstractBoundingBox outputBBox;
+            AbstractBoundingBox nativeBBox = null;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
                 /*
                  * TODO
-                 * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
-                 *
-                 *
                  * do we have to use the same order as WMS 1.3.0 (SOUTH WEST NORTH EAST) ???
                  */
                 outputBBox = createBoundingBox(queryVersion,
-                            "EPSG:4326",
-                            inputGeoBox.getWestBoundLongitude(),
-                            inputGeoBox.getSouthBoundLatitude(),
-                            inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0);
+                        "EPSG:4326",
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0);
+
+                if(nativeCrs!=null){
+                    try {
+                        layerNativeEnv = CRS.transform(layerNativeEnv, CRS.decode(nativeCrs, true));
+                        nativeBBox = createBoundingBox(queryVersion,
+                            nativeCrs,
+                            layerNativeEnv.getMinimum(0),
+                            layerNativeEnv.getMinimum(1),
+                            layerNativeEnv.getMaximum(0),
+                            layerNativeEnv.getMaximum(1), 0.0, 0.0);
+                    } catch (FactoryException | TransformException ex) {
+                        LOGGER.log(Level.INFO, "Error retrieving data crs for the layer :"+ layer.getName(), ex);
+                    }
+                }
+                
             } else {
                 /*
                  * TODO
@@ -622,6 +652,16 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(),
                             inputGeoBox.getEastBoundLongitude(), 0.0, 0.0);
+
+                if(nativeCrs!=null){
+                    nativeBBox = createBoundingBox(queryVersion,
+                        nativeCrs,
+                        layerNativeEnv.getMinimum(0),
+                        layerNativeEnv.getMinimum(1),
+                        layerNativeEnv.getMaximum(0),
+                        layerNativeEnv.getMaximum(1), 0.0, 0.0);
+                }
+
             }
             // we build a Style Object
             final List<DataReference> stylesName = configLayer.getStyles();
@@ -634,11 +674,26 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     styles.add(style);
                 }
             }
+
+            //list supported crs
+            final List<String> supportedCrs;
+            if(nativeCrs!=null && DEFAULT_CRS.indexOf(nativeCrs)!=0){
+                //we add or move to first position the native crs
+                supportedCrs = new ArrayList<>(DEFAULT_CRS);
+                supportedCrs.remove(nativeCrs);
+                supportedCrs.add(0, nativeCrs);
+            }else{
+                supportedCrs = DEFAULT_CRS;
+            }
+
             final AbstractGeographicBoundingBox bbox = createGeographicBoundingBox(queryVersion, inputGeoBox);
             final AbstractLayer outputLayerO = createLayer(queryVersion, layerName,
                     (_abstract != null) ? _abstract.toString() : null,
                     ( keyword  != null) ?  keyword .toString() : null,
-                    DEFAULT_CRS, bbox, outputBBox, queryable, dimensions, styles);
+                    supportedCrs, bbox, outputBBox, queryable, dimensions, styles);
+            if(nativeBBox!=null){
+                ((List)outputLayerO.getBoundingBox()).add(0, nativeBBox);
+            }
 
             final AbstractLayer outputLayer = customizeLayer(queryVersion, outputLayerO, configLayer, layer, legendUrlPng, legendUrlGif);
             outputLayers.add(outputLayer);
