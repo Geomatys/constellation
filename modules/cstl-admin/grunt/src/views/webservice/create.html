@@ -314,6 +314,267 @@
         </div>
 
 
+        <div ng-if="wpsProcessChoice">
+            <div class="col-sm-11">
+                <div>
+                    <legend style="margin-bottom:0;"><span translate="service.process.choice">Processes choice</span></legend>
+                </div>
+
+
+
+
+
+
+
+
+
+                <div class="navbar sort-navbar">
+                    <div class="navbar-inner" style="box-shadow: none">
+                        <ul class="nav nav-style">
+                            <li ng-click="wrap.ordertype='Name';wrap.orderreverse=!wrap.orderreverse">
+                                <a>
+                                    <span translate="label.title">Title</span>
+                                    <i class="fa fa-caret-up" ng-if="wrap.ordertype === 'Name' && wrap.orderreverse"></i>
+                                    <i class="fa fa-caret-down" ng-if="wrap.ordertype === 'Name' && !wrap.orderreverse"></i>
+                                </a>
+                            </li>
+                            <li class="divider-vertical"></li>
+                        </ul>
+                        <button type="button"
+                                ng-click="resetFilters();"
+                                title="{{'label.search.refresh' | translate }}"
+                                class="btn btn-xs btn-info btn-task">
+                            <i class="fa fa-times"></i>
+                        </button>
+                        <div class="pull-right quick-search-panel">
+                            <div class="col-sm-7 pull-right input-group"
+                                 ng-show="!dataCtrl.advancedMetadataSearch"
+                                 style="padding-left: 5px;padding-right: 5px;">
+                                <input type="text"
+                                       class="searchbox search-query form-control form-control-fix"
+                                       ng-model="dataCtrl.searchMetadataTerm"
+                                       onkeyup="if(event.keyCode == 13){$('.searchbtn').click(); return false;}"/>
+                        <span class="input-group-btn">
+                            <button class="btn btn-info btn-task searchbtn"
+                                    type="button"
+                                    ng-click="callSearchMD();"
+                                    title="{{'label.search' | translate}}"
+                                    style="height: 30px;margin: 0;">
+                                <i class="glyphicon glyphicon-search" style="vertical-align: top;"></i>
+                            </button>
+                        </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dash-inner row" style="padding-bottom: 10pt;">
+                <div class="pull-left"
+                     id="contentList"
+                     style="width: 80%;"
+                     ng-init="dataCtrl.smallMode=false">
+                    <div id="list" data-role="list">
+                        <div class="pagination-wrapper pagination-task">
+                            <strong class="col-md-6">
+                                <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
+                                <span class="nb-results" translate="label.count.dataset">available dataset</span>
+                            </strong>
+                            <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
+                                <button type="button"
+                                        ng-click="dataCtrl.smallMode=true"
+                                        class="pull-right btn btn-xs btn-info btn-task"
+                                        ng-class="{'btn-small-selected':dataCtrl.smallMode}"
+                                        style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
+                                    <img src="img/btn-display-reduced.svg" alt="" />
+                                </button>
+                                <button type="button"
+                                        ng-click="dataCtrl.smallMode=false"
+                                        class="pull-right btn btn-xs btn-info btn-task"
+                                        ng-class="{'btn-small-selected':!dataCtrl.smallMode}"
+                                        style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
+                                    <img src="img/btn-display-normal.svg" alt="" />
+                                </button>
+                                <p class="pull-right" style="margin-top:12px;" translate="label.display">Display :</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-9"
+                                     style="padding-left:15px; margin-top: 5px;"
+                                     page-switcher="{page:wrap.currentpage,size:wrap.nbbypage,count:wrap.countdata}"
+                                     on-select-page="displayPage(page)"></div>
+                                <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                        style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
+                                        ng-model="wrap.nbbypage">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="item-list">
+                            <div ng-repeat="dataset in wrap.dataList"
+                                 ng-class="{'col-xs-6':dataCtrl.smallMode}"
+                                 style="padding-left:0;">
+                                <div data-name="{{dataset.Name}}"
+                                     class="item registery"
+                                     ng-class="{'selected':selectedDS && (dataset.id==selectedDS.id), 'style-small':dataCtrl.smallMode}"
+                                     ng-click="selectDS(dataset);toggleDataSetFirstChild(dataset);"
+                                     ng-cloak>
+                                    <div class="top">
+                                    <span class="item-title csw-title"
+                                          title="{{dataset.Name}}">{{truncate(dataCtrl.smallMode,dataset.Name)}}</span>
+                                    <span class="pull-right text-right item-list-style"
+                                          translate="md.listing.metadata.type">METADATA</span>
+                                    </div>
+                                    <div class="bottom">
+                                        <div ng-class="{'hidden':!dataCtrl.smallMode}">
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;text-shadow: none;">
+                                                <i class="fa fa-calendar"
+                                                   tooltip data-placement="top"
+                                                   title="{{dataset.Date | date:'yyyy-MM-dd'}}"></i>
+                                            </div>
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;text-shadow: none;">
+                                                <i class="fa fa-user"
+                                                   tooltip data-placement="top"
+                                                   title="{{dataset.Owner}}"></i>
+                                            </div>
+                                        </div>
+                                        <div ng-class="{'hidden':dataCtrl.smallMode}">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{dataset.Date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{dataset.Owner}}
+                                            </div>
+                                        </div>
+                                        <div class="block pull-right" style="height:30px;text-shadow:none;position:relative;"
+                                             ng-if="dataset.MdCompletion">
+                                            <div style="width:60px;margin-top:10px;"
+                                                 tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
+                                                 tooltip-placement="top">
+                                                <progressbar max="100"
+                                                             value="dataset.MdCompletion"
+                                                             animate="true"
+                                                             class="progress-striped"
+                                                             style="margin: 0;height:12px;"
+                                                             type="{{dataset.MdCompletion<25?'danger':dataset.MdCompletion<50?'warning':dataset.MdCompletion<75?'info':'success'}}">
+                                                    <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{dataset.MdCompletion}}%</span>
+                                                </progressbar>
+                                            </div>
+                                        </div>
+                                        <div class="block pull-right">
+                                            <i class="fa fa-paperclip"></i>
+                                        <span ng-if="dataset.Children.length == 0"
+                                              translate="md.listing.no.data">No</span>
+                                            <span ng-if="dataset.Children.length > 0">{{dataset.Children.length}}</span>
+                                        <span ng-class="{'hide':dataCtrl.smallMode}"
+                                              translate="md.listing.data.associated">associated data</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-name="{{dataset.Name}}:{{relatedData.Name}}"
+                                     class="item"
+                                     style="margin-top: 0;"
+                                     ng-if="dataset.id==selectedDS.id"
+                                     ng-repeat="relatedData in dataset.Children"
+                                     ng-click="selectDataSetChild(relatedData,dataset)"
+                                     ng-cloak
+                                     ng-class="{'selected':dataCtrl.selectedDataSetChild && (relatedData.Id==dataCtrl.selectedDataSetChild.Id),
+                                            'metadata-product-vector':relatedData.Type.toLowerCase()=='vector',
+                                            'metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage',
+                                            'metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor',
+                                            'child':!dataCtrl.smallMode,
+                                            'col-xs-11':dataCtrl.smallMode,
+                                            'col-sm-offset-1':dataCtrl.smallMode,
+                                            'style-small':dataCtrl.smallMode}">
+                                    <div class="top">
+                                    <span class="item-title csw-title"
+                                          title="{{relatedData.Name}}">{{truncate(dataCtrl.smallMode,relatedData.Name)}}</span>
+                                        <span class="pull-right text-right item-list-style">{{relatedData.Type}}</span>
+                                    </div>
+                                    <div class="bottom">
+                                        <div ng-class="{'hidden':!dataCtrl.smallMode}">
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;text-shadow: none;">
+                                                <i class="fa fa-calendar"
+                                                   tooltip data-placement="top"
+                                                   title="{{relatedData.Date | date:'yyyy-MM-dd'}}"></i>
+                                            </div>
+                                            <div class="block tooltipicon"
+                                                 style="margin-top:0;text-shadow: none;">
+                                                <i class="fa fa-user"
+                                                   tooltip data-placement="top"
+                                                   title="{{relatedData.Owner}}"></i>
+                                            </div>
+                                        </div>
+                                        <div ng-class="{'hidden':dataCtrl.smallMode}">
+                                            <div class="block">
+                                                <i class="fa fa-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="fa fa-user"></i>{{relatedData.Owner}}
+                                            </div>
+                                        </div>
+                                        <div class="block pull-right"
+                                             style="height:30px;text-shadow:none;position:relative;"
+                                             ng-if="dataset.MdCompletion || relatedData.MdCompletion">
+                                            <div style="width:60px;margin-top:10px;"
+                                                 tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
+                                                 tooltip-placement="top"
+                                                 ng-init="completion=relatedData.MdCompletion?relatedData.MdCompletion:dataset.MdCompletion">
+                                                <progressbar max="100"
+                                                             value="completion"
+                                                             animate="true"
+                                                             class="progress-striped"
+                                                             style="margin: 0;height:12px;"
+                                                             type="{{completion<25?'danger':completion<50?'warning':completion<75?'info':'success'}}">
+                                                    <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{completion}}%</span>
+                                                </progressbar>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-left" style="width: 20%;">
+                    <div id="block-information-right">
+                        <div class="sous-block-information">
+                            <div>
+                                <div class="alert alert-info alert-task"
+                                     ng-if="!selectedDS && !dataCtrl.selectedDataSetChild">
+                                    <h4 translate="service.process.no.selected" style="font-size: 15px;">No selected process</h4>
+                                    <p style="font-weight:normal;"
+                                       translate="service.process.click.process">Click on a proccess to add it in wps service</p>
+                                </div>
+                                <div class="alert alert-info alert-task"
+                                     ng-if="selectedDS || dataCtrl.selectedDataSetChild">
+                                    <h4 translate="service.process.nb.selected" style="font-size: 15px;">Nb process selected</h4>
+                                </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
 
 
         <div class="row bg-white">
@@ -324,7 +585,10 @@
                 <button ng-if="serviceContact" class="btn btn-add" type="button" ng-click="goToServiceRights()" translate="create.description.next.label" id="nextButton">Next</button>
                 
                 <button ng-if="serviceRights" class="btn btn-default" type="button" ng-click="goToServiceContact()" translate="create.description.previous.label">Previous</button>
-                <button ng-if="serviceRights" class="btn btn-add" type="button" ng-click="saveServiceMetadata()" translate="label.save" id="saveButton">Save</button>
+                <button ng-if="serviceRights" class="btn btn-add" type="button" ng-click="goToProcessChoice()" translate="label.save" id="saveButton">Save</button>
+
+                <button ng-if="wpsProcessChoice" class="btn btn-default" type="button" ng-click="goToServiceRights()" translate="create.description.previous.label">Previous</button>
+                <button ng-if="wpsProcessChoice" class="btn btn-add" type="button" ng-click="saveServiceMetadata()" translate="label.save" id="saveButton">Save</button>
             </div>
         </div>
     </div>

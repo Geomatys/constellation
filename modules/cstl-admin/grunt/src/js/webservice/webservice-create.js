@@ -26,6 +26,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
         $scope.serviceInfo = true;
         $scope.serviceContact = false;
         $scope.serviceRights = false;
+        $scope.wpsProcessChoice = false;
         $scope.metadata = {
             keywords: []
         };
@@ -70,6 +71,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
                 $scope.serviceContact = true;
                 $scope.serviceInfo = false;
                 $scope.serviceRights = false;
+                $scope.wpsProcessChoice = false;
             } else {
                 $scope.invalideName=true;
             }
@@ -79,8 +81,25 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
                 $scope.serviceContact = false;
                 $scope.serviceRights = true;
                 $scope.serviceInfo = false;
+                $scope.wpsProcessChoice = false;
             } else {
                 $scope.invalideName=true;
+            }
+        };
+
+        $scope.goToProcessChoice = function() {
+            if($scope.type === 'wps'){
+                if($scope.metadata.name || $scope.metadata.identifier){
+                    $scope.serviceContact = false;
+                    $scope.serviceRights = false;
+                    $scope.serviceInfo = false;
+                    $scope.wpsProcessChoice = true;
+                } else {
+                    $scope.invalideName=true;
+                }
+            }
+            else {
+                $scope.saveServiceMetadata();
             }
         };
 
@@ -88,6 +107,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
             $scope.serviceContact = false;
             $scope.serviceRights = false;
             $scope.serviceInfo = true;
+            $scope.wpsProcessChoice = false;
         };
 
         $scope.addTag = function() {
