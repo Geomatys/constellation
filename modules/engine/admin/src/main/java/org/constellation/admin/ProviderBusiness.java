@@ -85,6 +85,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 
 import com.google.common.base.Optional;
+import java.net.URISyntaxException;
 import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.storage.coverage.CoverageReference;
 import org.geotoolkit.storage.coverage.CoverageStoreFactory;
@@ -330,149 +331,150 @@ public class ProviderBusiness implements IProviderBusiness {
     protected ParameterValueGroup fillProviderParameter(String type, String subType,
                                                         Map<String, String> inParams,
                                                         ParameterValueGroup sources)throws ConfigurationException {
-        switch (type) {
-            case "sld":
-                final String sldPath = inParams.get("path");
-                String folderPath = sldPath.substring(0, sldPath.lastIndexOf('/'));
-                sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
-                break;
 
-            case "feature-store":
-                boolean foundProvider = false;
-                try {
+        if("sld".equals(type)){
+            final String sldPath = inParams.get("path");
+            String folderPath = sldPath.substring(0, sldPath.lastIndexOf('/'));
+            sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
+            
+        }else if("observation-store".equals(type)){
+            switch (subType) {
+                // TODO : Remove this hacky switch / case when input map will have the right identifier for url parameter.
+                case "observation-file":
+                    final ParameterValueGroup ncObsParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
+                    ncObsParams.parameter("identifier").setValue("observationFile");
+                    ncObsParams.parameter("namespace").setValue("no namespace");
+                    ncObsParams.parameter("url").setValue(new File(inParams.get("path")));
+                    break;
+                case "observation-xml":
+                    final ParameterValueGroup xmlObsParams = sources.groups("choice").get(0).addGroup("ObservationXmlFileParameters");
+                    xmlObsParams.parameter("identifier").setValue("observationXmlFile");
+                    xmlObsParams.parameter("namespace").setValue("no namespace");
+                    xmlObsParams.parameter("url").setValue(new File(inParams.get("path")));
+                    break;
+                default:
+                    LOGGER.log(Level.WARNING, "error on subtype definition");
+            }
+        }
 
-                    final Path filePath;
-                    if (inParams.get("path") != null) {
-                        filePath = Paths.get(inParams.get("path"));
+
+
+        //url parameter is sometimes named path
+        String path = inParams.get("path");
+        String url = inParams.get("url");
+        if(path!=null && url==null) url = path;
+        if(path==null && url!=null) path = url;
+        //try to fix path and url to valid urls
+        path = toValidURL(path);
+        url = toValidURL(url);
+        if(path!=null) inParams.put("path", path);
+        if(url!=null) inParams.put("url", url);
+
+
+        if("feature-store".equals(type)){
+            boolean foundProvider = false;
+            try {
+
+                URL rurl = path==null ? null : new URL(path);
+                if (rurl != null) {
+                    final File file = new File(rurl.toURI());
+                    final File[] candidates;
+                    if (file.isDirectory()) {
+                        candidates = file.listFiles();
                     } else {
-                        filePath = null;
+                        candidates = new File[]{file};
                     }
-                    URL url = null;
-                    if (filePath != null) {
-                        url = filePath.toUri().toURL();
-                        final File file = filePath.toFile();
-                        final File[] candidates;
-                        if (file.isDirectory()) {
-                            candidates = file.listFiles();
-                        } else {
-                            candidates = new File[]{file};
-                        }
-                        Arrays.sort(candidates);
-                        search:
-                        for (File candidate : candidates) {
-                            final String candidateName = candidate.getName().toLowerCase();
+                    Arrays.sort(candidates);
 
-                            //loop on features file factories
-                            final Iterator<FeatureStoreFactory> ite = FeatureStoreFinder.getAllFactories(null).iterator();
-                            while (ite.hasNext()) {
-                                final FeatureStoreFactory factory = ite.next();
-                                if (factory instanceof FileFeatureStoreFactory) {
-                                    final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
-                                    for (String tempExtension : fileFactory.getFileExtensions()) {
-                                        if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("dbf")) {
-                                            //found a factory which can handle it
-                                            final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
-                                            factory.getParametersDescriptor().getName().getCode());
-                                            if(candidates.length>1 && file.isDirectory()){
-                                                url = new URL(url.toString()+candidateName);
-                                            }
-                                            params.parameter("url").setValue(url);
-                                            params.parameter("namespace").setValue("no namespace");
-                                            foundProvider = true;
-                                            break search;
-                                        }
-                                    }
-                                } else {
-                                    final ParameterValueGroup testParams = factory.getParametersDescriptor().createValue();
-                                    try {
-                                        testParams.parameter("namespace").setValue("no namespace");
-                                        final ParameterValue pv = ParametersExt.getOrCreateValue(testParams, "url");
-                                        pv.setValue(url);
+                    search:
+                    for (File candidate : candidates) {
+                        final String candidateName = candidate.getName().toLowerCase();
 
-                                        if (factory.canProcess(testParams)) {
-                                            final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
-                                                    factory.getParametersDescriptor().getName().getCode());
-                                            params.parameter("url").setValue(url);
-                                            params.parameter("namespace").setValue("no namespace");
-                                            foundProvider = true;
-                                            break search;
+                        //loop on features file factories
+                        final Iterator<FeatureStoreFactory> ite = FeatureStoreFinder.getAllFactories(null).iterator();
+                        while (ite.hasNext()) {
+                            final FeatureStoreFactory factory = ite.next();
+                            if (factory instanceof FileFeatureStoreFactory) {
+                                final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
+                                for (String tempExtension : fileFactory.getFileExtensions()) {
+                                    if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("dbf")) {
+                                        //found a factory which can handle it
+                                        final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                        factory.getParametersDescriptor().getName().getCode());
+                                        if(candidates.length>1 && file.isDirectory()){
+                                            rurl = new URL(rurl.toString()+candidateName);
                                         }
-                                    } catch (Exception ex) {
-                                        //parameter might not exist
+                                        params.parameter("url").setValue(rurl);
+                                        params.parameter("namespace").setValue("no namespace");
+                                        foundProvider = true;
+                                        break search;
                                     }
+                                }
+                            } else {
+                                final ParameterValueGroup testParams = factory.getParametersDescriptor().createValue();
+                                try {
+                                    testParams.parameter("namespace").setValue("no namespace");
+                                    final ParameterValue pv = ParametersExt.getOrCreateValue(testParams, "url");
+                                    pv.setValue(rurl);
+
+                                    if (factory.canProcess(testParams)) {
+                                        final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                                factory.getParametersDescriptor().getName().getCode());
+                                        params.parameter("url").setValue(rurl);
+                                        params.parameter("namespace").setValue("no namespace");
+                                        foundProvider = true;
+                                        break search;
+                                    }
+                                } catch (Exception ex) {
+                                    //parameter might not exist
                                 }
                             }
                         }
                     }
-
-
-                    if (subType!=null && !subType.isEmpty()) {
-                        if (url != null) {
-                            inParams.put("url",url.toString());
-                        }
-                        final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
-                        final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
-                        final ParameterValueGroup choice = ParametersExt.getOrCreateGroup(sources.groups("choice").get(0),cvgConfig.getDescriptor().getName().getCode());
-                        ParametersExt.deepCopy(cvgConfig, choice);
-                        foundProvider = true;
-                    }
-
-                    if(!foundProvider) {
-                        throw new ConfigurationException("No provider found to resolve the data!");
-                    }
-
-                } catch (MalformedURLException e) {
-                    LOGGER.log(Level.WARNING, "unable to create url from path", e);
                 }
-                break;
 
-            case "coverage-store":
-                // TODO : remove this crappy hack after provider system refactoring.
-                final String filePath = inParams.get("path");
-                if (filePath != null ) {
 
-                    try {
-                        inParams.put("path", Paths.get(filePath).toUri().toURL().toString());
-                    } catch (MalformedURLException e) {
-                     throw new CstlConfigurationRuntimeException(e);
-                    }
+                if (subType!=null && !subType.isEmpty()) {
+                    final FeatureStoreFactory featureFactory = FeatureStoreFinder.getFactoryById(subType);
+                    final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, featureFactory.getParametersDescriptor(), true);
+                    final ParameterValueGroup choice = ParametersExt.getOrCreateGroup(sources.groups("choice").get(0),cvgConfig.getDescriptor().getName().getCode());
+                    ParametersExt.deepCopy(cvgConfig, choice);
+                    foundProvider = true;
                 }
-                final CoverageStoreFactory cvgFactory = CoverageStoreFinder.getFactoryById(subType);
-                final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, cvgFactory.getParametersDescriptor(), true);
-                final ParameterValueGroup choice =
-                        sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
-                org.apache.sis.parameter.Parameters.copy(cvgConfig, choice);
-                break;
 
-            case "observation-store":
-
-                switch (subType) {
-                    // TODO : Remove this hacky switch / case when input map will have the right identifier for url parameter.
-                    case "observation-file":
-                        final ParameterValueGroup ncObsParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
-                        ncObsParams.parameter("identifier").setValue("observationFile");
-                        ncObsParams.parameter("namespace").setValue("no namespace");
-                        ncObsParams.parameter("url").setValue(new File(inParams.get("path")));
-                        break;
-
-                    case "observation-xml":
-
-                        final ParameterValueGroup xmlObsParams = sources.groups("choice").get(0).addGroup("ObservationXmlFileParameters");
-                        xmlObsParams.parameter("identifier").setValue("observationXmlFile");
-                        xmlObsParams.parameter("namespace").setValue("no namespace");
-                        xmlObsParams.parameter("url").setValue(new File(inParams.get("path")));
-                        break;
-
-                    default:
-                        LOGGER.log(Level.WARNING, "error on subtype definition");
+                if(!foundProvider) {
+                    throw new ConfigurationException("No provider found to resolve the data!");
                 }
-                break;
-            default:
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    LOGGER.log(Level.FINER, "Provider type not known");
-                }
+
+            } catch (MalformedURLException e) {
+                LOGGER.log(Level.WARNING, "unable to create url from path", e);
+            } catch (URISyntaxException e) {
+                LOGGER.log(Level.WARNING, "unable to create url from path", e);
+            }
+
+        }else if("coverage-store".equals(type)){
+            final CoverageStoreFactory cvgFactory = CoverageStoreFinder.getFactoryById(subType);
+            final ParameterValueGroup cvgConfig = Parameters.toParameter(inParams, cvgFactory.getParametersDescriptor(), true);
+            final ParameterValueGroup choice =
+                    sources.groups("choice").get(0).addGroup(cvgConfig.getDescriptor().getName().getCode());
+            org.apache.sis.parameter.Parameters.copy(cvgConfig, choice);
         }
+
         return sources;
+    }
+
+    private static String toValidURL(String candidate){
+        if(candidate==null) return candidate;
+        try {
+            new URL(candidate);
+        } catch (MalformedURLException ex) {
+            try {
+                return new File(candidate).toURI().toURL().toString();
+            } catch (MalformedURLException ex1) {
+                //we have try
+            }
+        }
+        return candidate;
     }
 
     /**

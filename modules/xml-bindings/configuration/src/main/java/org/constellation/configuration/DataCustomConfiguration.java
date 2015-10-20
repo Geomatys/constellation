@@ -205,8 +205,10 @@ public class DataCustomConfiguration {
          * Copy property values in given map
          * @param map
          */
-        public void toMap(Map map){
+        public void toMap(Map map) {
             for(Property p : getProperties()){
+                if(p.optional && p.value==null) continue;
+                
                 if(p.type!=null){
                     map.put(p.id, p.value);
                 }else{

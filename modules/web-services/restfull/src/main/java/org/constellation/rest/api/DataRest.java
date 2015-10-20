@@ -671,6 +671,17 @@ public class DataRest {
             provConfig.setSubType(selected.getId());
 
             final DataCustomConfiguration.Property props = selected.getProperty();
+            //special case for namespace, we don't want an empty string
+            //we generalize this approach for all optional parameters with empty strings
+            final List<DataCustomConfiguration.Property> properties = props.getProperties();
+            for(int i=properties.size()-1;i>=0;i--){
+                final DataCustomConfiguration.Property prop = properties.get(i);
+                final Object propValue = prop.getValue();
+                if(prop.isOptional() && propValue instanceof String && ((String)propValue).isEmpty()){
+                    properties.remove(i);
+                }
+            }
+
             props.toMap(provConfig.getParameters());
 
             final String provId = selected.getId()+UUID.randomUUID().toString();
