@@ -393,7 +393,6 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                 $scope.import.allowNext = true;
 
             },function(response){//error
-                console.debug(response);
                 Growl('error','Error',response.data);
             });
         };
@@ -685,7 +684,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
         }
     })
 
-    .controller('ModalImportCustomStep1Controller', function($scope, dataListing, Growl) {
+    .controller('ModalImportCustomStep1Controller', function($scope, dataListing, Growl,EPSGService) {
         var self = $scope;
 
         self.import.allowNext = false;
@@ -694,6 +693,7 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
         self.options = {
             config : null,
             types : [],
+            epsgCodes : null,
             selectedType : null
         };
 
@@ -712,6 +712,11 @@ angular.module('cstl-data-import', ['cstl-restapi', 'cstl-services', 'pascalprec
                     self.options.types = [];
                 }
             );
+            var codesPromise = EPSGService.getEPSGCodes().$promise;
+            codesPromise.then(function(response){
+                self.options.epsgCodes = response;
+            });
+
         };
         self.init();
 

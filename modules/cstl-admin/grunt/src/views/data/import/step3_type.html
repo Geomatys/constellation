@@ -51,7 +51,7 @@
     </div>
 
     <div class="col-xs-12" ng-show="import.enableSelectEPSGCode">
-        <label class="col-sm-12"translate="layer.listing.data.upload.selectEPSG">Select EPSG code</label>
+        <label class="col-sm-12" translate="layer.listing.data.upload.selectEPSG">Select EPSG code</label>
         <input type="text"
                ng-model="import.epsgSelected"
                typeahead="epsgCode for epsgCode in epsgList | filter:$viewValue | limitTo:8"

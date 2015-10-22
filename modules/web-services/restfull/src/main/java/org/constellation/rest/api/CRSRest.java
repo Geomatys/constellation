@@ -85,7 +85,6 @@ public class CRSRest {
     @Produces("application/json")
     public Response getAllEPSG() {
         try {
-            String filter = null;
             final CRSAuthorityFactory factory = CRS.getAuthorityFactory(Boolean.FALSE);
             final Set<String> authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
 
@@ -96,8 +95,8 @@ public class CRSRest {
             }
             return Response.ok().entity(crss).build();
         } catch (FactoryException ex) {
-            LOGGER.log(Level.WARNING, "Enable to load EPSG codes : "+ex.getMessage(), ex);
-            return Response.serverError().entity("Enable to load EPSG codes : "+ex.getMessage()).build();
+            LOGGER.log(Level.WARNING, "Unable to load EPSG codes : "+ex.getMessage(), ex);
+            return Response.serverError().entity("Unable to load EPSG codes : "+ex.getMessage()).build();
         }
     }
 
