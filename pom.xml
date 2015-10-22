@@ -1111,6 +1111,10 @@
             <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
         </repository>
         <repository>
+            <id>dev</id>
+            <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
+        </repository>
+        <repository>
             <id>geomatys</id>
             <url>http://maven.geomatys.com/</url>
         </repository>
@@ -1122,6 +1126,17 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>dev</id>
+            <url>http://dev.geomatys.com/nexus/content/repositories/releases</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven.nexus</id>
+            <name>Maven Geomatys Snapshot</name>
+            <url>http://dev.geomatys.com/nexus/content/repositories/snapshots/</url>
+            <snapshots><enabled>true</enabled></snapshots>
+            <releases><enabled>false</enabled></releases>
         </pluginRepository>
     </pluginRepositories>
 
