@@ -91,8 +91,29 @@ public class ProcessContext extends AbstractConfigurationObject {
             return processes.getFactory();
         }
     }
-
-
+    
+    public ProcessFactory getProcessFactory(String authorityCode) {
+        if (processes != null) {
+            for (ProcessFactory factory : processes.getFactory()) {
+                if (factory.getAutorityCode().equals(authorityCode)) {
+                    return factory;
+                }
+            }
+        }
+        return null;    
+    }
+    
+    public void removeProcessFactory(String authorityCode) {
+        if (processes != null) {
+            for (ProcessFactory factory : processes.getFactory()) {
+                if (factory.getAutorityCode().equals(authorityCode)) {
+                    processes.getFactory().remove(factory);
+                    return;
+                }
+            }
+        }
+    }
+    
     /**
      * @param processes the layers to set
      */

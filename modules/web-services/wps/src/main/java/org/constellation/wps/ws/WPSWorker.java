@@ -338,7 +338,7 @@ public class WPSWorker extends AbstractWorker {
             return;
         }
             // Load all processes from all factory
-            if (Boolean.TRUE == context.getProcesses().getLoadAll()) {
+            if (Boolean.TRUE.equals(context.getProcesses().getLoadAll())) {
                 LOGGER.info("Loading all process");
                 final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
                 while (factoryIte.hasNext()) {
@@ -356,7 +356,7 @@ public class WPSWorker extends AbstractWorker {
                 for (final ProcessFactory processFactory : context.getProcessFactories()) {
                     final ProcessingRegistry factory = ProcessFinder.getProcessFactory(processFactory.getAutorityCode());
                     if (factory != null) {
-                        if (Boolean.TRUE == processFactory.getLoadAll()) {
+                        if (Boolean.TRUE.equals(processFactory.getLoadAll())) {
                             LOGGER.log(Level.INFO, "loading all process for factory:{0}", processFactory.getAutorityCode());
                             for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
                                 if (WPSUtils.isSupportedProcess(descriptor)) {
