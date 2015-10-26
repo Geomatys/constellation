@@ -322,7 +322,7 @@ public class LayerBusiness implements ILayerBusiness {
             final LayerContext context = readMapConfiguration(service.getConfig());
             final MapFactory mapfactory = getMapFactory(context.getImplementation());
             final LayerSecurityFilter securityFilter = mapfactory.getSecurityFilter();
-            Layer layer = (namespace != null)?
+            Layer layer = (namespace != null && !namespace.isEmpty())?
                     layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace) :
                     layerRepository.findByServiceIdAndLayerName(service.getId(), name);
             org.constellation.configuration.Layer layerConfig = toLayerConfig(login, securityFilter, layer);
