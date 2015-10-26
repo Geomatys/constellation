@@ -13,6 +13,7 @@ public class CstlAdminLoginConfigurationService {
     private String cstlLoginURL = "login.html";
     private String cstlLogoutURL = null;
     private String cstlRefreshURL = null;
+    private String cstlProfileURL = null;
 
     public CstlAdminLoginConfigurationService() {
          LOGGER.debug("***** CstlAdminLoginConfigurationService construct *****");
@@ -52,5 +53,18 @@ public class CstlAdminLoginConfigurationService {
     public void setCstlRefreshURL(String cstlRefreshURL) {
         LOGGER.info("CSTL Refresh token page changed to " + cstlRefreshURL);
         this.cstlRefreshURL = cstlRefreshURL;
+    }
+
+    /**
+     * Profile URL
+     * @return profile URL, can be null
+     */
+    public String getCstlProfileURL() {
+        return cstlProfileURL;
+    }
+
+    public void setCstlProfileURL(String cstlProfileURL) {
+        LOGGER.info("CSTL Profile page changed to " + cstlProfileURL);
+        this.cstlProfileURL = cstlProfileURL;
     }
 }

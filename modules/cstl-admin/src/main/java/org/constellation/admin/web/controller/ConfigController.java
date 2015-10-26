@@ -106,6 +106,11 @@ public class ConfigController {
         if (refreshURL != null) {
             properties.put("cstlRefreshURL", env.getProperty("cstlRefreshURL", refreshURL));
         }
+
+        final String profileURL = cstlAdminLoginConfigurationService.getCstlProfileURL();
+        if (profileURL != null) {
+            properties.put("cstlProfileURL", env.getProperty("cstlProfileURL", profileURL));
+        }
         return properties;
     }
 

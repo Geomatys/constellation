@@ -88,6 +88,7 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
 
         AppConfigService.getConfig(function(config) {
             $scope.cstlLogoutURL = config.cstlLogoutURL || '@cstl/spring/auth/logout';
+            $scope.cstlProfileURL = config.cstlProfileURL || '#/profile';
 
             var cstlRefreshURL = config.cstlRefreshURL;
             if (cstlRefreshURL) {
