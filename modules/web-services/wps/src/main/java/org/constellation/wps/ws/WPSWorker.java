@@ -1358,7 +1358,7 @@ public class WPSWorker extends AbstractWorker {
 
                     try {
                         dataValue = WPSConvertersUtils.convertFromComplex(complex, expectedClass);
-                    } catch (UnconvertibleObjectException ex) {
+                    } catch (IllegalArgumentException ex) {
                         LOGGER.log(Level.WARNING, "Error during conversion of complex input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }

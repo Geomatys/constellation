@@ -170,6 +170,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         LOGGER.log(Level.INFO, "Shutdown executor pool");
         if (EXECUTOR != null) {
             EXECUTOR.shutdown();
+            EXECUTOR = null;
         }
     }
 

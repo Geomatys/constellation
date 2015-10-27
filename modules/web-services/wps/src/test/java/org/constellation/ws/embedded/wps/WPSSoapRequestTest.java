@@ -113,7 +113,8 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         try {
             final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
             if (service != null) {
-                service.deleteAll();
+                service.delete("wps", "default");
+                service.delete("wps", "test");
             }
         } catch (ConfigurationException ex) {
             Logging.getLogger("org.constellation.ws.embedded.wps").log(Level.WARNING, ex.getMessage());

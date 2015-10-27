@@ -41,6 +41,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import java.util.logging.Level;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.webdav.AdminWebdavService;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -64,8 +66,7 @@ import org.springframework.test.context.ActiveProfiles;
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-context.xml")
 @ActiveProfiles({"standard"})
-@Ignore //@FIXME this test break the build on jenkins see JIRA CSTL-1172, please fix this and use mock objects
-public class WPSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
+ public class WPSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
 
@@ -122,7 +123,8 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
     public static void shutDown() throws Exception {
         final IServiceBusiness service = SpringHelper.getBean(IServiceBusiness.class);
         if (service != null) {
-            service.deleteAll();
+            service.delete("wps", "default");
+            service.delete("wps", "test");
         }
         ConfigDirectory.shutdownTestEnvironement("WPSRequestTest");
         finish();
@@ -174,7 +176,7 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
 
 
         try {
-            getCapsUrl = new URL(WPS_GETCAPABILITIES);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?" + WPS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -189,6 +191,60 @@ public class WPSRequestTest extends AbstractGrizzlyServer implements Application
 
         currentUrl = responseCaps.getOperationsMetadata().getOperation("getCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
         assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?", currentUrl);
+    }
+    
+    @Ignore // TODO FIXME when GEOTK-480 is completed
+    public void testWPSExecute1() throws Exception {
+
+        waitForStart();
+        
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        postRequestFile(conec, "org/constellation/wps/xml/executeRequest.xml");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExecuteResponse);
+    }
+    
+    @Test
+    public void testWPSExecute2() throws Exception {
+
+        waitForStart();
+        
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        postRequestFile(conec, "org/constellation/wps/xml/executeRequest2.xml");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExecuteResponse);
+    }
+    
+    @Test
+    public void testWPSExecute3() throws Exception {
+
+        waitForStart();
+        
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        postRequestFile(conec, "org/constellation/wps/xml/executeRequest3.xml");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExecuteResponse);
     }
 
 }
