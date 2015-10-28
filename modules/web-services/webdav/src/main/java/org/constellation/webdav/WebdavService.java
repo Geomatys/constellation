@@ -39,17 +39,11 @@ public final class WebdavService implements ResourceFactory {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.webdav");
 
-    private final String contextPath;
+    private String contextPath;
 
     public WebdavService() {
+        setContextPath();
         final Map<String, Worker> workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
-
-        // all worker MUST have the same contextPath
-        if (!workersMap.isEmpty()) {
-            contextPath = ((WebdavWorker)workersMap.values().iterator().next()).getContextPath();
-        } else {
-            contextPath = null;
-        }
         LOGGER.log(Level.INFO, "Webdav REST service running ({0} instances)", workersMap.size());
     }
 
@@ -74,6 +68,7 @@ public final class WebdavService implements ResourceFactory {
     }
 
     private String getInstanceName(final String url) {
+        setContextPath();
         final int i = url.indexOf(contextPath);
         if (url.endsWith(contextPath) || url.endsWith(contextPath+"/")) {
             return null;
@@ -85,6 +80,18 @@ public final class WebdavService implements ResourceFactory {
             return s.substring(0, s.indexOf('/'));
         } else {
             return s;
+        }
+    }
+    
+    private void setContextPath() {
+        if (contextPath == null) {
+            final Map<String, Worker> workersMap = WSEngine.getWorkersMap(Specification.WEBDAV.name());
+            // all worker MUST have the same contextPath
+            if (!workersMap.isEmpty()) {
+                contextPath = ((WebdavWorker)workersMap.values().iterator().next()).getContextPath();
+            } else {
+                contextPath = null;
+            }
         }
     }
 }
