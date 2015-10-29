@@ -518,8 +518,13 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
 
         // Dataset deletion success callback.
         function onDatasetDeleteSuccess() {
-            Growl('success', 'Success', 'Data set '+ selection.dataset.name + ' successfully deleted');
-            selection.dataset = selection.data = null;
+            Growl('success', 'Success', 'Dataset '+ selection.dataset.name + ' successfully deleted');
+            if (selection.data) {
+                selection.data = null;
+                // If a data was selected we need to clear the preview map.
+                self.updatePreview();
+            }
+            selection.dataset = null;
             $scope.$broadcast('reloadDatasets');
         }
 
