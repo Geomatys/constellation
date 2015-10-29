@@ -194,18 +194,14 @@
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
-        <constellation.metadata.soap><![CDATA[<endpoint implementation="org.constellation.metadata.ws.soap.CSWService" name="CSWService" url-pattern="/WS-SOAP/csw/*"/>]]></constellation.metadata.soap>
         <constellation.metadata-provider>org.constellation.metadata.ws.rs.provider</constellation.metadata-provider>
         <constellation.map>org.constellation.map.ws.rs</constellation.map>
         <constellation.tile>org.constellation.wmts.ws.rs</constellation.tile>
-        <constellation.tile.soap><![CDATA[<endpoint implementation="org.constellation.wmts.ws.soap.WMTSService" name="WMTSService" url-pattern="/WS-SOAP/wmts/*"/>]]></constellation.tile.soap>
         <constellation.feature>org.constellation.wfs.ws.rs</constellation.feature>
         <constellation.provider>org.constellation.ws.rs.provider</constellation.provider>
         <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
         <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
-        <constellation.sensor.soap><![CDATA[<endpoint implementation="org.constellation.sos.ws.soap.SOService" name="SOService"  url-pattern="/WS-SOAP/sos/*"/>]]></constellation.sensor.soap>
         <constellation.wps>org.constellation.wps.ws.rs</constellation.wps>
-        <constellation.wps.soap><![CDATA[<endpoint implementation="org.constellation.wps.ws.soap.WPSService" name="WPSService" url-pattern="/WS-SOAP/wps/*"/>]]></constellation.wps.soap>
         <constellation.webdav>org.constellation.webdav</constellation.webdav>
         <constellation.services.packages>
             ${constellation.config};
@@ -220,12 +216,6 @@
             ${constellation.wps};
             ${constellation.webdav}
         </constellation.services.packages>
-        <constellation.services.soap.packages>
-            ${constellation.metadata.soap}
-            ${constellation.sensor.soap}
-            ${constellation.tile.soap}
-            ${constellation.wps.soap}
-        </constellation.services.soap.packages>
         <!-- Defines the source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -235,56 +225,48 @@
             <id>wmswcs</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.map};${constellation.coverage};${constellation.provider}</constellation.services.packages>
-                <constellation.services.soap.packages></constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>wms</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.map};${constellation.provider}</constellation.services.packages>
-                <constellation.services.soap.packages></constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>wmts</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.tile};${constellation.provider}</constellation.services.packages>
-                <constellation.services.soap.packages>${constellation.tile.soap}</constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>wcs</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.coverage};${constellation.provider}</constellation.services.packages>
-                <constellation.services.soap.packages></constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>sos</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.sensor};${constellation.provider}</constellation.services.packages>
-                <constellation.services.soap.packages>${constellation.sensor.soap}</constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>csw</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.metadata};${constellation.provider};${constellation.metadata-provider}</constellation.services.packages>
-                <constellation.services.soap.packages>${constellation.metadata.soap}</constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>wfs</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.feature}</constellation.services.packages>
-                <constellation.services.soap.packages></constellation.services.soap.packages>
             </properties>
         </profile>
         <profile>
             <id>wps</id>
             <properties>
                 <constellation.services.packages>${constellation.config};${constellation.wps};${constellation.provider}</constellation.services.packages>
-                <constellation.services.soap.packages>${constellation.wps.soap}</constellation.services.soap.packages>
             </properties>
         </profile>
     </profiles>
@@ -372,6 +354,11 @@
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-rt</artifactId>
                 <version>${jaxws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jvnet.jax-ws-commons.spring</groupId>
+                <artifactId>jaxws-spring</artifactId>
+                <version>1.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

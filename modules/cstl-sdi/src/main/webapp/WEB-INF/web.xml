@@ -164,15 +164,15 @@
     <url-pattern>/spring/*</url-pattern>
   </servlet-mapping>
 
-    <!-- SOAP enabling In Glassfish: To enable SOAP service in glassfish remove
-    the property 'metadata-complete="true"' in the web-app tag (at the top of
-    this document) In Tomcat :
-    1) Uncomment the WSServletContextListener listener.
-    2) Rename the file sun-jaxws.xml.backup in sun-jaxws.xml and uncomment the
-    endpoint you want to enable. >
-    <listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener-->
+    <!-- SOAP SERVLET -->
+  <servlet>
+    <servlet-name>jaxws-servlet</servlet-name>
+    <servlet-class>com.sun.xml.ws.transport.http.servlet.WSSpringServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>jaxws-servlet</servlet-name>
+    <url-pattern>/WS-SOAP/*</url-pattern>
+  </servlet-mapping>
 
   <!-- webdav server servlet -->
   <servlet>
