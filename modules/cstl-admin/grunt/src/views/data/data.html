@@ -241,12 +241,12 @@
                                             <h4 translate="label.no.selected.data">No selected data</h4>
                                             <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
                                         </div>
-                                        <div id="selected-item" class="selected-item" ng-if="dc.selection.dataset" ng-init="collasped=true">
-                                            <div class="block-header" ng-click="collasped=!collasped">
+                                        <div id="selected-item" class="selected-item" ng-if="dc.selection.dataset" ng-init="collapsed=true">
+                                            <div class="block-header" ng-click="collapsed=!collapsed">
                                                 <strong class="item-title title-bloc" title="{{dc.selection.dataset.name}}" ng-bind="dc.selection.dataset.name"></strong>
-                                                <i class="fa fa-chevron-down pull-right"></i>
+                                                <i class="fa pull-right" ng-class="{'fa-chevron-up':collapsed,'fa-chevron-down':!collapsed}"></i>
                                             </div>
-                                            <div slide-toggle="collasped" style="display:none">
+                                            <div slide-toggle="collapsed" style="display:none">
                                                 <div class="block-content">
                                                     <div class="row description-block">
                                                         <div class="col-sm-3 col-md-2">

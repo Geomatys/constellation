@@ -55,7 +55,7 @@ import org.opengis.util.NoSuchIdentifierException;
  * @version 1.1
  * @since 1.1
  */
-@Path("/1/WPS")
+@Path("/1/WPS/")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class WPSRest {
@@ -64,7 +64,11 @@ public class WPSRest {
     
     @Inject
     private IServiceBusiness serviceBusiness;
-    
+
+    /**
+     * Returns the list of all supported processes for WPS service.
+     * @return {code List} of pojo
+     */
     @GET
     @Path("process/all")
     public List<RegistryDTO> getAllProcess() {
@@ -89,14 +93,21 @@ public class WPSRest {
                 }
             }
             registry.setProcesses(processes);
-            
-            results.add(registry);
+            if(!processes.isEmpty()) {
+                results.add(registry);
+            }
         }
 
         return results;
 
     }
-    
+
+    /**
+     * Returns the list of processes for WPS service
+     * @param id the wps instance identifier
+     * @return {List} of pojo
+     * @throws ConfigurationException
+     */
     @GET
     @Path("{id}/process")
     public List<RegistryDTO> getProcess(final @PathParam("id") String id) throws ConfigurationException {
@@ -122,7 +133,8 @@ public class WPSRest {
                         processes.add(dto);
                     }
                 } else {
-                    for (Process p : pFacto.getInclude().getProcess()) {
+                    final List<Process> list = pFacto.getInclude().getProcess();
+                    for (Process p : list) {
                         try {
                             final ProcessDescriptor descriptor = processingRegistry.getDescriptor(p.getId());
                             final ProcessDTO dto = new ProcessDTO(descriptor.getIdentifier().getCode());
@@ -136,12 +148,20 @@ public class WPSRest {
                     }
                 }
                 registry.setProcesses(processes);
-                results.add(registry);
+                if(!processes.isEmpty()) {
+                    results.add(registry);
+                }
             }
             return results;
         }
     }
-    
+
+    /**
+     * Add processes list for WPS service
+     * @param id the wps instance identifier
+     * @param registries pojo
+     * @throws ConfigurationException
+     */
     @PUT
     @Path("{id}/process")
     public void addProcess(final @PathParam("id") String id, final RegistryListDTO registries) throws ConfigurationException {
@@ -177,7 +197,13 @@ public class WPSRest {
         // save context
         serviceBusiness.configure("WPS", id, null, context);
     }
-    
+
+    /**
+     * Remove authority for WPS service
+     * @param id the wps instance identifier
+     * @param code the authority code
+     * @throws ConfigurationException
+     */
     @DELETE
     @Path("{id}/authority/{code}")
     public void removeAuthority(final @PathParam("id") String id, final @PathParam("code") String code) throws ConfigurationException {
@@ -203,7 +229,14 @@ public class WPSRest {
         // save context
         serviceBusiness.configure("WPS", id, null, context);
     }
-    
+
+    /**
+     * remove single process for WPS service.
+     * @param id the wps instance identifier
+     * @param code the authority code
+     * @param processId the process identifier
+     * @throws ConfigurationException
+     */
     @DELETE
     @Path("{id}/process/{code}/{pid}")
     public void removeProcess(final @PathParam("id") String id, final @PathParam("code") String code, final @PathParam("pid") String processId) throws ConfigurationException {

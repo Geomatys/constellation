@@ -174,7 +174,7 @@ module.exports = function(grunt) {
                         '<%= src_dir %>/js/process/*.js',
                         '<%= src_dir %>/js/sensor/*.js',
                         '<%= src_dir %>/js/style/*.js',
-                        '<%= src_dir %>/js/webservice/*.js',
+                        '<%= src_dir %>/js/webservice/**/*.js',
                         '<%= src_dir %>/js/cstl.data.viewer.js',
                         '<%= src_dir %>/js/cstl.viewer.wmts.js'
                     ]

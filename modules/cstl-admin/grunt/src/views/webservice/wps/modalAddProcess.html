@@ -1,23 +1,27 @@
-<div id="chooseProcessModal" class="modal-dialog modal-dialog-resp-height"
-     ng-class="{'modal-dialog-sld':service.type.toLowerCase() != 'sos'}">
+<div id="chooseProcessModal" class="modal-dialog modal-dialog-resp-height modal-dialog-sld">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="dismiss()">×</button>
-            <h4 class="modal-title" translate="service.edit.dashboard.action.add.process">Add Process</h4>
+            <h4 class="modal-title" translate="service.edit.dashboard.wps.modal.add.title">Add Process</h4>
         </div>
         <div class="modal-body modal-body-style">
             <div class="row">
                 <div class="col-xs-12 col-sm-4">
-                    <div style="padding:10px; background-color:#d3d3d3; border-radius:5px; margin-top:10px; margin-bottom:10px;">
-                        <p><b translate="service.edit.dashboard.wps.authority">Sélectionner une autorité</b></p>
-
-                        <select id="selectProcessAuthority" ng-if="task.id == null" ng-model="option.authIndex" class="form-control">
-                            <option ng-repeat="auth in processes track by $index" ng-selected="$index==option.authIndex" value="{{$index}}">{{auth.auth}}</option>
+                    <div style="padding:10px; background-color:#9ccc8f; border-radius:5px; margin-top:10px; margin-bottom:10px;">
+                        <label translate="service.edit.dashboard.wps.authority" for="selectProcessAuthority"></label>
+                        <select id="selectProcessAuthority"
+                                class="form-control form-control-fix"
+                                ng-model="options.selectedAuthority"
+                                ng-change="initDashboardList()"
+                                ng-options="item as (item.name | translate) for item in options.allProcesses | orderBy:'_name'">
                         </select>
                     </div>
+                    <div ng-if="options.selectedAuthority && options.selectedAuthority != options.all"
+                         class="alert alert-task alert-info alert-data">
+                        <h4>{{options.selectedAuthority.name}}</h4>
+                        <p style="font-weight:normal;">{{'service.process.category.desc.'+options.selectedAuthority.name | translate}}</p>
+                    </div>
                 </div>
-
-
                 <div style="padding-left: 0;padding-right: 0;" class="col-xs-12 col-sm-8">
                     <div class="dashboard dashboard-internal list-style-modal">
                         <div class="navbar sort-navbar" style="margin-bottom: 6px;">
@@ -25,7 +29,7 @@
                                 <ul class="nav nav-style">
                                     <li ng-click="clickFilter('Name')">
                                         <a style="padding:10px;">
-                                            <span translate="label.title">Title</span>
+                                            <span translate="label.name">Name</span>
                                             <i class="fa fa-caret-up"
                                                ng-if="wrap.ordertype === 'Name' && wrap.orderreverse"></i>
                                             <i class="fa fa-caret-down"
@@ -33,13 +37,13 @@
                                         </a>
                                     </li>
                                     <li class="divider-vertical"></li>
-                                    <li ng-click="clickFilter('Type')">
+                                    <li ng-click="clickFilter('Auth')">
                                         <a style="padding:10px;">
-                                            <span translate="service.edit.dashboard.header.type">Type</span>
+                                            <span translate="tasks.modal.authority">Category</span>
                                             <i class="fa fa-caret-up"
-                                               ng-if="wrap.ordertype === 'Type' && wrap.orderreverse"></i>
+                                               ng-if="wrap.ordertype === 'Auth' && wrap.orderreverse"></i>
                                             <i class="fa fa-caret-down"
-                                               ng-if="wrap.ordertype === 'Type' && !wrap.orderreverse"></i>
+                                               ng-if="wrap.ordertype === 'Auth' && !wrap.orderreverse"></i>
                                         </a>
                                     </li>
                                     <li class="divider-vertical"></li>
@@ -49,14 +53,8 @@
                                         class="btn btn-xs btn-task">
                                     <i class="fa fa-times"></i>
                                 </button>
-                                <button type="button"
-                                        ng-click="searchVisible= !searchVisible"
-                                        class="btn btn-xs btn-task">
-                                    <i class="fa fa-search"></i>
-                                </button>
                                 <div class="pull-right col-xs-5 col-sm-5 col-md-3 col-lg-4"
-                                     style="padding-right:0;padding-left: 10px;"
-                                     ng-if="searchVisible">
+                                     style="padding-right:0;padding-left: 10px;">
                                     <div style="position:relative;">
                                         <input type="text"
                                                ng-model="wrap.filtertext"
@@ -73,17 +71,17 @@
                                     <div class="col-xs-12" style="padding: 0;">
                                         <strong class="col-xs-8" style="padding-right: 0;">
                                             <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
-                                            <span class="nb-results"
-                                                  translate="label.count.process">available data</span>
+                                            <span class="nb-results">{{'label.count.process' | translate}}</span>
                                         </strong>
-                                        <div ng-if="service.type.toLowerCase() !== 'sos'"
-                                             class="pull-right col-xs-4"
+                                        <div class="pull-right col-xs-4"
                                              style="padding-right:0;padding-left: 0">
                                             <input type="checkbox"
                                                    ng-model="dataSelect.all"
                                                    id="selectAll"
                                                    ng-change="selectAllData()"/>
-                                            <span translate="label.select.all">Select all</span>
+                                            <label translate="label.select.all"
+                                                   for="selectAll"
+                                                   style="font-weight: normal;">Select all</label>
                                         </div>
                                     </div>
                                     <div class="row" style="margin-left: 0; margin-right: 0;">
@@ -101,39 +99,49 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="item-list">
-                                        <div ng-repeat="process in processes[option.authIndex].processes track by $index">
-                                            <div class="item  registry"
-                                                 ng-class="{'selected':isInSelected(process)}"
-                                                 ng-click="toggleDataInArray(process)"
-                                                 data-name="{{process}}">
-                                                <div class="top">
-                                                    <span class="item-title title-modal">{{truncate(process,40)}}</span>
+                                <div class="item-list" ng-if="options.selectedAuthority">
+                                    <div ng-repeat="process in wrap.dataList track by $index">
+                                        <div class="item  process-child"
+                                             ng-class="{'selected':isInSelected(process)}"
+                                             ng-click="toggleDataInArray(process)"
+                                             data-name="{{process.Name}}">
+                                            <div class="top">
+                                                <span class="item-title title-modal">{{process.Name}}</span>
+                                                <span class="text-right item-list-style">{{process.Auth}}</span>
+                                            </div>
+                                            <div class="bottom">
+                                                <div class="block tooltipicon"
+                                                     style="margin-top:0;text-shadow: none;">
+                                                    <i class="fa fa-info-circle"
+                                                       tooltip-html-unsafe="{{process.Description}}"
+                                                       tooltip-placement="top"></i>
                                                 </div>
-                                                <div class="bottom">
-                                                    <span class="block">{{data.Type}}</span>
+                                                <div class="tooltipicon"
+                                                     style="margin-top:0;text-shadow: none;">
+                                                    <span class="block col-xs-6 col-sm-6 col-md-8 col-lg-7"
+                                                          style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{process.Description}}</span>
                                                 </div>
                                             </div>
-
                                         </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
         <div class="modal-footer modal-footer-list-data">
             <button type="button"
                     class="btn btn-default"
                     ng-click="dismiss()"
-                    translate="label.close">Close</button>
+                    translate="data.modal.cancel">Cancel</button>
             <button id="chooseButton"
+                    ng-if="values.listSelect.length > 0"
                     type="button"
-                    class="btn btn-add"
+                    class="btn btn-task"
                     ng-click="choose()"
-                    translate="data.modal.choose">Choose</button>
+                    translate="label.validate">Validate</button>
         </div>
     </div>
 </div>

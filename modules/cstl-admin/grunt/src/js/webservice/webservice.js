@@ -21,4 +21,5 @@
 angular.module('cstl-webservice', ['cstl-webservice-common',
                                    'cstl-webservice-create',
                                    'cstl-webservice-dashboard',
-                                   'cstl-webservice-edit']);
+                                   'cstl-webservice-edit',
+                                   'cstl-webservice-edit-wps']);

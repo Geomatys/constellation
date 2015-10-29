@@ -22,8 +22,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
 
     .controller('WebServiceEditController', function($rootScope, $scope, $routeParams , webService, dataListing, provider,
                                                      csw, sos, $modal, textService, Dashboard, Growl, $filter,
-                                                     DomainResource,StyleSharedService, style, $cookieStore, $translate,
-                                                     $window, TaskService) {
+                                                     DomainResource,StyleSharedService, style, $cookieStore, $translate) {
         /**
          * To fix angular bug with nested scope.
          */
@@ -35,18 +34,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
         $scope.url = $scope.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookieStore.get('cstlActiveDomainId');
-        $scope.writeOperationAvailable = $scope.type === 'csw' || $scope.type === 'sos' || $scope.type === 'wfs';
-        $scope.hideScroll = true;
-
-
-        angular.element($window).bind("scroll", function() {
-            if (this.pageYOffset < 220) {
-                $scope.hideScroll = true;
-            } else {
-                $scope.hideScroll = false;
-            }
-            $scope.$apply();
-        });
 
         $scope.getCurrentLang = function() {
             var lang = $translate.use();
@@ -171,9 +158,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                     $scope.layers = sensors.children;
 
                 }, function() { Growl('error','Error','Unable to list sensors'); });
-            } else if ($scope.type === 'wps') {
-                $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
-                //@TODO get process list
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
@@ -194,7 +178,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             $scope.wrap.orderreverse=false;
             $scope.wrap.filtertext='';
             $scope.selected=null;
-            if($scope.type !== 'csw' && $scope.type !== 'sos' && $scope.type !== 'wps') {
+            if($scope.type !== 'csw' && $scope.type !== 'sos') {
                 $scope.showLayerDashboardMap();
             }
         };
@@ -376,30 +360,6 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
             });
         };
 
-        $scope.showProcessToAdd = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/process/modalProcessChoose.html',
-                controller: 'ProcessModalController',
-                resolve: {
-                    exclude: function() { return $scope.layers; },
-                    service: function() { return $scope.service; },
-
-                    'processes' : function(){return TaskService.listProcess().$promise;}
-
-                }
-            });
-            modal.result.then(function() {
-                if ($scope.type.toLowerCase() !== 'sos') {
-                    $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
-                        Dashboard($scope, response, true);
-                        $scope.selected = null;
-                    });
-                } else {
-                    $scope.initScope();
-                }
-            });
-        };
-
         $scope.deleteLayer = function() {
             var keymsg = ($scope.service.type.toLowerCase() === 'wmts') ? "dialog.message.confirm.delete.tiledLayer" : "dialog.message.confirm.delete.layer";
             if ($scope.selected) {
@@ -574,7 +534,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
         };
 
         $scope.showLayerDashboardMap = function() {
-            if($scope.type !== 'sos' && $scope.type !== 'csw' && $scope.type !== 'wps') {
+            if($scope.type !== 'sos' && $scope.type !== 'csw') {
                 if($scope.type === 'wmts') {
                     if (WmtsLayerDashboardViewer.map) {
                         WmtsLayerDashboardViewer.map.setTarget(undefined);
