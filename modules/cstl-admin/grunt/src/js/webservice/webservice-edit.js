@@ -73,7 +73,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                 return [{ 'id': '1.1.0','checked':false}, { 'id': '2.0.0','checked':false}];
             }
             if ($scope.type === 'wcs') {
-                return [{ 'id': '1.0.0','checked':false}];
+                return [{ 'id': '1.0.0','checked':false}, { 'id': '2.0.1','checked':false}];
             }
             if ($scope.type === 'wmts') {
                 return [{ 'id': '1.0.0','checked':false}];
