@@ -1,0 +1,231 @@
+<div class="row" ng-controller="WPSEditController">
+    <div class="col-sm-8" id="contentList">
+        <div class="frame dashboard">
+            <div class="navbar title">
+                <div class="navbar-inner">
+                    <div class="brand"
+                         translate="service.edit.dashboard.process.list">Process list</div>
+                </div>
+            </div>
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner">
+                    <ul class="nav nav-style">
+                        <li ng-click="wrap.ordertype='name';wrap.orderreverse=!wrap.orderreverse">
+                            <a>
+                                <span translate="label.name">Name</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="wrap.ordertype ==='name' && wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="wrap.ordertype ==='name' && !wrap.orderreverse"></i>
+                            </a>
+                        </li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button"
+                            ng-click="clearFilters();"
+                            title="{{'label.search.refresh' | translate }}"
+                            class="btn btn-xs btn-task">
+                        <i class="fa fa-times"></i>
+                    </button>
+                    <div class="pull-right"
+                         style="padding-right:0;padding-left: 10px;">
+                        <div style="position:relative;">
+                            <input type="text"
+                                   ng-model="wrap.filtertext"
+                                   class="searchbox search-query form-control form-control-fix"
+                                   placeholder="{{'label.search' | translate}}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-inner row dashboard" ng-init="small=false">
+                <div id="list" data-role="list">
+                    <div class="pagination-wrapper pagination-task">
+                        <strong class="col-lg-6 col-xs-8 col-md-6">
+                            <span class="nb-results pull-left">{{wrap.countdata}}&nbsp;</span>
+                            <span class="nb-results">{{'label.count.categoriesOfProcess' | translate}}</span>
+                        </strong>
+                        <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
+                            <button type="button" ng-click="small=true"
+                                    class="pull-right btn btn-xs btn-info btn-task"
+                                    ng-class="{'btn-small-selected':small==true}"
+                                    style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
+                                <img src="img/btn-display-reduced.svg" alt="" />
+                            </button>
+                            <button type="button" ng-click="small=false"
+                                    class="pull-right btn btn-xs btn-info btn-task"
+                                    ng-class="{'btn-small-selected':small==false}"
+                                    style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
+                                <img src="img/btn-display-normal.svg" alt="" />
+                            </button>
+                            <p class="pull-right"
+                               style="margin-top:12px;"
+                               translate="label.display">Display :</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-9" style="padding-left:15px; margin-top: 5px;"
+                                 page-switcher="{page:wrap.currentpage,size:wrap.nbbypage,count:wrap.countdata}"
+                                 on-select-page="displayPage(page)"></div>
+                            <select class="nb-per-page input-small form-control pull-right col-xs-2 "
+                                    style="padding-left: 5px;padding-right: 5px; margin-right: 15px; margin-top: 5px;"
+                                    ng-model="wrap.nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item-list">
+                        <div ng-repeat="process in wrap.dataList"
+                             ng-class="{'col-xs-6':small}"
+                             style="padding-left:0;">
+                            <div class="item  registry"
+                                 ng-class="{selected:process.name==selected.name,'style-small':small}"
+                                 ng-click="select(process);selectChild(null);">
+                                <div class="top">
+                                    <span class="item-title">{{process.name}}</span>
+                                    <span class="pull-right text-right item-list-style hidden-xs hidden-sm"
+                                          ng-if="!small"
+                                          translate="tasks.modal.authority">Category</span>
+                                </div>
+                                <div class="bottom">
+                                    <div class="block pull-right">
+                                        <i class="fa fa-gears"></i>
+                                            <span ng-if="process.processes == null || process.processes.length == 0"
+                                                  translate="label.no.process">No process</span>
+                                            <span ng-if="process.processes.length == 1">
+                                                <span>{{process.processes.length}} </span>
+                                                <span translate="label.process">process</span>
+                                            </span>
+                                            <span ng-if="process.processes.length > 1">
+                                                <span>{{process.processes.length}} </span>
+                                                <span translate="label.processes">processes</span>
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="process.name==selected.name"
+                                 ng-repeat="child in process.processes | orderBy:'id'"
+                                 style="padding-left:0;">
+                                <div class="item child process-child"
+                                     ng-class="{'selected':child.id==values.selectedChild.id, 'style-small':small}"
+                                     ng-click="selectChild(child);">
+
+                                    <div class="top">
+                                        <span class="item-title">{{child.id}}</span>
+                                        <span ng-if="!small" class="pull-right text-right item-list-style">{{'label.process' | translate}}</span>
+                                    </div>
+                                    <div class="bottom">
+                                        <!--div class="block tooltipicon"
+                                             style="margin-top:0;text-shadow: none;">
+                                            <i class="fa fa-info-circle"
+                                               tooltip-html-unsafe="{{child.description}}"
+                                               tooltip-placement="top"></i>
+                                        </div-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div id="block-information-right">
+            <div style="padding-top:0;">
+                <div>
+                    <a id="showProcessToAdd"
+                       data-toggle="modal"
+                       class="btn btn-task btn-lg btn-block"
+                       ng-click="showProcessToAdd()">
+                        <span class="fa fa-plus"
+                              style="margin-right:5px;"></span>
+                        <span translate="service.edit.dashboard.wps.action.add.button">Add new process</span>
+                    </a>
+                </div>
+                <div class="sous-block-information sous-block-information-service">
+                    <div>
+                        <div class="alert alert-info alert-task"
+                             ng-if="!selected">
+                            <h4 translate="label.no.selected.process">No selected process</h4>
+                            <p translate="msg.no.selected.process"
+                               style="font-weight:normal;">Click on a process to display more information</p>
+                        </div>
+                        <div class="selected-item"
+                             id="selected-item"
+                             ng-if="selected"
+                             ng-init="collapsed=false">
+                            <div class="block-header block-header-process"
+                                 ng-click="collapsed=!collapsed">
+                                <strong class="item-title title-bloc"
+                                        title="{{selected.name}}">{{selected.name}}</strong>
+                                <i class="fa pull-right" ng-class="{'fa-chevron-up':collapsed,'fa-chevron-down':!collapsed}"></i>
+                            </div>
+                            <div slide-toggle="collapsed">
+                                <div class="block-content">
+                                    <div class="row description-block">
+                                        <div class="col-sm-3 col-md-2">
+                                            <i class="fa fa-gears" style="font-size: 35px;color:gray;"></i>
+                                        </div>
+                                        <div class="col-sm-9 col-md-10">
+                                            <p>{{'service.process.category.desc.'+selected.name | translate}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="block-action">
+                                    <div class="row" style="padding-bottom: 5px">
+                                        <div class="col-sm-3 col-md-2">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        id="removeCategory"
+                                                        class="btn btn-process"
+                                                        ng-click="removeCategory();"
+                                                        tooltip-placement="bottom"
+                                                        tooltip-html-unsafe="{{'service.process.button.delete.category' | translate }}">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="block-content"
+                                     ng-if="values.selectedChild">
+                                    <h6>{{values.selectedChild.id}}</h6>
+                                    <div class="row description-block" style="margin-top: 10px;">
+                                        <div class="col-sm-3 col-md-2">
+                                            <i class="fa fa-gear" style="font-size: 35px;color:gray;"></i>
+                                        </div>
+                                        <div class="col-sm-9 col-md-10">
+                                            <span>{{values.selectedChild.description}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="values.selectedChild">
+                                <div class="block-action">
+                                    <div class="row" style="padding-bottom: 5px">
+                                        <div class="col-sm-3 col-md-2">
+                                            <span class="tooltipicon">
+                                                <button type="button"
+                                                        id="removeProcess"
+                                                        class="btn btn-process"
+                                                        ng-click="removeProcess();"
+                                                        tooltip-placement="bottom"
+                                                        tooltip-html-unsafe="{{'service.process.button.delete.process' | translate }}">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

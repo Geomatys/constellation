@@ -83,12 +83,16 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane" ng-class="{active:tabdata}" ng-show="tabdata">
-                    <div class="row" ng-init="initScope()">
+                    <div ng-if="type == 'wps'"
+                         ng-include="'views/webservice/wps/dashboard.html'">
+                    </div>
+                    <div ng-if="type !== 'wps'">
+                      <div class="row" ng-init="initScope()">
                         <div class="col-sm-8" id="contentList">
                             <div class="frame dashboard">
                                 <div class="navbar title">
                                     <div class="navbar-inner">
-                                        <div ng-if="type !== 'csw' && type !== 'sos' && type !== 'wps'"
+                                        <div ng-if="type !== 'csw' && type !== 'sos'"
                                              class="brand"
                                              translate="service.edit.dashboard.layer.title">Layers list</div>
                                         <div ng-if="type === 'csw'"
@@ -97,9 +101,6 @@
                                         <div ng-if="type === 'sos'"
                                              class="brand"
                                              translate="service.edit.dashboard.sensors.list">Sensors list</div>
-                                        <div ng-if="type === 'wps'"
-                                             class="brand"
-                                             translate="service.edit.dashboard.process.list">Process list</div>
                                     </div>
                                 </div>
                                 <div class="navbar sort-navbar">
@@ -435,9 +436,8 @@
                                 </div>
                             </div>
                         </div>
-
                             <div id="block-information-right" class="col-sm-4">
-                                <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps' && service.type.toLowerCase() !== 'wmts'">
+                                <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wmts'">
                                     <a data-toggle="modal"
                                        class="btn btn-add btn-lg btn-block"
                                        ng-click="showDataToAdd()" id="showDataToAdd">
@@ -464,7 +464,7 @@
                                     <div id="layerPreviewMap"
                                          class="dashboardmap data-dashboardmap"
                                          style="padding:0;"
-                                         ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'"></div>
+                                         ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw'"></div>
                                     <div>
                                         <div class="alert alert-info alert-data"
                                              ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
@@ -742,7 +742,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                      </div>
                     </div>
                 </div>
                 <div class="tab-pane"
@@ -1236,10 +1236,4 @@
     </div>
 </div>
 
-<div scroll-to=""
-     id="backtotop"
-     class="backtotop"
-     ng-hide="hideScroll"
-     ng-if="tabdata">
-    <span class="glyphicon glyphicon-chevron-up"></span>
-</div>
+<scroll-top></scroll-top>

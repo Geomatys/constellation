@@ -359,9 +359,13 @@ angular.module('cstl-restapi', ['ngResource', 'cstl-services'])
         });
     })
 
-    .factory('ProcessService', function($resource) {
-        return $resource('@cstl/spring/admin/process;jsessionid=', {}, {
-            'get' : {method : 'GET',isArray : true}
+    .factory('WPSService', function($resource) {
+        return $resource('@cstl/api/1/WPS', {}, {
+            'getAllProcess' : {method : 'GET', url: '@cstl/api/1/WPS/process/all', isArray : true},
+            'listWPSProcess' : {method : 'GET', url: '@cstl/api/1/WPS/:id/process', isArray : true},
+            'addListProcessToWPS' : {method : 'PUT', url: '@cstl/api/1/WPS/:id/process'},
+            'removeWPSAuthority' : {method : 'DELETE', url: '@cstl/api/1/WPS/:id/authority/:code'},
+            'removeWPSProcess' : {method : 'DELETE', url: '@cstl/api/1/WPS/:id/process/:code/:pid'}
         });
     })
 

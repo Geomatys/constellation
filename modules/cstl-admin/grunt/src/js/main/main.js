@@ -113,7 +113,7 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
         $scope.buildInfo = BuildService;
     })
 
-    .controller('MainController', function($scope, $location, webService, dataListing, ProcessService, Growl, UserResource, GeneralService, TaskService) {
+    .controller('MainController', function($scope, $location, webService, dataListing, Growl, UserResource, GeneralService, TaskService) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;

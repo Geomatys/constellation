@@ -353,56 +353,13 @@ public class ConfigurationXmlBindingTest {
         comparator.compare();
 
         /////////////////////////////////////////
-        // Test ProcessContext exclude process
-        /////////////////////////////////////////
-        factories = new ArrayList<>();
-        List<Process> exclude = new ArrayList<>();
-        Process l1 = new Process();
-        l1.setId("process1");
-        Process l2 = new Process();
-        l2.setId("process2");
-        exclude.add(l1);
-        exclude.add(l2);
-        s1 = new ProcessFactory();
-        s1.setExclude(new ProcessList(exclude));
-        s1.setLoadAll(true);
-        s1.setAutorityCode("source1");
-        s2 = new ProcessFactory();
-        s2.setLoadAll(true);
-        s2.setAutorityCode("source2");
-        factories.add(s1);
-        factories.add(s2);
-        context = new ProcessContext(new Processes(factories));
-        sw = new StringWriter();
-        marshaller.marshal(context, sw);
-
-        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
-                + "<ns2:ProcessContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
-                + "    <ns2:processes>" + '\n'
-                + "        <ns2:ProcessFactory autorityCode=\"source1\" load_all=\"true\">" + '\n'
-                + "            <ns2:exclude>" + '\n'
-                + "                <ns2:Process id=\"process1\"/>" + '\n'
-                + "                <ns2:Process id=\"process2\"/>" + '\n'
-                + "            </ns2:exclude>" + '\n'
-                + "        </ns2:ProcessFactory>" + '\n'
-                + "        <ns2:ProcessFactory autorityCode=\"source2\" load_all=\"true\"/>" + '\n'
-                + "    </ns2:processes>" + '\n'
-                + "    <ns2:customParameters/>" + '\n'
-                + "</ns2:ProcessContext>\n";
-
-        result = sw.toString();
-        comparator = new XMLComparator(expresult, result);
-        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-        comparator.compare();
-
-        /////////////////////////////////////////
         // Test ProcessContext include process
         /////////////////////////////////////////
         factories = new ArrayList<>();
         List<Process> include = new ArrayList<>();
-        l1 = new Process();
+        Process l1 = new Process();
         l1.setId("process1");
-        l2 = new Process();
+        Process l2 = new Process();
         l2.setId("process2");
         include.add(l1);
         include.add(l2);

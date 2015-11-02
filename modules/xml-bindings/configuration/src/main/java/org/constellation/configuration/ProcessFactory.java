@@ -39,9 +39,6 @@ public class ProcessFactory {
     @XmlElement
     private ProcessList include;
 
-    @XmlElement
-    private ProcessList exclude;
-
     public ProcessFactory() {
 
     }
@@ -99,20 +96,4 @@ public class ProcessFactory {
         this.include = include;
     }
 
-    /**
-     * @return the exclude
-     */
-    public ProcessList getExclude() {
-        if (exclude == null) {
-            exclude = new ProcessList();
-        }
-        return exclude;
-    }
-
-    /**
-     * @param exclude the exclude to set
-     */
-    public void setExclude(final ProcessList exclude) {
-        this.exclude = exclude;
-    }
 }

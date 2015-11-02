@@ -59,6 +59,24 @@ public class ProcessList {
     public void setProcess(final List<Process> process) {
         this.process = process;
     }
+    
+    public void add(String id) {
+        if (process == null) {
+            process = new ArrayList<>();
+        }
+        this.process.add(new Process(id));
+    }
+    
+    public void remove(String id) {
+        if (process != null) {
+            for (Process p : process) {
+                if (p.getId().equals(id)) {
+                    process.remove(p);
+                    return;
+                }
+            }
+        }
+    }
 
     public boolean contains(final String id) {
         for (Process p : getProcess()) {
