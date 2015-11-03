@@ -99,6 +99,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -107,15 +112,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 
 import static org.constellation.utils.RESTfulUtilities.badRequest;
 import static org.constellation.utils.RESTfulUtilities.noContent;
 import static org.constellation.utils.RESTfulUtilities.ok;
-import org.geotoolkit.util.NamesExt;
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.sld.MutableLayer;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DISPLACEMENT;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
+import org.geotoolkit.util.NamesExt;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.opengis.sld.LayerStyle;
+import org.opengis.sld.NamedLayer;
+import org.opengis.sld.UserLayer;
+import org.opengis.util.FactoryException;
 import org.opengis.util.GenericName;
 
 /**
@@ -653,6 +671,126 @@ public final class StyleRest {
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.get("dataId") + "\"."));
     }
 
+    @POST
+    @Path("{id}/style/{styleId}/import")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces({MediaType.APPLICATION_XML})
+    public Response importStyle(final @PathParam("id") String id, 
+                                final @PathParam("styleId") String styleId,
+                               @FormDataParam("data") InputStream fileIs,
+                               @FormDataParam("data") FormDataContentDisposition fileDetail,
+                               @Context HttpServletRequest request) throws Exception {
+        
+        //copy the file content in memory
+        final byte[] buffer;
+        try{
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            IOUtilities.copy(fileIs, bos);
+            fileIs.close();
+            buffer = bos.toByteArray();
+        }catch(IOException ex){
+            LOGGER.log(Level.WARNING, "Error while retrieving SLD input", ex);
+            return Response.status(500).entity("fail while retrieving SLD input").build();
+        }
+        
+        //try to parse SLD from various form and version      
+        final List<MutableStyle> styles = new ArrayList<>();
+        final StyleXmlIO io = new StyleXmlIO();  
+        MutableStyle style = null;
+        
+        //try to parse an SLD input
+        MutableStyledLayerDescriptor sld = null;
+        try {
+            sld = io.readSLD(new ByteArrayInputStream(buffer), Specification.StyledLayerDescriptor.V_1_1_0);
+        } catch (JAXBException | FactoryException ex) {
+            LOGGER.log(Level.FINEST, ex.getMessage(),ex);
+        }
+        if(sld==null){
+            try {
+                sld = io.readSLD(new ByteArrayInputStream(buffer), Specification.StyledLayerDescriptor.V_1_0_0);
+            } catch (JAXBException | FactoryException ex) {
+                LOGGER.log(Level.FINEST, ex.getMessage(),ex);
+            }
+        }
+        
+        if(sld != null){
+            for(MutableLayer sldLayer : sld.layers()){
+                if(sldLayer instanceof NamedLayer){
+                    final NamedLayer nl = (NamedLayer) sldLayer;
+                    for(LayerStyle ls : nl.styles()){
+                        if(ls instanceof MutableStyle){
+                            styles.add((MutableStyle)ls);
+                        }
+                    }
+                }else if(sldLayer instanceof UserLayer){
+                    final UserLayer ul = (UserLayer) sldLayer;
+                    for(org.opengis.style.Style ls : ul.styles()){
+                        if(ls instanceof MutableStyle){
+                            styles.add((MutableStyle)ls);
+                        }
+                    }
+                }
+            }
+            if(!styles.isEmpty()){
+                style = styles.remove(0);
+            }
+        }else{
+            //try to parse a UserStyle input
+            try {
+                style = io.readStyle(new ByteArrayInputStream(buffer), Specification.SymbologyEncoding.V_1_1_0);
+            } catch (JAXBException | FactoryException ex) {
+                LOGGER.log(Level.FINEST, ex.getMessage(),ex);
+            }
+            if(style==null){
+                try {
+                    style = io.readStyle(new ByteArrayInputStream(buffer), Specification.SymbologyEncoding.SLD_1_0_0);
+                } catch (JAXBException | FactoryException ex) {
+                    LOGGER.log(Level.FINEST, ex.getMessage(),ex);
+                }
+            }
+        }
+        
+        if(style==null){
+            final String message = "Failed to import style from XML, no UserStyle element defined";
+            LOGGER.log(Level.WARNING, message);
+            return Response.status(500).entity("failed").build();
+        }
+        
+        //log styles which have been ignored
+        if(!styles.isEmpty()){
+            final StringBuilder sb = new StringBuilder("Ignored styles at import :");
+            for(MutableStyle ms : styles){
+                sb.append(' ').append(ms.getName());
+            }
+            LOGGER.log(Level.FINEST, sb.toString());
+        }
+                
+        //store imported style
+        style.setName(styleId);
+        return createStyle(id, (DefaultMutableStyle) style);
+    }
+    
+    @GET
+    @Path("{id}/style/{styleId}/export")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response exportStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) {
+        try{
+            final MutableStyle style = styleBusiness.getStyle(id, styleId);
+            if (style != null) {
+                final StyleXmlIO io = new StyleXmlIO();
+                final StringWriter writer = new StringWriter();
+                io.writeStyle(writer, style, Specification.StyledLayerDescriptor.V_1_1_0);
+                final String xml = writer.toString();
+                return Response.ok(xml, MediaType.APPLICATION_XML_TYPE)
+                        .header("Content-Disposition", "attachment; filename=\"" + styleId + ".xml\"").build();
+            }
+        }catch(Exception ex){
+            LOGGER.log(Level.WARNING, "Failed to write style as XML with identifier "+styleId,ex);
+            return Response.status(500).entity("failed").build();
+        }
+        return Response.status(500).entity("failed").build();
+    }
+    
     @GET
     @Path("restart")
     public Response restartStyleProviders() throws Exception {
