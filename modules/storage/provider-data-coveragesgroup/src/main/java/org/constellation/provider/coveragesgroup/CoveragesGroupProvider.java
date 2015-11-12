@@ -41,7 +41,7 @@ import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.URL;
 import org.constellation.provider.coveragesgroup.util.MapContextIO;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterValue;

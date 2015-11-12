@@ -20,7 +20,7 @@
 package org.constellation.wfs.ws;
 
 import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.filter.expression.PropertyName;
 

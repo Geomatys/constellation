@@ -46,7 +46,7 @@ import javax.xml.namespace.QName;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.lib.base.CstlLibBaseRuntimeException;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import org.opengis.util.GenericName;
 
 /**

@@ -20,7 +20,8 @@ package org.constellation.util;
 
 import javax.xml.bind.annotation.XmlValue;
 import java.util.Date;
-import org.geotoolkit.feature.type.NamesExt;
+
+import org.geotoolkit.util.NamesExt;
 import org.opengis.util.GenericName;
 
 /**

@@ -26,6 +26,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.util.NamesExt;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -45,7 +46,6 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
-import org.geotoolkit.feature.type.NamesExt;
 import org.geotoolkit.storage.coverage.CoverageReference;
 import org.geotoolkit.storage.coverage.CoverageStore;
 import org.opengis.util.GenericName;

@@ -166,7 +166,7 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import org.geotoolkit.storage.coverage.CoverageReference;
 import org.geotoolkit.storage.coverage.CoverageStore;
 import org.geotoolkit.storage.coverage.CoverageStoreFactory;

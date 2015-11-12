@@ -49,7 +49,7 @@ import static org.constellation.provider.configuration.ProviderParameters.getLay
 import static org.constellation.provider.configuration.ProviderParameters.getLayers;
 import static org.constellation.provider.configuration.ProviderParameters.getQueryLayers;
 import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.opengis.util.GenericName;
 

@@ -53,7 +53,7 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 
 import org.apache.sis.util.logging.Logging;
 import static org.junit.Assert.assertEquals;

@@ -68,7 +68,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import static org.constellation.data.om2.OM2FeatureStoreFactory.SGBDTYPE;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import org.opengis.util.GenericName;
 
 /**

@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.opengis.util.GenericName;

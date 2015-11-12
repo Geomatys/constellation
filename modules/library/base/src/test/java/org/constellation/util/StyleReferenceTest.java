@@ -18,10 +18,10 @@
  */
 package org.constellation.util;
 
+import org.geotoolkit.util.NamesExt;
 import org.junit.Test;
 
 import java.util.Date;
-import org.geotoolkit.feature.type.NamesExt;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

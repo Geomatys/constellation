@@ -44,6 +44,7 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
+import org.geotoolkit.util.NamesExt;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
@@ -79,7 +80,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.geotoolkit.feature.type.NamesExt;
 import static org.geotoolkit.utility.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;

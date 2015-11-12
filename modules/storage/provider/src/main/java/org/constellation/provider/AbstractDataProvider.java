@@ -33,7 +33,7 @@ import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_NAME_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getLayers;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import static org.geotoolkit.parameter.Parameters.stringValue;
 import org.opengis.util.GenericName;
 

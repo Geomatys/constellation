@@ -112,7 +112,7 @@ import java.util.logging.Logger;
 import static org.constellation.utils.RESTfulUtilities.badRequest;
 import static org.constellation.utils.RESTfulUtilities.noContent;
 import static org.constellation.utils.RESTfulUtilities.ok;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DISPLACEMENT;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;

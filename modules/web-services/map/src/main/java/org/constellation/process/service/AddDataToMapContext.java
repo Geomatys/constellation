@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.constellation.process.service.AddDataToMapContextDescriptor.*;
-import org.geotoolkit.feature.type.NamesExt;
+import org.geotoolkit.util.NamesExt;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import org.opengis.util.GenericName;
 
