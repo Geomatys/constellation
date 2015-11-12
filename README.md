@@ -103,3 +103,13 @@ SMTP server configuration (used to re-initialized user password) :
 * **cstl.mail.smtp.username** : Default value `no-reply@localhost`
 * **cstl.mail.smtp.password** : Default value `mypassword`
 * **cstl.mail.smtp.ssl** : Default value `false`
+
+## Contribute
+
+### Activate Git hooks
+Constellation use Git hooks to standardize commits message format.
+
+```shell
+rm .git/hooks/commit-msg
+ln -s githook/* .git/hooks/
+```
