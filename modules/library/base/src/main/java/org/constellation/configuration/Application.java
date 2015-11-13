@@ -33,7 +33,7 @@ import java.util.Properties;
  * system properties and system environment variables.
  * The resolving order is :
  * <ol>
- *     <li>System environment variables. Evaluated at runtime</li>
+ *     <li>System environment variables. Evaluated at runtime and use env variable convention naming</li>
  *     <li>System property variables (with <code>-Dvar=value</code> or <code>System.setProperty("var", "value");</code>). Evaluated at runtime</li>
  *     <li>External property file (referenced with <code>-Dcstl.config=/path/to/config.properties</code> option). Evaluated once.</li>
  *     <li>Embedded property file in resources. Evaluated once</li>
@@ -142,7 +142,8 @@ public final class Application {
      */
     public static String getProperty(String key, String fallback) {
         //check env
-        final String envValue = System.getenv(key);
+        String envKey = toEnvConvention(key);
+        final String envValue = System.getenv(envKey);
         if (envValue != null) {
             return envValue;
         }
@@ -155,6 +156,16 @@ public final class Application {
 
         //check conf
         return getProperties().getProperty(key, fallback);
+    }
+
+    /**
+     * Translate a property key from java convention ("path.to.property") into an
+     * environment variable convention ("PATH_TO_PROPERTY")
+     * @param key in java convention
+     * @return translated key
+     */
+    private static String toEnvConvention(String key) {
+        return key.toUpperCase().replace('.', '_');
     }
 
     /**
@@ -182,9 +193,10 @@ public final class Application {
         }
 
         //override with system environment variables
+        String envPrefix = toEnvConvention(prefix);
         final Map<String, String> envProps = System.getenv();
         for (Map.Entry<String, String> env : envProps.entrySet()) {
-            if (env.getKey().startsWith(prefix)) {
+            if (env.getKey().startsWith(envPrefix)) {
                 properties.put(env.getKey(), env.getValue());
             }
         }

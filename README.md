@@ -82,15 +82,17 @@ Browse  [http://localhost:8080/constellation](http://localhost:8080/constellatio
 
 ### Configuration
 Constellation retrieve his configuration through various inputs using following priority  :
-1. System environment variables
-2. Startup options (`-Dproperty=value`)
+1. System environment variables following standard naming convention
+2. Startup options (`-Dproperty=value`) following standard java properties naming convention
 3. External configuration file (referenced with `-Dcstl.config=/path/to/config.properties` option)
 4. Default embedded configuration
 
+For example, database configuration can be specified from environment variable `DATABASE_URL` or startup/external property `database.url`.
+
 #### Available configuration properties
-* **DATABASE_URL** : application database URL in Hiroku like format. Default value `postgres://cstl:admin@localhost:5432/constellation`
-* **EPSG_DATABASE_URL** : EPSG database URL. Default value same as **DATABASE_URL**
-* **TEST_DATABASE_URL** : testing database URL. Default value `postgres://test:test@localhost:5432/cstl-test`
+* **database.url** : application database URL in Hiroku like format. Default value `postgres://cstl:admin@localhost:5432/constellation`
+* **epsg.database.url** : EPSG database URL. Default value same as **database.url**
+* **epsg.database.url** : testing database URL. Default value `postgres://test:test@localhost:5432/cstl-test`
 * **cstl.config** : Path to application external configuration properties file. Optional, default null.
 * **cstl.url** : Constellation application URL. Used by Constellation to generate resources URLs.
 * **cstl.home** : Application home directory, used by Constellation to store logs, indexes, ... . Default set to `~/.constellation/`

@@ -10,19 +10,19 @@ public enum AppProperty {
      * Application database URL in Hiroku like format
      * "protocol://login:password@host:port/instance"
      */
-    CSTL_DATABASE_URL("DATABASE_URL"),
+    CSTL_DATABASE_URL("database.url"),
 
     /**
      * EPSG database URL in Hiroku like format
      * "protocol://login:password@host:port/instance"
      */
-    EPSG_DATABASE_URL("EPSG_DATABASE_URL"),
+    EPSG_DATABASE_URL("epsg.database.url"),
 
     /**
      * Testing database URL in Hiroku like format
      * "protocol://login:password@host:port/instance"
      */
-    TEST_DATABASE_URL("TEST_DATABASE_URL"),
+    TEST_DATABASE_URL("test.database.url"),
 
     /**
      * Path to application external configuration properties file
@@ -64,6 +64,7 @@ public enum AppProperty {
      */
     CSTL_MAIL_ENABLE("cstl.mail.enabled"),
 
+    //TODO update SMTP configuration properties using one single url like "smtp://user:port@host:25"
     CSTL_MAIL_SMTP_FROM("cstl.mail.smtp.from"),
     CSTL_MAIL_SMTP_HOST("cstl.mail.smtp.host"),
     CSTL_MAIL_SMTP_PORT("cstl.mail.smtp.port"),
@@ -85,5 +86,9 @@ public enum AppProperty {
 
     public String getKey() {
         return key;
+    }
+
+    public String getEnvKey() {
+        return key.toLowerCase().replace(".", "_");
     }
 }
