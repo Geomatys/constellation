@@ -117,7 +117,8 @@ public final class SOSConstants {
     static {
         ACCEPTED_OUTPUT_FORMATS = Arrays.asList(MimeType.TEXT_XML,
                                                 MimeType.APPLICATION_XML,
-                                                MimeType.TEXT_PLAIN);
+                                                MimeType.TEXT_PLAIN,
+                                                MimeType.APP_JSON);
     }
     
     /**
@@ -245,7 +246,7 @@ public final class SOSConstants {
         gcParameters.add(SERVICE_PARAMETER);
         gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "Acceptversions", Arrays.asList("1.0.0", "2.0.0")));
         gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "Sections", Arrays.asList("ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities", "All")));
-        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "AcceptFormats", Arrays.asList("text/xml")));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "AcceptFormats", ACCEPTED_OUTPUT_FORMATS));
         
         GET_CAPABILITIES = OWSXmlFactory.buildOperation("1.1.0", GET_AND_POST, gcParameters, null, "GetCapabilities");
     }

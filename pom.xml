@@ -201,6 +201,7 @@
         <constellation.provider>org.constellation.ws.rs.provider</constellation.provider>
         <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
         <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
+        <constellation.sensor-provider>org.constellation.sos.ws.rs.provider</constellation.sensor-provider>
         <constellation.wps>org.constellation.wps.ws.rs</constellation.wps>
         <constellation.webdav>org.constellation.webdav</constellation.webdav>
         <constellation.services.packages>
@@ -211,6 +212,7 @@
             ${constellation.coverage};
             ${constellation.feature};
             ${constellation.sensor};
+            ${constellation.sensor-provider};
             ${constellation.tile};
             ${constellation.metadata-provider};
             ${constellation.wps};
@@ -248,7 +250,7 @@
         <profile>
             <id>sos</id>
             <properties>
-                <constellation.services.packages>${constellation.config};${constellation.sensor};${constellation.provider}</constellation.services.packages>
+                <constellation.services.packages>${constellation.config};${constellation.sensor};${constellation.sensor-provider};${constellation.provider}</constellation.services.packages>
             </properties>
         </profile>
         <profile>

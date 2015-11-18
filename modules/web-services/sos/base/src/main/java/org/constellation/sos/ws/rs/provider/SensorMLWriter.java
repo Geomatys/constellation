@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.sos.ws.rs;
+package org.constellation.sos.ws.rs.provider;
 
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.sml.xml.AbstractSensorML;
