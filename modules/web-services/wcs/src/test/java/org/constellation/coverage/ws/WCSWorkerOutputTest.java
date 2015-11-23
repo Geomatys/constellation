@@ -330,7 +330,7 @@ public class WCSWorkerOutputTest implements ApplicationContextAware {
                     final List<DirectPositionType> pos = new ArrayList<>();
                     pos.add(new DirectPositionType(-180.0, -90.0));
                     pos.add(new DirectPositionType(180.0, 90.0));
-                    final EnvelopeType expectedEnvelope = new EnvelopeType(pos, "EPSG:4326");
+                    final EnvelopeType expectedEnvelope = new EnvelopeType(pos, "urn:ogc:def:crs:EPSG::4326");
                     // Builds expected temporal domain
                     final List<TimePositionType> expectedTimes =
                             Collections.singletonList(new TimePositionType("2003-05-16T00:00:00Z"));

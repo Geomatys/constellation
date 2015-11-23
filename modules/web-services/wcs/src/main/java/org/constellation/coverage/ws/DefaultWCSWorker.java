@@ -306,13 +306,16 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         try {
             final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
 
+            final List<EnvelopeType> envelopes = new ArrayList<>();
+
             final LonLatEnvelopeType llenvelope;
             final EnvelopeType envelope;
             if (inputGeoBox != null) {
                 final SortedSet<Number> elevations = coverageRef.getAvailableElevations();
                 final List<DirectPositionType> pos = WCSUtils.buildPositions(inputGeoBox, elevations);
                 llenvelope = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
-                envelope   = new EnvelopeType(pos, "EPSG:4326");
+                envelope   = new EnvelopeType(pos, "urn:ogc:def:crs:EPSG::4326");
+                envelopes.add(envelope);
             } else {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
@@ -323,6 +326,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
              * Spatial metadata
              */
             final EnvelopeType nativeEnvelope = new EnvelopeType(coverageRef.getEnvelope());
+
+            if (!envelopes.contains(nativeEnvelope)) {
+                envelopes.add(nativeEnvelope);
+            }
 
             GridType grid = null;
             try {
@@ -352,7 +359,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
 
             final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
-                new org.geotoolkit.wcs.xml.v100.SpatialDomainType(Arrays.asList(envelope, nativeEnvelope), Arrays.asList(grid));
+                    new org.geotoolkit.wcs.xml.v100.SpatialDomainType(envelopes, Arrays.asList(grid));
 
             // temporal metadata
             final List<Object> times = WCSUtils.formatDateList(coverageRef.getAvailableTimes());
@@ -360,7 +367,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             //TODO complete
             final RangeSetType rangeSet   = new RangeSetType(null, coverageName, coverageName, null, null, null, null);
             //supported CRS
-            final SupportedCRSsType supCRS = new SupportedCRSsType("EPSG:4326");
+            final SupportedCRSsType supCRS = new SupportedCRSsType("urn:ogc:def:crs:EPSG::4326");
             supCRS.addNativeCRSs(nativeEnvelope.getSrsName());
 
             // supported formats
@@ -440,7 +447,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
             //supported CRS
-            final List<String> supportedCRS = Arrays.asList("EPSG:4326");
+            final List<String> supportedCRS = Arrays.asList("urn:ogc:def:crs:EPSG::4326");
 
             return new CoverageDescriptionType(title, (abstractt != null) ? abstractt.toString() : null,
                     keywords, coverageName, domain, range, supportedCRS, SUPPORTED_FORMATS_111);
