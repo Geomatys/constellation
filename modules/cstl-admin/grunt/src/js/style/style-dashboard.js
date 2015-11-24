@@ -36,9 +36,9 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
             style.listAll({provider: 'sld'},function(response) {//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
-                    $scope.wrap.ordertype = "Name";
+                    $scope.wrap.ordertype = "Date";
                     $scope.wrap.filtertext='';
-                    $scope.wrap.orderreverse=false;
+                    $scope.wrap.orderreverse=true;
                     setTimeout(function(){
                         $scope.previewStyledData(null,false);
                     },300);
@@ -63,9 +63,9 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
             style.listAll({provider: 'sld'},function(response) {//success
                     Dashboard($scope, response, true);
                     $scope.wrap.filtertype = "";
-                    $scope.wrap.ordertype = "Name";
+                    $scope.wrap.ordertype = "Date";
                     $scope.wrap.filtertext='';
-                    $scope.wrap.orderreverse=false;
+                    $scope.wrap.orderreverse=true;
                 },function() {//error
                     Growl('error','Error','Unable to show styles list!');
                 }
@@ -135,6 +135,13 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
          */
         $scope.showStyleCreate = function() {
             StyleSharedService.showStyleCreate($scope);
+        };
+
+        /**
+         * Open sld editor modal to upload new style.
+         */
+        $scope.showStyleImport = function() {
+            StyleSharedService.showStyleImport($scope);
         };
 
         $scope.previewStyledData = function(data,isLayer) {
@@ -258,5 +265,90 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                     } else {return text;}
                 }
             }
+        };
+    })
+
+    .controller('StyleImportModalController', function ($rootScope, $scope, $modalInstance, style, provider,
+                                                        Growl, $cookieStore, cfpLoadingBar) {
+
+        $scope.import = {
+            styleName : '',
+            allowSubmit : false,
+            badExtension : false,
+            alreadyExistsName : null
+        };
+
+        $scope.isValidField = function(input){
+            if(input){
+                return (input.$valid || input.$pristine);
+            }
+            return true;
+        };
+
+        $scope.isValidRequired = function(input){
+            if(input){
+                return ! input.$error.required;
+            }
+            return true;
+        };
+
+        $scope.verifyExtension = function(path) {
+            var lastPointIndex = path.lastIndexOf(".");
+            var extension = path.substring(lastPointIndex+1, path.length);
+            if(extension && (extension.toLowerCase() === 'xml' || extension.toLowerCase() === 'sld')) {
+                //ok to sumbit the form
+                $scope.import.allowSubmit = true;
+                $scope.import.badExtension = false;
+            }else {
+                //bad extension then disable submitting the form
+                $scope.import.allowSubmit = false;
+                $scope.import.badExtension = true;
+            }
+        };
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.uploadStyle = function() {
+
+            //ensure that styleName is never empty, otherwise generate one.
+            var styleName = $scope.import.styleName;
+            if(! styleName){
+                styleName = 'SLD_import_'+new Date().getTime();
+            }
+
+            var $form = $('#uploadSLDform');
+            var formData = new FormData($form[0]);
+            $.ajax({
+                headers: {
+                    'access_token': $rootScope.access_token
+                },
+                url: $cookieStore.get('cstlUrl') + "api/1/SP/sld/style/"+styleName+"/import",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                beforeSend: function(){
+                    cfpLoadingBar.start();
+                    cfpLoadingBar.inc();
+                },
+                success: function (response) {
+                    Growl('success','Success','Style imported with success.');
+                    $modalInstance.close();
+                    cfpLoadingBar.complete();
+                },
+                error: function (data){
+                    if(data.responseJSON && data.responseJSON.styleAlreadyExists){
+                        Growl('error','Error','Style with name: '+styleName+' already exists!');
+                        $scope.import.alreadyExistsName = styleName;
+                    }else {
+                        Growl('error','Error','Unable to import style, please contact an administrator for more details.');
+                    }
+                    cfpLoadingBar.complete();
+                }
+            });
         };
     });

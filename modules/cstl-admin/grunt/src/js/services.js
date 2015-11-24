@@ -568,6 +568,20 @@ angular.module('cstl-services', ['cstl-restapi'])
                 });
             },
 
+            showStyleImport : function(scope) {
+                var modal = $modal.open({
+                    templateUrl: 'views/style/modalStyleImport.html',
+                    controller: 'StyleImportModalController'
+                });
+                modal.result.then(function(item) {
+                    if (scope) {
+                        style.listAll({provider: 'sld'}, function(response) {
+                            scope.wrap.fullList = response;
+                        });
+                    }
+                });
+            },
+
             showStyleEdit : function(scope, response) {
                 var modal = $modal.open({
                     templateUrl: 'views/style/modalStyleEdit.html',

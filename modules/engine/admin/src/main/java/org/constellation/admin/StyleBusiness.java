@@ -334,6 +334,27 @@ public class StyleBusiness implements IStyleBusiness {
     }
 
     /**
+     * Flag that returns if style exists for given provider and style name.
+     *
+     * @param providerId
+     *            the style provider identifier
+     * @param styleName
+     *            the style identifier
+     * @return boolean
+     * @throws TargetNotFoundException
+     *             if the provider with the specified identifier can't be found
+     */
+    @Override
+    public boolean existsStyle(final String providerId, final String styleName) throws TargetNotFoundException {
+        //may produces TargetNotFoundException if provider does not exists
+        final Provider provider = ensureExistingProvider(providerId);
+
+        //the provider is never null here, then check if the style exists in this provider
+        final Style style = styleRepository.findByNameAndProvider(provider.getId(), styleName);
+        return style != null;
+    }
+
+    /**
      *
      * @param providerId
      *            the style provider identifier

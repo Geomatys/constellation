@@ -44,6 +44,8 @@ public interface IStyleBusiness {
 
     MutableStyle getStyle(int styleId) throws TargetNotFoundException;
 
+    boolean existsStyle(final String providerId, final String styleName) throws TargetNotFoundException;
+
     void createOrUpdateStyleFromLayer(String serviceType, String serviceIdentifier, String layerName, String styleProviderId,
                                       String styleName) throws TargetNotFoundException;
 

@@ -340,6 +340,8 @@
     "label.close": "Fermer",
     "label.comparison": "Comparaison",
     "label.create.new.style": "Créer un nouveau style",
+    "label.create.button.upload.style": "Importer un fichier",
+    "label.create.button.new.style": "Créer un nouveau",
     "label.data.list": "Liste des données",
     "label.data.processed": "Données traitées",
     "label.data.pyramidal": "Données pyramidées",
@@ -952,6 +954,11 @@
     "style.listing.numberbypage.20.label": "20 styles",
     "style.listing.selected.delete.button": "Supprimer",
     "style.listing.selected.edit.button": "Éditer",
+    "style.listing.selected.export.button":"Télécharger le style au format OGC SLD",
+    "style.modal.import.title":"Import de style SLD",
+    "style.modal.import.uploadFile":"Envoyer un fichier",
+    "style.modal.import.badExtension":"Le fichier doit être de type XML",
+    "style.modal.import.nameExists":"Un style portant le même nom existe déjà.",
 
     "webservicepage.button.create.label": "Créer un service",
     "webservicepage.button.dropdown.csw.label": "Catalogues (CSW)",
@@ -1107,6 +1114,7 @@
     "tooltip.user.remove":"Supprimer cet utilisateur",
     "tooltip.group.remove":"Supprimer ce groupe",
     "tooltip.help.title":"A propos",
+    "tooltip.style.import":"Fichier de style 'Styled Layer Descriptor' SLD (*.xml)",
 
     "sensors.information.title":"Capteurs disponibles",
 

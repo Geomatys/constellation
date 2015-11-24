@@ -39,6 +39,7 @@ import org.constellation.json.binding.InterpolationPoint;
 import org.constellation.json.binding.Style;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
+import org.constellation.provider.Provider;
 import org.constellation.rest.dto.AutoIntervalValuesDTO;
 import org.constellation.rest.dto.AutoUniqueValuesDTO;
 import org.constellation.rest.dto.ChartDataModelDTO;
@@ -643,7 +644,7 @@ public final class StyleRest {
     }
 
     /**
-     * @see StyleBusiness#getStyleReport(String, String,Locale)
+     * @see StyleBusiness#getStyleReport(String, String,java.util.Locale)
      */
     @GET
     @Path("{id}/style/{styleId}/report")
@@ -671,10 +672,20 @@ public final class StyleRest {
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.get("dataId") + "\"."));
     }
 
+    /**
+     * Proceed to import style file for given provider id and style name.
+     * @param id provider identifier
+     * @param styleId the style name
+     * @param fileIs the stream
+     * @param fileDetail file detail info
+     * @param request the servlet request
+     * @return Response
+     * @throws Exception
+     */
     @POST
     @Path("{id}/style/{styleId}/import")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importStyle(final @PathParam("id") String id, 
                                 final @PathParam("styleId") String styleId,
                                @FormDataParam("data") InputStream fileIs,
@@ -767,7 +778,21 @@ public final class StyleRest {
                 
         //store imported style
         style.setName(styleId);
-        return createStyle(id, (DefaultMutableStyle) style);
+
+        try {
+            final boolean exists = styleBusiness.existsStyle(id,styleId);
+            if(!exists) {
+                styleBusiness.createStyle(id, style);
+                return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
+            }else {
+                final Map<String,Boolean> map = new HashMap<>();
+                map.put("styleAlreadyExists",true);
+                return Response.status(403).entity(map).build();
+            }
+        }catch(TargetNotFoundException ex) {
+            LOGGER.log(Level.WARNING, "The provider of style with id = "+id+" was not found.",ex);
+            return Response.status(500).entity("failed to import the style with name "+styleId+" because the given provider of style was not found.").build();
+        }
     }
     
     @GET
