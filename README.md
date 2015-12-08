@@ -41,7 +41,7 @@ For building :
 * **Maven 3.3.x** found [here](https://maven.apache.org/download.cgi)
 
 ### Download latest version
-You can download the latest version WAR [here](http://constellation-sdi.org/en/download.html).
+You can download the latest version WAR [here](http://constellation-sdi.org/en/downloads.html).
 
 ### Build from sources
 ```sh
