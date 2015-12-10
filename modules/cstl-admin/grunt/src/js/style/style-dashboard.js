@@ -293,17 +293,22 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
         };
 
         $scope.verifyExtension = function(path) {
-            var lastPointIndex = path.lastIndexOf(".");
-            var extension = path.substring(lastPointIndex+1, path.length);
-            if(extension && (extension.toLowerCase() === 'xml' || extension.toLowerCase() === 'sld')) {
-                //ok to sumbit the form
-                $scope.import.allowSubmit = true;
-                $scope.import.badExtension = false;
-            }else {
-                //bad extension then disable submitting the form
-                $scope.import.allowSubmit = false;
-                $scope.import.badExtension = true;
-            }
+            $scope.$apply( function (){
+                var lastPointIndex = path.lastIndexOf(".");
+                var extension = path.substring(lastPointIndex+1, path.length);
+                if(extension && (extension.toLowerCase() === 'xml' || extension.toLowerCase() === 'sld')) {
+                    //ok to sumbit the form
+                    $scope.import.allowSubmit = true;
+                    $scope.import.badExtension = false;
+                    if(!$scope.import.styleName) {
+                        $scope.import.styleName = path.substring(path.lastIndexOf("\\")+1,lastPointIndex);
+                    }
+                }else {
+                    //bad extension then disable submitting the form
+                    $scope.import.allowSubmit = false;
+                    $scope.import.badExtension = true;
+                }
+            });
         };
 
         $scope.close = function() {
