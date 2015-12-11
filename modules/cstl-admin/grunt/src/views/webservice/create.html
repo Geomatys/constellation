@@ -255,7 +255,7 @@
         </div>
 
 
-        <div ng-if="serviceRights">
+        <!--div ng-if="serviceRights">
             <div class="col-sm-11">
                 <div style="padding-left:20px;">
                     <legend><span translate="service.rights">Service rights</span></legend>
@@ -311,13 +311,14 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div-->
         <div class="row bg-white">
             <div class="pull-right" style="margin: 20px 30px;">
                 <button ng-if="serviceInfo" class="btn btn-add" type="button" ng-click="goToServiceContact()" translate="create.description.next.label" id="nextButton">Next</button>
 
                 <button ng-if="serviceContact" class="btn btn-default" type="button" ng-click="goToServiceInfo()" translate="create.description.previous.label">Previous</button>
-                <button ng-if="serviceContact" class="btn btn-add" type="button" ng-click="goToServiceRights()" translate="create.description.next.label" id="nextButton">Next</button>
+                <!--button ng-if="serviceContact" class="btn btn-add" type="button" ng-click="goToServiceRights()" translate="create.description.next.label" id="nextButton">Next</button-->
+                <button ng-if="serviceContact" class="btn btn-add" type="button" ng-click="saveServiceMetadata()" translate="label.save" id="nextButton">Next</button>
                 
                 <button ng-if="serviceRights" class="btn btn-default" type="button" ng-click="goToServiceContact()" translate="create.description.previous.label">Previous</button>
                 <button ng-if="serviceRights" class="btn btn-add" type="button" ng-click="saveServiceMetadata()" translate="label.save" id="saveButton">Save</button>
