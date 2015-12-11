@@ -21,7 +21,7 @@
 angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate', 'ui.bootstrap.modal'])
 
     .controller('EditSensorMLController', function ($scope,$modalInstance, $routeParams,sensor, $location, $translate,
-                                                    Growl,id,type,template) {
+                                                    Growl,id,type,template,$modal) {
 
         $scope.sensorId = id;
         $scope.sensorType = type;
@@ -127,11 +127,33 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
          * @param form
          */
         $scope.showValidationPopup = function(form) {
-            var validationPopup = $('#validationPopup');
-            validationPopup.modal("show");
-            validationPopup.off('shown.bs.modal');
-            validationPopup.on('shown.bs.modal', function (e) {
-                validationPopup.blur(); //fix bug for safari
+            var validationPopup = $modal.open({
+                templateUrl: 'validation_popup.html',
+                controller : ['$scope','metadataform', function($scope,metadataform){
+                    $scope.metadataform = metadataform;
+                }],
+                resolve: {
+                    'metadataform':function(){return form;}
+                }
+            });
+            validationPopup.result.then(function(value){
+                //nothing to do here
+            }, function () {
+                if($('#metadataform').hasClass('ng-invalid')){
+                    var selClass = '.highlight-invalid';
+                    var firstInvalid = $(selClass).get(0);
+                    if(firstInvalid){
+                        var modalBody = $(selClass).parents('.modal-body');
+                        if(modalBody && modalBody.get(0)){
+                            modalBody.animate(
+                                {scrollTop: $(firstInvalid).offset().top-200}, 1000);
+                        }else {
+                            $('html, body').animate(
+                                {scrollTop: $(firstInvalid).offset().top-200}, 1000);
+                        }
+                        $(firstInvalid).focus();
+                    }
+                }
             });
         };
 
@@ -314,23 +336,6 @@ angular.module('cstl-sensor-metadata', ['cstl-restapi', 'pascalprecht.translate'
                 }else {
                     icon.removeClass('fa-angle-down');
                     icon.addClass('fa-angle-up');
-                }
-            });
-            $(document).on('hidden.bs.modal','#validationPopup', function(e){
-                if($('#metadataform').hasClass('ng-invalid')){
-                    var selClass = '.highlight-invalid';
-                    var firstInvalid = $(selClass).get(0);
-                    if(firstInvalid){
-                        var modalBody = $(selClass).parents('.modal-body');
-                        if(modalBody && modalBody.get(0)){
-                            modalBody.animate(
-                                {scrollTop: $(firstInvalid).offset().top-200}, 1000);
-                        }else {
-                            $('html, body').animate(
-                                {scrollTop: $(firstInvalid).offset().top-200}, 1000);
-                        }
-                        $(firstInvalid).focus();
-                    }
                 }
             });
             window.collapseEditionEventsRegistered = true;

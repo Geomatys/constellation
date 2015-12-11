@@ -23,6 +23,7 @@ window.buildDataViewer = function () {
         maxExtent : undefined, //the maximum extent for the given projection
         addBackground : true,
         fullScreenControl : false,
+        enableAttributions : true,
 
         initConfig : function() {
             this.layers = [];
@@ -30,6 +31,7 @@ window.buildDataViewer = function () {
             this.projection = 'EPSG:3857';
             this.addBackground = true;
             this.fullScreenControl = false;
+            this.enableAttributions = true;
         },
 
         initMap : function(mapId){
@@ -69,13 +71,15 @@ window.buildDataViewer = function () {
 
             if(this.addBackground) {
                 //adding background layer by default OSM
-                var sourceOSM = new ol.source.OSM({
+                var osmOpts = {url:'//otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
                     attributions:[new ol.Attribution({
                         html: 'Tiles courtesy of ' +
                             '<a href="http://www.mapquest.com" target="_blank">MapQuest</a>'
-                    })],
-                    url:'//otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
-                });
+                    })]};
+                if(!this.enableAttributions) {
+                    osmOpts.attributions = null;
+                }
+                var sourceOSM = new ol.source.OSM(osmOpts);
                 var backgroundLayer = new ol.layer.Tile({
                     source: sourceOSM
                 });
@@ -114,7 +118,9 @@ window.buildDataViewer = function () {
             this.map.on("pointerdrag", function (evt) {
                 var target = this.getTarget();
                 var jTarget = typeof target === "string" ? $("#" + target) : $(target);
-                jTarget.css("cursor", "move");
+                if(jTarget.css("cursor") !== 'crosshair') {
+                    jTarget.css("cursor", "move");
+                }
             });
             this.map.on("moveend", function (evt) {
                 var target = this.getTarget();
@@ -421,3 +427,5 @@ window.DataDashboardViewer = window.buildDataViewer();
 window.LayerDashboardViewer = window.buildDataViewer();
 window.MapContextDashboardViewer = window.buildDataViewer();
 window.StyleDashboardViewer = window.buildDataViewer();
+window.MetadataEditorViewer = window.buildDataViewer();
+

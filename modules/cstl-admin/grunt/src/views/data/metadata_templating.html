@@ -66,6 +66,16 @@
             </div>
         </div>
     </div>
+    <div ng-if="blockObj.block.render == 'BOUNDINGBOX'"
+         class="buttons-block">
+        <button type="button"
+                class="btn btn-default"
+                ng-click="openBboxModal(blockObj);"
+                title="{{'metadata.edition.block.bbox.tooltip' | translate}}">
+            <i class="fa fa-globe"></i>
+            {{'metadata.edition.block.bbox.label' | translate}}
+        </button>
+    </div>
 </div>
 <li ng-if="fieldObj.field" style="padding-left: 2px;"
         data-id="{{blockObj.block.name}}_{{blockIndex}}_{{fieldObj.field.name}}_{{$index}}">

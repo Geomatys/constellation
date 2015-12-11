@@ -55,19 +55,14 @@
                             </button>
                         </div>
                     </form>
-                    <div id="validationPopup"
-                         class="modal fade"
-                         style="overflow:hidden;"
-                         tabindex="-1"
-                         role="dialog"
-                         aria-labelledby="modalValidTitle"
-                         aria-hidden="true">
+
+                    <script type="text/ng-template"  id="validation_popup.html">
                         <div class="modal-dialog" style="width: 400px;margin-top: 90pt;">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button"
                                             class="close"
-                                            data-dismiss="modal"
+                                            ng-click="$dismiss()"
                                             aria-hidden="true">×</button>
                                     <h4 id="modalValidTitle"
                                         class="modal-title"
@@ -81,7 +76,7 @@
                                         </div>
                                         <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" style="margin-top: 8pt;">
                                             <span style="margin: 13pt 5pt;"
-                                              translate="metadata.edition.heading.check.validation.passed">Well done ! your current form is valid.</span>
+                                                  translate="metadata.edition.heading.check.validation.passed">Well done ! your current form is valid.</span>
                                         </div>
                                     </div>
                                     <div ng-if="metadataform.$invalid" class="row" style="margin:0;">
@@ -97,11 +92,79 @@
                                 <div class="modal-footer">
                                     <button type="button"
                                             class="btn btn-default"
-                                            data-dismiss="modal">Ok</button>
+                                            ng-click="$dismiss()">Ok</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </script>
+
+                    <script type="text/ng-template"  id="bbox_popup.html">
+                        <div class="modal-dialog" style="margin-top:5px;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button"
+                                            class="close"
+                                            ng-click="$dismiss()"
+                                            aria-hidden="true">×</button>
+                                    <h4 class="modal-title">{{'metadata.edition.bbox.title' | translate}}</h4>
+                                </div>
+                                <div class="modal-body" style="padding:20px 20px 2px 20px;">
+                                    <div style="position: relative">
+                                        <div id="bboxMap" class="md-editor-bbox-map"></div>
+                                        <div class="ol-control" style="position: absolute;top:80px;left:8px;">
+                                            <button ng-click="bboxCtrl.toggleControlDragBox()"
+                                                    ng-style="bboxCtrl.bboxOptions.enableDragBoxControl ? {'background-color':'#7b98bc'}:{'background-color':'#c1c1c1'}"
+                                                    title="{{'metadata.edition.bbox.dragbox' | translate}}">
+                                                <span class="fa fa-edit"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="container-fluid" style="margin-top: 12px;">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label style="font-weight: normal;">{{'metadata.edition.bbox.west' | translate}}</label>
+                                                <input type="number"
+                                                       ng-model="bboxCtrl.bboxOptions.west"
+                                                       ng-change="bboxCtrl.onChangeBboxCoords()"
+                                                       class="form-control form-control-fix"/>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label style="font-weight: normal;">{{'metadata.edition.bbox.south' | translate}}</label>
+                                                <input type="number"
+                                                       ng-model="bboxCtrl.bboxOptions.south"
+                                                       ng-change="bboxCtrl.onChangeBboxCoords()"
+                                                       class="form-control form-control-fix"/>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top: 5px;">
+                                            <div class="col-md-6">
+                                                <label style="font-weight: normal;">{{'metadata.edition.bbox.east' | translate}}</label>
+                                                <input type="number"
+                                                       ng-model="bboxCtrl.bboxOptions.east"
+                                                       ng-change="bboxCtrl.onChangeBboxCoords()"
+                                                       class="form-control form-control-fix"/>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label style="font-weight: normal;">{{'metadata.edition.bbox.north' | translate}}</label>
+                                                <input type="number"
+                                                       ng-model="bboxCtrl.bboxOptions.north"
+                                                       ng-change="bboxCtrl.onChangeBboxCoords()"
+                                                       class="form-control form-control-fix"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button"
+                                            class="btn btn-default"
+                                            ng-click="$dismiss()">{{'data.modal.cancel' | translate}}</button>
+                                    <button type="button"
+                                            class="btn btn-add"
+                                            ng-click="bboxCtrl.saveBboxValues()">{{'metadata.edition.bbox.save' | translate}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </script>
                 </div>
             </div>
         </div>
