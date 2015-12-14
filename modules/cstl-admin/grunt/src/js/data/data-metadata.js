@@ -725,7 +725,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             MetadataEditorViewer.enableDragBoxControl = self.bboxOptions.enableDragBoxControl;
             setTimeout(function(){
                 self.showBboxViewer();
-            },200);
+            },400);
         };
 
         self.toggleControlDragBox = function() {
