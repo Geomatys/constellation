@@ -738,13 +738,13 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
                 var fields = blockObj.block.children;
                 for(var i = 0; i< fields.length;i++) {
                     if(fields[i].field && fields[i].field.name.indexOf('westBoundLongitude') !==-1 && fields[i].field.value){
-                        self.bboxOptions.west = fields[i].field.value;
+                        self.bboxOptions.west = Number(fields[i].field.value);
                     }else if(fields[i].field && fields[i].field.name.indexOf('eastBoundLongitude') !==-1 && fields[i].field.value){
-                        self.bboxOptions.east = fields[i].field.value;
+                        self.bboxOptions.east = Number(fields[i].field.value);
                     }else if(fields[i].field && fields[i].field.name.indexOf('northBoundLatitude') !==-1 && fields[i].field.value){
-                        self.bboxOptions.north = fields[i].field.value;
+                        self.bboxOptions.north = Number(fields[i].field.value);
                     }else if(fields[i].field && fields[i].field.name.indexOf('southBoundLatitude') !==-1 && fields[i].field.value){
-                        self.bboxOptions.south = fields[i].field.value;
+                        self.bboxOptions.south = Number(fields[i].field.value);
                     }
                 }
             }
