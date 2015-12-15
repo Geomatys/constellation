@@ -82,6 +82,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-wps</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.engine</groupId>
             <artifactId>cstl-engine-process-core</artifactId>
             <version>${project.version}</version>
@@ -111,18 +116,22 @@
             <artifactId>cstl-json-metadata</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
         <dependency>
           <groupId>org.constellation.engine</groupId>
           <artifactId>cstl-engine-spring-security</artifactId>
           <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.constellation.testing</groupId>
+            <artifactId>cstl-test-embedded</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Geomatys external project -->
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-coverage-xml</artifactId>
-            <version>${geotoolkit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>

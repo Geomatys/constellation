@@ -50,6 +50,10 @@ public class RegistryDTO {
     public List<ProcessDTO> getProcesses() {
         return processes;
     }
+    
+    public int getSize() {
+        return processes.size();
+    }
 
     public void setProcesses(List<ProcessDTO> processes) {
         this.processes = processes;

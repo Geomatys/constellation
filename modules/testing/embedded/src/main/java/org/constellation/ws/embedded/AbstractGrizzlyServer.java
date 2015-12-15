@@ -126,9 +126,9 @@ public abstract class AbstractGrizzlyServer {
                 suffix = "";
             }
             if (grizzly != null && grizzly.getCurrentPort() != null) {
-                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/1/user/access");
+                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/1/OGC/spec/list");
             } else {
-                u = new URL("http://localhost:9090/1/user/access");
+                u = new URL("http://localhost:9090//1/OGC/spec/list");
             }
             ex = false;
             URLConnection conec = u.openConnection();

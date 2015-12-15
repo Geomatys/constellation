@@ -49,6 +49,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.constellation.wps.configuration.WPSConfigurer;
 
 /**
  * Restfull main configuration service
@@ -198,6 +199,12 @@ public class AdminRest {
             }catch(Exception ex){
                 count = 0;
             }
+        } else if("wps".equalsIgnoreCase(service.getType())){
+            try {
+                count = getWPSConfigurer().getProcessCount(service.getIdentifier());
+            }catch(Exception ex){
+                count = 0;
+            }
         } else {
             count = layerRepository.findByServiceId(service.getId()).size();
         }
@@ -215,5 +222,9 @@ public class AdminRest {
 
     private SOSConfigurer getSOSConfigurer() throws NotRunningServiceException {
         return (SOSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.SOS);
+    }
+    
+    private WPSConfigurer getWPSConfigurer() throws NotRunningServiceException {
+        return (WPSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.WPS);
     }
 }
