@@ -759,10 +759,8 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             }
             MetadataEditorViewer.initConfig();
             MetadataEditorViewer.enableAttributions = false;
-            var bboxExists = (self.bboxOptions.north && self.bboxOptions.north !== 90.0 &&
-                self.bboxOptions.south && self.bboxOptions.south !== -90.0 &&
-                self.bboxOptions.west && self.bboxOptions.west !== -180.0 &&
-                self.bboxOptions.east && self.bboxOptions.east !== 180.0);
+            var bboxExists = (self.bboxOptions.north && self.bboxOptions.south && self.bboxOptions.west && self.bboxOptions.east) &&
+                (self.bboxOptions.north !== 90.0 || self.bboxOptions.south !== -90.0 || self.bboxOptions.west !== -180.0 || self.bboxOptions.east !== 180.0);
             if (bboxExists) {
                 var minX = self.bboxOptions.west;
                 var minY = self.bboxOptions.south;
