@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 public class WPSProcessListener implements ProcessListener{
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.wps.ws");
-    private static final int TIMEOUT = 20000; //processing time step
+    private static final int TIMEOUT = 200; //processing time step
 
     private final Execute request;
     private final ExecuteResponse responseDoc;
@@ -99,14 +99,23 @@ public class WPSProcessListener implements ProcessListener{
             if (currentTimestamp >= (nextTimestamp)){
                 //LOGGER.log(Level.INFO, "Process {0} is progressing : {1}.", new Object[]{WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()), event.getProgress()});
                 nextTimestamp += TIMEOUT;
-                final StatusType status = new StatusType();
-                status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
-                final ProcessStartedType started = new ProcessStartedType();
-                started.setValue("Process " + request.getIdentifier().getValue() + " is pending");
-                started.setPercentCompleted((int) event.getProgress());
-                status.setProcessStarted(started);
-                responseDoc.setStatus(status);
-                WPSUtils.storeResponse(responseDoc, folderPath, fileName);
+                try {
+                    final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
+                    final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
+                    WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc,
+                            event.getOutput(), parameters, true);
+                    final StatusType status = new StatusType();
+                    status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
+                    final ProcessStartedType started = new ProcessStartedType();
+                    started.setValue("Process " + request.getIdentifier().getValue() + " is pending");
+                    started.setPercentCompleted((int) event.getProgress());
+                    status.setProcessStarted(started);
+                    responseDoc.setStatus(status);
+                    responseDoc.setProcessOutputs(outputs);
+                    WPSUtils.storeResponse(responseDoc, folderPath, fileName);
+                } catch (CstlServiceException ex) {
+                    writeException(ex);
+                }
             }
         }
     }
@@ -117,7 +126,8 @@ public class WPSProcessListener implements ProcessListener{
         try {
             final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), parameters);
+            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc,
+                    event.getOutput(), parameters, false);
             final StatusType status = new StatusType();
             status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
             status.setProcessSucceeded("Process completed.");

@@ -1161,7 +1161,7 @@ public class WPSWorker extends AbstractWorker {
 
                     //no error - fill response outputs.
                     final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-                    fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, parameters);
+                    fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, parameters, false);
                     response.setProcessOutputs(outputs);
                     status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
                     status.setProcessSucceeded("Process completed.");
@@ -1423,10 +1423,12 @@ public class WPSWorker extends AbstractWorker {
      * @param processOutputDesc The descriptors of the geotk process outputs.
      * @param result The values which have been filled by the process.
      * @param parameters URL of the WPS service.
+     * @param progressing True if the process is still in progress, for intermediate results.
      * @throws CstlServiceException If one of the outputs is invalid.
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
-            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final Map<String, Object> parameters)
+            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final Map<String, Object> parameters,
+            final boolean progressing)
             throws CstlServiceException {
         if (result == null) {
             throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
@@ -1456,7 +1458,9 @@ public class WPSWorker extends AbstractWorker {
             if (outputDescriptor instanceof ParameterDescriptor) {
                 //output value object.
                 final Object outputValue = result.parameter(outputIdentifierCode).getValue();
-                outputs.getOutput().add(createDocumentResponseOutput((ParameterDescriptor) outputDescriptor, outputsRequest, outputValue, parameters));
+                if (!progressing || (progressing && outputValue != null)) {
+                	outputs.getOutput().add(createDocumentResponseOutput((ParameterDescriptor) outputDescriptor, outputsRequest, outputValue, parameters));
+                }
             } else if (outputDescriptor instanceof ParameterDescriptorGroup) {
                 /**
                  * TODO: Treat ParameterValueGroup for outputs.
