@@ -6,6 +6,7 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
                                               $window, WPSService) {
         $scope.wrap = {};
         $scope.type = $routeParams.type;
+        $scope.serviceIdentifier = $routeParams.id;
         $scope.cstlUrl = $cookieStore.get('cstlUrl');
         $scope.url = $scope.cstlUrl + "WS/" + $scope.type + "/" + $routeParams.id;
 
@@ -43,7 +44,7 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
                 controller: 'WPSAddProcessModalController',
                 resolve: {
                     exclude: function() { return $scope.processList; },
-                    service: function() { return $scope.service; },
+                    service: function() { return $scope.serviceIdentifier; },
                     processList : function(WPSService){
                         return WPSService.getAllProcess().$promise;
                     }
@@ -52,11 +53,11 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
             modal.result.then(function() {
                 webService.restart({type: $scope.type, id: $routeParams.id}, {value: true},
                     function() {
-                        Growl('success','Success','Service '+ $scope.service.name +' successfully reloaded');
+                        Growl('success','Success','Service '+ $scope.serviceIdentifier +' successfully reloaded');
                         $scope.initCtrl();
                     },
                     function() {
-                        Growl('error','Error','Service '+ $scope.service.name +' reload failed');
+                        Growl('error','Error','Service '+ $scope.serviceIdentifier +' reload failed');
                     }
                 );
             });
@@ -83,11 +84,11 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
                         //reload service then reload list of processes for this wps
                         webService.restart({type: $scope.type, id: $routeParams.id}, {value: true},
                             function() {
-                                Growl('success','Success','Service '+ $scope.service.name +' successfully reloaded');
+                                Growl('success','Success','Service '+ $scope.serviceIdentifier +' successfully reloaded');
                                 $scope.initCtrl();
                             },
                             function() {
-                                Growl('error','Error','Service '+ $scope.service.name +' reload failed');
+                                Growl('error','Error','Service '+ $scope.serviceIdentifier +' reload failed');
                             }
                         );
                     }, function(){
@@ -118,11 +119,11 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
                             //reload service then reload list of processes for this wps
                             webService.restart({type: $scope.type, id: $routeParams.id}, {value: true},
                                 function() {
-                                    Growl('success','Success','Service '+ $scope.service.name +' successfully reloaded');
+                                    Growl('success','Success','Service '+ $scope.serviceIdentifier +' successfully reloaded');
                                     $scope.initCtrl();
                                 },
                                 function() {
-                                    Growl('error','Error','Service '+ $scope.service.name +' reload failed');
+                                    Growl('error','Error','Service '+ $scope.serviceIdentifier +' reload failed');
                                 }
                             );
                         }, function(){
@@ -141,7 +142,7 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
         $scope.wrap = {};
         $scope.wrap.nbbypage = 5;
         $scope.dataSelect={all:false};
-        $scope.service = service;
+        $scope.serviceIdentifier = service;
         $scope.exclude = exclude;
         $scope.values = {
             listSelect : []
@@ -262,7 +263,7 @@ angular.module('cstl-webservice-edit-wps', ['cstl-restapi', 'cstl-services', 'pa
             }
             var toSend = {registries : []};
             toSend.registries = buildList($scope.values.listSelect);
-            WPSService.addListProcessToWPS({id:$scope.service.identifier},toSend,
+            WPSService.addListProcessToWPS({id:$scope.serviceIdentifier},toSend,
                 function(){//on success
                     Growl('success', 'Success', 'Process added with success!');
                     $scope.close();

@@ -534,7 +534,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
         };
 
         $scope.showLayerDashboardMap = function() {
-            if($scope.type !== 'sos' && $scope.type !== 'csw') {
+            if($scope.type !== 'sos' && $scope.type !== 'csw' && $scope.type !== 'wps') {
                 if($scope.type === 'wmts') {
                     if (WmtsLayerDashboardViewer.map) {
                         WmtsLayerDashboardViewer.map.setTarget(undefined);
