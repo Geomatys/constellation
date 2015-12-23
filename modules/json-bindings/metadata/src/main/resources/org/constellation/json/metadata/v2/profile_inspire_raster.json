@@ -107,7 +107,7 @@
                                             "multiplicity": 1,
                                             "help": "metadata.field.graphicOverViewFileName_help",
                                             "path": "metadata.identificationInfo.graphicOverview.fileName",
-                                            "render": "web",
+                                            "render": "UPLOADIMAGE.text",
                                             "obligation": "O","completion" : "EXTENDED",
                                             "defaultValue": null,
                                             "value": null

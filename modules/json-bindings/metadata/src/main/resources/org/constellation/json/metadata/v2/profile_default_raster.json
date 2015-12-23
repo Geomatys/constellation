@@ -76,6 +76,18 @@
                                             "defaultValue": null,
                                             "value": null
                                         }
+                                    }, {
+                                        "type": "field",
+                                        "field": {
+                                            "name": "metadata.field.graphicOverViewFileName",
+                                            "multiplicity": 1,
+                                            "help": "metadata.field.graphicOverViewFileName_help",
+                                            "path": "metadata.identificationInfo.graphicOverview.fileName",
+                                            "render": "UPLOADIMAGE.text",
+                                            "obligation": "O","completion" : "EXTENDED",
+                                            "defaultValue": null,
+                                            "value": null
+                                        }
                                     }
                                 ]
                             }
