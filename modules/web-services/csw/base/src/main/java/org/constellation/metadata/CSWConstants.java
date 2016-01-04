@@ -86,6 +86,10 @@ public abstract class CSWConstants {
     public static final String NETCDF_EXT = ".nc";
     public static final String NCML_EXT = ".ncml";
 
+    public static final String CSW_SCHEMA_LOCATION = "http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/csw.xsd";
+    
+    public static final String ISO_SCHEMA_LOCATION = "http://www.isotc211.org/2005/gmd http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd http://www.isotc211.org/2005/gmx http://schemas.opengis.net/iso/19139/20070417/gmx/gmx.xsd";
+    
     // TODO those 3 namespace must move to geotk Namespace class
     public static final String EBRIM_25 = "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
     public static final String EBRIM_30 = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";

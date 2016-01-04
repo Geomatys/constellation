@@ -43,6 +43,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.constellation.metadata.CSWConstants.CSW_SCHEMA_LOCATION;
+import static org.constellation.metadata.CSWConstants.ISO_SCHEMA_LOCATION;
+import org.geotoolkit.csw.xml.GetRecordByIdResponse;
+import org.geotoolkit.csw.xml.GetRecordsResponse;
 
 /**
  * Note: replace <T extends CSWResponse> by <T extends Object> because an strange bug arrive with DescribeRecordResponse not passing in this Provider.
@@ -72,8 +76,9 @@ public class CSWResponseWriter<T extends Object> implements MessageBodyWriter<T>
             final Marshaller m = CSWMarshallerPool.getInstance().acquireMarshaller();
             m.setProperty(XML.CONVERTER, warnings);
             if (t instanceof SerializerResponse) {
-                final SerializerResponse response = (SerializerResponse) t;
-                final CstlXMLSerializer serializer    = response.getSerializer();
+                final SerializerResponse response   = (SerializerResponse) t;
+                final CstlXMLSerializer serializer  = response.getSerializer();
+                m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, getSchemaLocation(response.getResponse()));
                 if (serializer != null) {
                     DataWriter writer = new DataWriter(new OutputStreamWriter(out), "UTF-8");
                     writer.setIndentStep("   ");
@@ -83,6 +88,7 @@ public class CSWResponseWriter<T extends Object> implements MessageBodyWriter<T>
                     m.marshal(response.getResponse(), out);
                 }
             } else {
+                m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, getSchemaLocation(t));
                 m.marshal(t, out);
             }
             CSWMarshallerPool.getInstance().recycle(m);
@@ -95,6 +101,14 @@ public class CSWResponseWriter<T extends Object> implements MessageBodyWriter<T>
                    LOGGER.warning(message);
                }
             }
+        }
+    }
+    
+    private static String getSchemaLocation(Object t) {
+        if (t instanceof GetRecordByIdResponse || t instanceof GetRecordsResponse) {
+            return CSW_SCHEMA_LOCATION + " " + ISO_SCHEMA_LOCATION;
+        } else {
+            return CSW_SCHEMA_LOCATION;
         }
     }
 }
