@@ -450,6 +450,7 @@
                         <goal>npm</goal>
                     </goals>
                     <configuration>
+                        <installDirectory>${node.install.dir}</installDirectory>
                         <arguments>install</arguments>
                     </configuration>
                 </execution>
@@ -460,6 +461,7 @@
                         <goal>grunt</goal>
                     </goals>
                     <configuration>
+                        <installDirectory>${node.install.dir}</installDirectory>
                         <arguments>${grunt.build.profile} --target_dir=${grunt.target.dir}</arguments>
                     </configuration>
                 </execution>
