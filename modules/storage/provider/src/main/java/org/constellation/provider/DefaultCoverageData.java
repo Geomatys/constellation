@@ -19,6 +19,7 @@
 package org.constellation.provider;
 
 import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -30,6 +31,7 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
@@ -55,6 +57,9 @@ import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.filestore.FileCoverageReference;
 import org.geotoolkit.storage.coverage.CoverageReference;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.FactoryException;
 import org.opengis.util.GenericName;
 
 /**
@@ -164,16 +169,26 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         SortedSet<Date> dates = new TreeSet<>();
         final Envelope env = getEnvelope();
 
-        final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
-//        final TemporalCRS temporalCRS = org.apache.sis.referencing.CRS.getTemporalComponent(crs);
-        final int tempIndex = CRSUtilities.getDimensionOf(crs, TemporalCRS.class);
-        if (tempIndex != -1) {
-            final GridCoverageReader reader = ref.acquireReader();
-            final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
-            ref.recycle(reader);
-            for (NumberRange nR : tempValues) {
-                dates.add(new Date(Double.valueOf(nR.getMinDouble()).longValue()));
+        try {
+            final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
+            final int tempIndex = CRSUtilities.getDimensionOf(crs, TemporalCRS.class);
+            if (tempIndex != -1) {
+                final TemporalCRS temporalCRS = org.apache.sis.referencing.CRS.getTemporalComponent(crs);
+                final MathTransform mt = CRS.findMathTransform(temporalCRS, CommonCRS.Temporal.JAVA.crs());
+
+                final GridCoverageReader reader = ref.acquireReader();
+                final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
+                ref.recycle(reader);
+                double[] sourceDate = new double[1];
+                for (NumberRange nR : tempValues) {
+                    //transform extracted values into java time units (timestamp)
+                    sourceDate[0] = nR.getMinDouble();
+                    mt.transform(sourceDate,0,sourceDate,0, 1);
+                    dates.add(new Date(Double.valueOf(sourceDate[0]).longValue()));
+                }
             }
+        } catch (FactoryException | TransformException e) {
+            throw new DataStoreException("Unable to extract available times from layer "+name, e);
         }
 
         return dates;
@@ -188,17 +203,26 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         final Envelope env = getEnvelope();
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
 
-        //final VerticalCRS verticalCRS = org.apache.sis.referencing.CRS.getVerticalComponent(crs, true);
-        final int tempIndex = CRSUtilities.getDimensionOf(crs, VerticalCRS.class);
-        if (tempIndex != -1) {
-            
-            final GridCoverageReader reader = ref.acquireReader();
-            final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
-            ref.recycle(reader);
-            
-            for (NumberRange nR : tempValues) {
-                elevations.add(nR.getMinDouble());
+        try {
+            final int tempIndex = CRSUtilities.getDimensionOf(crs, VerticalCRS.class);
+            if (tempIndex != -1) {
+
+                final VerticalCRS verticalCRS = org.apache.sis.referencing.CRS.getVerticalComponent(crs, true);
+                final MathTransform mt = CRS.findMathTransform(verticalCRS, CommonCRS.Vertical.ELLIPSOIDAL.crs());
+
+                final GridCoverageReader reader = ref.acquireReader();
+                final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
+                ref.recycle(reader);
+                double[] sourceEle = new double[1];
+                for (NumberRange nR : tempValues) {
+                    //transform extracted values into ellipsoid elevation
+                    sourceEle[0] = nR.getMinDouble();
+                    mt.transform(sourceEle,0,sourceEle,0, 1);
+                    elevations.add(sourceEle[0]);
+                }
             }
+        } catch (FactoryException | TransformException e) {
+            throw new DataStoreException("Unable to extract available times from layer "+name, e);
         }
         return elevations;
     }
