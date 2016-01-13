@@ -35,7 +35,7 @@ resources to operate a platform of sensors that feeds back information in real t
 To run Constellation-SDI, you'll need :
 * **JDK7u45+** from Oracle. Can be downloaded [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html) for your platform.
 * **PostgreSQL 9.x** (found [here](http://www.postgresql.org/download/)) with a database named `constellation` owned by role:password `cstl:admin`
-* **Apache Tomcat 7.0.27+** found [here](http://tomcat.apache.org/download-70.cgi)
+* **Apache Tomcat 7.0.47+** with support of websockets found [here](http://tomcat.apache.org/download-70.cgi)
 
 For building :
 * **Maven 3.3.x** found [here](https://maven.apache.org/download.cgi)
@@ -95,10 +95,10 @@ For example, database configuration can be specified from environment variable `
 * **epsg.database.url** : testing database URL. Default value `postgres://test:test@localhost:5432/cstl-test`
 * **cstl.config** : Path to application external configuration properties file. Optional, default null.
 * **cstl.url** : Constellation application URL. Used by Constellation to generate resources URLs.
-* **cstl.home** : Application home directory, used by Constellation to store logs, indexes, ... . Default set to `~/.constellation/`
-* **cstl.data** : Application data directory, used by Constellation to store integrated data and some configurations ... . Default set to `~/.constellation/data`
+* **cstl.home** : Application home directory, used by Constellation to store logs, indexes, ... . By default, Constellation will create a `.constellation` directory in current user home folder.
+* **cstl.data** : Application data directory, used by Constellation to store integrated data and some configurations ... .  By default, Constellation will create a `data` directory relative to `cstl.home` property.
 
-SMTP server configuration (used to re-initialized user password) :
+SMTP server configuration (used to re-initialize user password) :
 * **cstl.mail.smtp.from** : Default value `no-reply@localhost`
 * **cstl.mail.smtp.host** : Default value `localhost`
 * **cstl.mail.smtp.port** : Default value `25`
