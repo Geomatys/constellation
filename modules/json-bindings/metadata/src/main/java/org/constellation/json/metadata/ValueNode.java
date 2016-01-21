@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.MissingResourceException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.opengis.util.Enumerated;
+
+import org.opengis.util.ControlledVocabulary;
 import org.apache.sis.measure.Angle;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.CharSequences;
@@ -104,9 +105,9 @@ final class ValueNode extends ArrayList<ValueNode> {
              * Above were unquoted cases. Below are texts to quote.
              */
             out.append('"');
-            if (value instanceof Enumerated) {
+            if (value instanceof ControlledVocabulary) {
                 out.append(Types.getStandardName(value.getClass())).append('.')
-                   .append(Types.getCodeName((Enumerated) value));
+                   .append(Types.getCodeName((ControlledVocabulary) value));
             } else if (value instanceof Date) {
                 if (DATE_READ_ONLY.equals(template.render)) {
                     synchronized (DATE_HOUR_FORMAT) {
