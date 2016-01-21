@@ -22,10 +22,6 @@ package org.constellation.coverage.process;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.StyleProcessReference;
-import org.constellation.util.StyleReference;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -42,15 +38,20 @@ public class StyledPyramidCoverageDescriptor extends AbstractPyramidCoverageDesc
 
     public static final String STYLE_NAME = "pyramid_style";
     private static final String STYLE_REMARKS = "The style to apply to the pyramid.";
-    public static final ParameterDescriptor<StyleProcessReference> STYLE =
-            new DefaultParameterDescriptor<>(STYLE_NAME, STYLE_REMARKS, StyleProcessReference.class, null, true);
+    public static final ParameterDescriptor<StyleProcessReference> STYLE = BUILDER
+            .addName(STYLE_NAME)
+            .setRemarks(STYLE_REMARKS)
+            .setRequired(true)
+            .create(StyleProcessReference.class, null);
 
-    public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{IN_COVERAGE_REF, ORIGINAL_DATA, PYRAMID_NAME, PYRAMID_FOLDER, STYLE,
-                    PROVIDER_OUT_ID, PYRAMID_DATASET, PYRAMID_CRS, UPDATE});
+    /**Input parameters */
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(IN_COVERAGE_REF, ORIGINAL_DATA, PYRAMID_NAME, PYRAMID_FOLDER, STYLE,
+                    PROVIDER_OUT_ID, PYRAMID_DATASET, PYRAMID_CRS, UPDATE);
+
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
-            new GeneralParameterDescriptor[]{OUT_PYRAMID_PROVIDER_CONF});
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup(OUT_PYRAMID_PROVIDER_CONF);
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

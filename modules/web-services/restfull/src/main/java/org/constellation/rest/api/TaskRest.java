@@ -18,30 +18,8 @@
  */
 package org.constellation.rest.api;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import com.google.common.base.Optional;
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.dto.TaskStatusDTO;
 import org.constellation.admin.exception.ConstellationException;
@@ -53,21 +31,18 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringMap;
 import org.constellation.database.api.TaskParameterWithOwnerName;
-import org.constellation.database.api.jooq.tables.pojos.CstlUser;
-import org.constellation.database.api.jooq.tables.pojos.Dataset;
-import org.constellation.database.api.jooq.tables.pojos.Style;
-import org.constellation.database.api.jooq.tables.pojos.Task;
-import org.constellation.database.api.jooq.tables.pojos.TaskParameter;
+import org.constellation.database.api.jooq.tables.pojos.*;
 import org.constellation.database.api.repository.StyleRepository;
 import org.constellation.database.api.repository.TaskParameterRepository;
 import org.constellation.database.api.repository.UserRepository;
 import org.constellation.process.DatasetProcessReference;
 import org.constellation.process.ServiceProcessReference;
 import org.constellation.process.StyleProcessReference;
+import org.constellation.process.UserProcessReference;
 import org.constellation.util.ParamUtilities;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.processing.chain.model.Chain;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -75,9 +50,16 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
-import org.constellation.process.UserProcessReference;
-import org.geotoolkit.processing.chain.model.Chain;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * RestFull API for task management/operations.
@@ -219,7 +201,8 @@ public class TaskRest {
         //change the description, always encapsulate in the same namespace and name
         //jaxb object factory can not reconize changing names without a namespace
         ParameterDescriptorGroup idesc = desc.getInputDescriptor();
-        idesc = new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
+        idesc = new ParameterBuilder().addName("input").setRequired(true)
+                .createGroup(idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
         return idesc;
     }
     // </editor-fold>

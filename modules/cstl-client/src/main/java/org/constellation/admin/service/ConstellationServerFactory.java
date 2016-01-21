@@ -21,10 +21,9 @@ package org.constellation.admin.service;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.client.AbstractClientFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.parameter.ParameterDescriptor;
@@ -50,20 +49,34 @@ public class ConstellationServerFactory extends AbstractClientFactory{
         IDENTIFICATION.setCitation(citation);
     }
 
-    public static final ParameterDescriptor<String> IDENTIFIER = new DefaultParameterDescriptor<String>(
-            AbstractClientFactory.IDENTIFIER.getName().getCode(),
-            AbstractClientFactory.IDENTIFIER.getRemarks(), String.class,NAME,true);
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
-    public static final ParameterDescriptor<String> USER = new DefaultParameterDescriptor(
-            "User","User login",String.class,null,true);
-    public static final ParameterDescriptor<String> PASSWORD = new DefaultParameterDescriptor(
-            "Password","User password",String.class,null,true);
-    public static final ParameterDescriptor<String> SECURITY_TYPE = new DefaultParameterDescriptor(
-            "SecurityType","Security type",String.class,"Basic",true);
+    public static final ParameterDescriptor<String> IDENTIFIER = BUILDER
+            .addName(AbstractClientFactory.IDENTIFIER.getName().getCode())
+            .setRemarks(AbstractClientFactory.IDENTIFIER.getRemarks())
+            .setRequired(true)
+            .create(String.class,NAME);
 
-    public static final ParameterDescriptorGroup PARAMETERS =
-            new DefaultParameterDescriptorGroup("CstlParameters",
-                    IDENTIFIER,URL,USER,PASSWORD,SECURITY_TYPE,SECURITY);
+    public static final ParameterDescriptor<String> USER = BUILDER
+            .addName("User")
+            .setRemarks("User login")
+            .setRequired(true)
+            .create(String.class,null);
+
+    public static final ParameterDescriptor<String> PASSWORD = BUILDER
+            .addName("Password")
+            .setRemarks("User password")
+            .setRequired(true)
+            .create(String.class,null);
+
+    public static final ParameterDescriptor<String> SECURITY_TYPE = BUILDER
+            .addName("SecurityType")
+            .setRemarks("Security type")
+            .setRequired(true)
+            .create(String.class,"Basic");
+
+    public static final ParameterDescriptorGroup PARAMETERS = BUILDER.addName("CstlParameters").setRequired(true)
+            .createGroup(IDENTIFIER,URL,USER,PASSWORD,SECURITY_TYPE,SECURITY);
 
     @Override
     public Identification getIdentification() {

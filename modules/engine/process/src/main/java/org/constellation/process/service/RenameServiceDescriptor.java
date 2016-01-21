@@ -19,20 +19,15 @@
 
 package org.constellation.process.service;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.utility.parameter.ExtendedParameterDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
-
-import static org.constellation.process.service.ServiceProcessCommon.SUPPORTED_SERVICE_TYPE;
 
 /**
  *
@@ -43,30 +38,41 @@ public class RenameServiceDescriptor extends AbstractCstlProcessDescriptor {
     public static final String NAME = "service.rename";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("rename a new ogc service in constellation.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     public static final String SERVICE_TYPE_NAME = "service_type";
     private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS, WCS.";
-    private static final String[] SERVICE_TYPE_VALID_VALUES = SUPPORTED_SERVICE_TYPE.toArray(new String[SUPPORTED_SERVICE_TYPE.size()]);
-    public static final ParameterDescriptor<String> SERVICE_TYPE =
-            new ExtendedParameterDescriptor<>(SERVICE_TYPE_NAME, SERVICE_TYPE_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true, null);
+    private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
+    public static final ParameterDescriptor<String> SERVICE_TYPE = BUILDER
+            .addName(SERVICE_TYPE_NAME)
+            .setRemarks(SERVICE_TYPE_REMARKS)
+            .setRequired(true)
+            .createEnumerated(String.class, SERVICE_TYPE_VALID_VALUES, null);
 
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
-    public static final ParameterDescriptor<String> IDENTIFIER =
-            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
+    public static final ParameterDescriptor<String> IDENTIFIER = BUILDER
+            .addName(IDENTIFIER_NAME)
+            .setRemarks(IDENTIFIER_REMARKS)
+            .setRequired(true)
+            .create( String.class, null);
 
     public static final String NEW_NAME_NAME = "newName";
     private static final String NEW_NAME_REMARKS = "new name of the service instance.";
-    public static final ParameterDescriptor<String> NEW_NAME =
-            new DefaultParameterDescriptor(NEW_NAME_NAME, NEW_NAME_REMARKS, String.class, null, true);
-
+    public static final ParameterDescriptor<String> NEW_NAME =  BUILDER
+            .addName(NEW_NAME_NAME)
+            .setRemarks(NEW_NAME_REMARKS)
+            .setRequired(true)
+            .create( String.class, null);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, NEW_NAME});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(SERVICE_TYPE, IDENTIFIER, NEW_NAME);
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
+
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

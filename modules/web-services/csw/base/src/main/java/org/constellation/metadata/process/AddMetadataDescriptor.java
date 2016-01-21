@@ -18,18 +18,17 @@
  */
 package org.constellation.metadata.process;
 
-import java.io.File;
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
+
+import java.io.File;
 
 /**
  *
@@ -40,33 +39,47 @@ public class AddMetadataDescriptor extends AbstractProcessDescriptor {
     public static final String NAME = "metadata.add";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Add a metadata to a CSW service.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
     public static final String SERVICE_IDENTIFIER_NAME = "service_identifier";
     private static final String SERVICE_IDENTIFIER_REMARKS = "the identifier of the CSW servicer.";
-    public static final ParameterDescriptor<String> SERVICE_IDENTIFIER =
-            new DefaultParameterDescriptor<>(SERVICE_IDENTIFIER_NAME, SERVICE_IDENTIFIER_REMARKS, String.class, null, true);
-    
+    public static final ParameterDescriptor<String> SERVICE_IDENTIFIER = BUILDER
+            .addName(SERVICE_IDENTIFIER_NAME)
+            .setRemarks(SERVICE_IDENTIFIER_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
+
     public static final String METADATA_FILE_NAME = "metadata";
     private static final String METADATA_FILE_REMARKS = "The metadata to add to CSW.";
-    public static final ParameterDescriptor<File> METADATA_FILE =
-            new DefaultParameterDescriptor<>(METADATA_FILE_NAME, METADATA_FILE_REMARKS, File.class, null, true);
-    
+    public static final ParameterDescriptor<File> METADATA_FILE = BUILDER
+            .addName(METADATA_FILE_NAME)
+            .setRemarks(METADATA_FILE_REMARKS)
+            .setRequired(true)
+            .create(File.class, null);
+
     public static final String METADATA_ID_NAME = "metadata-id";
     private static final String METADATA_ID_REMARKS = "The metadata identifier.";
-    public static final ParameterDescriptor<String> METADATA_ID =
-            new DefaultParameterDescriptor<>(METADATA_ID_NAME, METADATA_ID_REMARKS, String.class, null, true);
-    
+    public static final ParameterDescriptor<String> METADATA_ID = BUILDER
+            .addName(METADATA_ID_NAME)
+            .setRemarks(METADATA_ID_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
+
     public static final String REFRESH_NAME = "refresh";
     private static final String REFRESH_REMARKS = "If set this flag the CSW will be refreshed.";
-    public static final ParameterDescriptor<Boolean> REFRESH =
-            new DefaultParameterDescriptor<>(REFRESH_NAME, REFRESH_REMARKS, Boolean.class, true, true);
-    
+    public static final ParameterDescriptor<Boolean> REFRESH = BUILDER
+            .addName(REFRESH_NAME)
+            .setRemarks(REFRESH_REMARKS)
+            .setRequired(true)
+            .create(Boolean.class, Boolean.TRUE);
+
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_IDENTIFIER, METADATA_FILE, METADATA_ID, REFRESH});
-    
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(SERVICE_IDENTIFIER, METADATA_FILE, METADATA_ID, REFRESH);
+
      /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+     public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+             .createGroup();
     
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

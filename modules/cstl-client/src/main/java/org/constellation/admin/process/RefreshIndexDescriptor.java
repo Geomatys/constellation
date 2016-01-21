@@ -18,11 +18,10 @@
  */
 package org.constellation.admin.process;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -36,25 +35,36 @@ import org.opengis.parameter.ParameterValueGroup;
 public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
  
     public static final String NAME = "refreshIndex";
-    
+
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     // Constellation
-    public static final GeneralParameterDescriptor CSTL_CSW_INSTANCE = new DefaultParameterDescriptor("CSWInstance",
-            "Name of the CSW instance.",String.class,"default", true);
-    public static final GeneralParameterDescriptor CSTL_ASYNCHRONOUS = new DefaultParameterDescriptor("Asynchronous",
-            "Falg for asynchrone refresh index mode.", Boolean.class, Boolean.TRUE, true);
-    public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
-            new DefaultParameterDescriptorGroup("Constellation",
-                                                 ConstellationServerFactory.URL,
-                                                 ConstellationServerFactory.USER,
-                                                 ConstellationServerFactory.PASSWORD,
-                                                 CSTL_CSW_INSTANCE,
-                                                 CSTL_ASYNCHRONOUS);
-    
+    public static final GeneralParameterDescriptor CSTL_CSW_INSTANCE = BUILDER
+            .addName("CSWInstance")
+            .setRemarks("Name of the CSW instance.")
+            .setRequired(true)
+            .create(String.class, null);
+
+    public static final GeneralParameterDescriptor CSTL_ASYNCHRONOUS = BUILDER
+            .addName("Asynchronous")
+            .setRemarks("Flag for asynchronous refresh index mode.")
+            .setRequired(true)
+            .create(Boolean.class, Boolean.TRUE);
+
+    public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP = BUILDER.addName("Constellation").setRequired(true)
+                    .createGroup(ConstellationServerFactory.URL,
+                            ConstellationServerFactory.USER,
+                            ConstellationServerFactory.PASSWORD,
+                            CSTL_CSW_INSTANCE,
+                            CSTL_ASYNCHRONOUS);
+
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters", CSTL_DESCRIPTOR_GROUP);
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(CSTL_DESCRIPTOR_GROUP);
 
     /** Output parameters : nothing */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
 
     /**
      * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.

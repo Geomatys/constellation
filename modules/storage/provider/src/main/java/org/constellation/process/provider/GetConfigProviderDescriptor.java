@@ -18,12 +18,10 @@
  */
 package org.constellation.process.provider;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -38,25 +36,32 @@ public class GetConfigProviderDescriptor extends AbstractProcessDescriptor {
     public static final String NAME = "provider.get_config";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Return provider configuration.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
     public static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of a provider.";
-    public static final ParameterDescriptor<String> PROVIDER_ID =
-            new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
+    public static final ParameterDescriptor<String> PROVIDER_ID = BUILDER
+            .addName(PROVIDER_ID_NAME)
+            .setRemarks(PROVIDER_ID_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_ID});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+                    .createGroup(PROVIDER_ID);
 
 
     public static final String CONFIG_NAME = "config";
     private static final String CONFIG_REMARKS = "Returned configuration from a provider.";
-    public static final ParameterDescriptor<ParameterValueGroup> CONFIG =
-            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, ParameterValueGroup.class, null, true);
+    public static final ParameterDescriptor<ParameterValueGroup> CONFIG = BUILDER
+                    .addName(CONFIG_NAME)
+                    .setRemarks(CONFIG_REMARKS)
+                    .setRequired(true)
+                    .create(ParameterValueGroup.class, null);
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters", new GeneralParameterDescriptor[] {CONFIG});
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup(CONFIG);
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

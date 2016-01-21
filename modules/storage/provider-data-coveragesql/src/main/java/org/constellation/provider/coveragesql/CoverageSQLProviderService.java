@@ -18,6 +18,7 @@
  */
 package org.constellation.provider.coveragesql;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -25,8 +26,6 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.geotoolkit.internal.sql.table.ConfigurationKey;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -50,23 +49,26 @@ public class CoverageSQLProviderService extends AbstractProviderFactory
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid coverage-sql provider config";
 
-    public static final ParameterDescriptor<String> NAMESPACE_DESCRIPTOR =
-             new DefaultParameterDescriptor<String>("namespace","",String.class,null,false);
-    
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
+    public static final ParameterDescriptor<String> NAMESPACE_DESCRIPTOR = BUILDER
+            .addName("namespace")
+            .setRemarks( "Provider general namespace")
+            .setRequired(false)
+            .create(String.class, null);
+
     public static final ParameterDescriptorGroup COVERAGESQL_DESCRIPTOR;
     private static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR;
     
     static {
         //add namespace parameter
         final ParameterDescriptorGroup base = CoverageDatabase.PARAMETERS;
-        final List<GeneralParameterDescriptor> descs = new ArrayList<GeneralParameterDescriptor>(base.descriptors());
+        final List<GeneralParameterDescriptor> descs = new ArrayList<>(base.descriptors());
         descs.add(NAMESPACE_DESCRIPTOR);
-        
-        COVERAGESQL_DESCRIPTOR = new DefaultParameterDescriptorGroup(
-                base.getName().getCode(),descs.toArray(new GeneralParameterDescriptor[descs.size()]));
-        
-        SERVICE_CONFIG_DESCRIPTOR =
-            ProviderParameters.createDescriptor(COVERAGESQL_DESCRIPTOR);
+
+        COVERAGESQL_DESCRIPTOR = BUILDER.addName(base.getName().getCode()).setRequired(true)
+                .createGroup(descs.toArray(new GeneralParameterDescriptor[descs.size()]));
+        SERVICE_CONFIG_DESCRIPTOR = ProviderParameters.createDescriptor(COVERAGESQL_DESCRIPTOR);
     }
     
     public static final GeneralParameterDescriptor PASSWORD_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.PASSWORD.key);

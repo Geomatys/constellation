@@ -18,11 +18,9 @@
  */
 package org.constellation.process.provider;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -37,20 +35,24 @@ public class RestartProviderDescriptor extends AbstractProcessDescriptor {
      public static final String NAME = "provider.restart";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Restart a provider in constellation.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
     public static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to restart.";
-    public static final ParameterDescriptor<String> PROVIDER_ID =
-            new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
+    public static final ParameterDescriptor<String> PROVIDER_ID = BUILDER
+            .addName(PROVIDER_ID_NAME)
+            .setRemarks(PROVIDER_ID_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_ID});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(PROVIDER_ID);
 
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

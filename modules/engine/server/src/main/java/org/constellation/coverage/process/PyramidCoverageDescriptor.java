@@ -20,8 +20,6 @@ package org.constellation.coverage.process;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
@@ -36,12 +34,13 @@ public class PyramidCoverageDescriptor extends AbstractPyramidCoverageDescriptor
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Build a pyramid from the specified file.");
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{IN_COVERAGE_REF, ORIGINAL_DATA, PYRAMID_NAME, PYRAMID_FOLDER,
-                    PROVIDER_OUT_ID, PYRAMID_DATASET, PYRAMID_CRS, UPDATE});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(IN_COVERAGE_REF, ORIGINAL_DATA, PYRAMID_NAME, PYRAMID_FOLDER,
+                    PROVIDER_OUT_ID, PYRAMID_DATASET, PYRAMID_CRS, UPDATE);
+
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
-            new GeneralParameterDescriptor[]{OUT_PYRAMID_PROVIDER_CONF});
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup(OUT_PYRAMID_PROVIDER_CONF);
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

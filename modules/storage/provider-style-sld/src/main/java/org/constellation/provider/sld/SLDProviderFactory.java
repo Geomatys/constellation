@@ -18,12 +18,11 @@
  */
 package org.constellation.provider.sld;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -47,12 +46,17 @@ public class SLDProviderFactory extends AbstractProviderFactory
     private static final String NAME = "sld";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid SLD provider config";
 
-    public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("path","Folder where style files can be found",String.class,null,true);
-    
-    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR = 
-            new DefaultParameterDescriptorGroup("sldFolder",FOLDER_DESCRIPTOR);
-    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
+    public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR = BUILDER
+            .addName("path")
+            .setRemarks("Folder where style files can be found")
+            .setRequired(true)
+            .create(String.class, null);
+
+    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR = BUILDER.addName("sldFolder").setRequired(true)
+            .createGroup(FOLDER_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR =
             ProviderParameters.createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     @Override

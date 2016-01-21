@@ -18,12 +18,11 @@
  */
 package org.constellation.provider.coveragesgroup;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -49,18 +48,24 @@ public class CoveragesGroupProviderService extends AbstractProviderFactory
         <GenericName,Data,DataProvider> implements DataProviderFactory {
 
     public static final String NAME = "coverages-group";
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
-    public static final ParameterDescriptor<URL> URL =
-            new DefaultParameterDescriptor<URL>(KEY_PATH, "Map context path", URL.class, null, true);
-    
-    public static final ParameterDescriptor<String> NAMESPACE =
-            new DefaultParameterDescriptor<String>("namespace", "Provider general namespace", String.class, null, false);
+    public static final ParameterDescriptor<URL> URL = BUILDER
+            .addName(KEY_PATH)
+            .setRemarks("Map context path")
+            .setRequired(true)
+            .create(URL.class, null);
 
-    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup("coveragesgroup", URL, NAMESPACE);
+    public static final ParameterDescriptor<String> NAMESPACE = BUILDER
+            .addName("namespace")
+            .setRemarks( "Provider general namespace")
+            .setRequired(false)
+            .create(String.class, null);
 
-    public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR = BUILDER.addName("coveragesgroup").setRequired(true)
+            .createGroup(URL, NAMESPACE);
+
+    public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR = createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public CoveragesGroupProviderService(){
         super(NAME);

@@ -18,6 +18,7 @@
  */
 package org.constellation.process.service;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.ResourceInternationalString;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.Layer;
@@ -25,11 +26,7 @@ import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.util.DataReference;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.utility.parameter.ExtendedParameterDescriptor;
 import org.opengis.filter.Filter;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -76,50 +73,70 @@ public class AddLayerToMapServiceDescriptor extends AbstractCstlProcessDescripto
     public static final String NAME = "service.add_layer";
     public static final InternationalString ABSTRACT = new ResourceInternationalString(BUNDLE, ADD_SFLAYER_ABSTRACT_KEY);
 
+    protected static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     /*
      * Layer reference
      */
     public static final String LAYER_REF_PARAM_NAME = "layer_reference";
     public static final InternationalString LAYER_REF_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_REF_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<DataReference> LAYER_REF =
-            new DefaultParameterDescriptor(LAYER_REF_PARAM_NAME, LAYER_REF_PARAM_REMARKS, DataReference.class, null, true);
+    public static final ParameterDescriptor<DataReference> LAYER_REF = BUILDER
+            .addName(LAYER_REF_PARAM_NAME)
+            .setRemarks(LAYER_REF_PARAM_REMARKS)
+            .setRequired(true)
+            .create(DataReference.class, null);
 
     /*
      * Layer alias
      */
     public static final String LAYER_ALIAS_PARAM_NAME = "layer_alias";
     public static final InternationalString LAYER_ALIAS_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_ALIAS_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<String> LAYER_ALIAS =
-            new DefaultParameterDescriptor(LAYER_ALIAS_PARAM_NAME, LAYER_ALIAS_PARAM_REMARKS, String.class, null, false);
+    public static final ParameterDescriptor<String> LAYER_ALIAS = BUILDER
+            .addName(LAYER_ALIAS_PARAM_NAME)
+            .setRemarks(LAYER_ALIAS_PARAM_REMARKS)
+            .setRequired(false)
+            .create(String.class, null);
 
     /*
      * Layer Style
      */
     public static final String LAYER_STYLE_PARAM_NAME = "layer_style_reference";
     public static final InternationalString LAYER_STYLE_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_STYLE_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<DataReference> LAYER_STYLE =
-            new DefaultParameterDescriptor(LAYER_STYLE_PARAM_NAME, LAYER_STYLE_PARAM_REMARKS, DataReference.class, null, false);
+    public static final ParameterDescriptor<DataReference> LAYER_STYLE = BUILDER
+            .addName(LAYER_STYLE_PARAM_NAME)
+            .setRemarks(LAYER_STYLE_PARAM_REMARKS)
+            .setRequired(false)
+            .create(DataReference.class, null);
 
     /*
      * Layer filter
      */
     public static final String LAYER_FILTER_PARAM_NAME = "layer_filter";
     public static final InternationalString LAYER_FILTER_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_FILTER_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<Filter> LAYER_FILTER =
-            new DefaultParameterDescriptor(LAYER_FILTER_PARAM_NAME, LAYER_FILTER_PARAM_REMARKS, Filter.class, null, false);
+    public static final ParameterDescriptor<Filter> LAYER_FILTER = BUILDER
+            .addName(LAYER_FILTER_PARAM_NAME)
+            .setRemarks(LAYER_FILTER_PARAM_REMARKS)
+            .setRequired(false)
+            .create(Filter.class, null);
 
     public static final String LAYER_DIMENSION_PARAM_NAME = "layer_dimension";
     public static final InternationalString LAYER_DIMENSION_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_DIMENSION_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<String> LAYER_DIMENSION =
-            new DefaultParameterDescriptor(LAYER_DIMENSION_PARAM_NAME, LAYER_DIMENSION_PARAM_REMARKS, String.class, null, false);
+    public static final ParameterDescriptor<String> LAYER_DIMENSION = BUILDER
+            .addName(LAYER_DIMENSION_PARAM_NAME)
+            .setRemarks(LAYER_DIMENSION_PARAM_REMARKS)
+            .setRequired(false)
+            .create(String.class, null);
 
     /*
      * Custom GetFeatureInfo
      */
     public static final String LAYER_CUSTOM_GFI_PARAM_NAME = "layer_feature_infos";
     public static final InternationalString LAYER_CUSTOM_GFI_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_CUSTOM_GFI_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<GetFeatureInfoCfg[]> LAYER_CUSTOM_GFI =
-            new DefaultParameterDescriptor(LAYER_CUSTOM_GFI_PARAM_NAME, LAYER_CUSTOM_GFI_PARAM_REMARKS, GetFeatureInfoCfg[].class, null, false);
+    public static final ParameterDescriptor<GetFeatureInfoCfg[]> LAYER_CUSTOM_GFI = BUILDER
+            .addName(LAYER_CUSTOM_GFI_PARAM_NAME)
+            .setRemarks(LAYER_CUSTOM_GFI_PARAM_REMARKS)
+            .setRequired(false)
+            .create(GetFeatureInfoCfg[].class, null);
 
     /*
      * Service Type
@@ -127,33 +144,42 @@ public class AddLayerToMapServiceDescriptor extends AbstractCstlProcessDescripto
     public static final String SERVICE_TYPE_PARAM_NAME = "service_type";
     public static final InternationalString SERVICE_TYPE_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, SERVICE_TYPE_PARAM_REMARKS_KEY);
     private static final String[] SERVICE_TYPE_VALID_VALUES = SUPPORTED_SERVICE_TYPE.toArray(new String[SUPPORTED_SERVICE_TYPE.size()]);
-    public static final ParameterDescriptor<String> SERVICE_TYPE =
-            new ExtendedParameterDescriptor<String>(SERVICE_TYPE_PARAM_NAME, SERVICE_TYPE_PARAM_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, "WMS", null, null, null, true, null);
+    public static final ParameterDescriptor<String> SERVICE_TYPE = BUILDER
+            .addName(SERVICE_TYPE_PARAM_NAME)
+            .setRemarks(SERVICE_TYPE_PARAM_REMARKS)
+            .setRequired(true)
+            .createEnumerated(String.class, SERVICE_TYPE_VALID_VALUES, "WMS");
 
     /*
      * Service instance name
      */
     public static final String SERVICE_INSTANCE_PARAM_NAME = "service_instance";
     public static final InternationalString SERVICE_INSTANCE_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, SERVICE_INSTANCE_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<String> SERVICE_INSTANCE =
-            new DefaultParameterDescriptor(SERVICE_INSTANCE_PARAM_NAME, SERVICE_INSTANCE_PARAM_REMARKS, String.class, null, true);
+    public static final ParameterDescriptor<String> SERVICE_INSTANCE = BUILDER
+            .addName(SERVICE_INSTANCE_PARAM_NAME)
+            .setRemarks(SERVICE_INSTANCE_PARAM_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
 
      /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{LAYER_REF, SERVICE_TYPE, SERVICE_INSTANCE, LAYER_ALIAS, LAYER_STYLE, LAYER_FILTER, LAYER_DIMENSION, LAYER_CUSTOM_GFI});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+             .createGroup(LAYER_REF, SERVICE_TYPE, SERVICE_INSTANCE, LAYER_ALIAS, LAYER_STYLE, LAYER_FILTER,
+                     LAYER_DIMENSION, LAYER_CUSTOM_GFI);
 
     /*
      * Output Layer context
      */
     public static final String OUT_LAYER_PARAM_NAME = "layer";
     public static final InternationalString OUT_LAYER_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, OUT_LAYER_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<Layer> OUT_LAYER =
-            new DefaultParameterDescriptor(OUT_LAYER_PARAM_NAME, OUT_LAYER_PARAM_REMARKS, Layer.class, null, true);
+    public static final ParameterDescriptor<Layer> OUT_LAYER = BUILDER
+            .addName(OUT_LAYER_PARAM_NAME)
+            .setRemarks(OUT_LAYER_PARAM_REMARKS)
+            .setRequired(true)
+            .create(Layer.class, null);
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
-            new GeneralParameterDescriptor[]{OUT_LAYER});
+    public static final ParameterDescriptorGroup OUTPUT_DESC =  BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup(OUT_LAYER);
 
 
     public AddLayerToMapServiceDescriptor() {

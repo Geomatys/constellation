@@ -18,21 +18,15 @@
  */
 package org.constellation.process.service;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Restart an instance for the specified service identifier. Or all service instances if identifier is not specified.
@@ -44,35 +38,40 @@ public class RestartServiceDescriptor  extends AbstractCstlProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Restart an instance for the specified service instance. "
             + "Or all service instances if identifier is not specified.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     public static final String SERVICE_TYPE_NAME = "service_type";
     private static final String SERVICE_TYPE_REMARKS = "The type of the service.";
-    private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
-    static {
-        SERVICE_TYPE_PROPERTIES = new HashMap<>();
-        SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
-        SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
-    }
-    public static final ParameterDescriptor<String> SERVICE_TYPE =
-            new DefaultParameterDescriptor(SERVICE_TYPE_PROPERTIES, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true);
+    public static final ParameterDescriptor<String> SERVICE_TYPE = BUILDER
+            .addName(SERVICE_TYPE_NAME)
+            .setRemarks(SERVICE_TYPE_REMARKS)
+            .setRequired(true)
+            .createEnumerated(String.class, SERVICE_TYPE_VALID_VALUES, null);
 
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the service instance to restart. If empty, all service instance will be restarted.";
-    public static final ParameterDescriptor<String> IDENTIFIER =
-            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, false);
+    public static final ParameterDescriptor<String> IDENTIFIER =BUILDER
+            .addName(IDENTIFIER_NAME)
+            .setRemarks(IDENTIFIER_REMARKS)
+            .setRequired(false)
+            .create(String.class, null);
 
     public static final String CLOSE_NAME = "close";
     private static final String CLOSE_REMARKS = "Close instance(s) before restart.";
-    public static final ParameterDescriptor<Boolean> CLOSE =
-            new DefaultParameterDescriptor(CLOSE_NAME, CLOSE_REMARKS, Boolean.class, true, true);
+    public static final ParameterDescriptor<Boolean> CLOSE = BUILDER
+            .addName(CLOSE_NAME)
+            .setRemarks(CLOSE_REMARKS)
+            .setRequired(true)
+            .create(Boolean.class, Boolean.TRUE);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CLOSE});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(SERVICE_TYPE, IDENTIFIER, CLOSE);
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
 
 
     /**
