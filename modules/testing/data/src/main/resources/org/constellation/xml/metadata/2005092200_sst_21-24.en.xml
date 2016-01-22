@@ -84,9 +84,6 @@
                     </gmd:date>
                     <gmd:identifier>
                         <gmd:MD_Identifier>
-                            <gmd:code>
-                                <gco:CharacterString>NCEP/SST/Global_5x2p5deg/SST_Global_5x2p5deg_20050922_0000.nc</gco:CharacterString>
-                            </gmd:code>
                             <gmd:authority>
                                 <gmd:CI_Citation>
                                     <gmd:title>
@@ -94,6 +91,9 @@
                                     </gmd:title>
                                 </gmd:CI_Citation>
                             </gmd:authority>
+                            <gmd:code>
+                                <gco:CharacterString>NCEP/SST/Global_5x2p5deg/SST_Global_5x2p5deg_20050922_0000.nc</gco:CharacterString>
+                            </gmd:code>
                         </gmd:MD_Identifier>
                     </gmd:identifier>
                     <gmd:citedResponsibleParty>
@@ -190,6 +190,32 @@
                                 <gml:VerticalCRS gml:id="epsg-crs-5714">
                                     <gml:identifier>urn:ogc:def:crs:EPSG::5714</gml:identifier>
                                     <gml:name>MSL height</gml:name>
+                                    <gml:domainOfValidity>
+                                        <gmd:EX_Extent>
+                                            <gmd:description>
+                                                <gco:CharacterString>World</gco:CharacterString>
+                                            </gmd:description>
+                                            <gmd:geographicElement>
+                                                <gmd:EX_GeographicBoundingBox>
+                                                    <gmd:extentTypeCode>
+                                                        <gco:Boolean>true</gco:Boolean>
+                                                    </gmd:extentTypeCode>
+                                                    <gmd:westBoundLongitude>
+                                                        <gco:Decimal>-180.0</gco:Decimal>
+                                                    </gmd:westBoundLongitude>
+                                                    <gmd:eastBoundLongitude>
+                                                        <gco:Decimal>180.0</gco:Decimal>
+                                                    </gmd:eastBoundLongitude>
+                                                    <gmd:southBoundLatitude>
+                                                        <gco:Decimal>-90.0</gco:Decimal>
+                                                    </gmd:southBoundLatitude>
+                                                    <gmd:northBoundLatitude>
+                                                        <gco:Decimal>90.0</gco:Decimal>
+                                                    </gmd:northBoundLatitude>
+                                                </gmd:EX_GeographicBoundingBox>
+                                            </gmd:geographicElement>
+                                        </gmd:EX_Extent>
+                                    </gml:domainOfValidity>
                                     <gml:verticalCS>
                                         <gml:VerticalCS gml:id="epsg-cs-6499">
                                             <gml:identifier>urn:ogc:def:cs:EPSG::6499</gml:identifier>
