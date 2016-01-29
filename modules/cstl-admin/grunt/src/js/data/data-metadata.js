@@ -809,22 +809,10 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
             });
 
             //drag bbox control
-            var styleObj = {
-                style: new ol.style.Style({
-                    fill: new ol.style.Fill({
-                        color: 'rgba(255, 255, 255, 0.2)'
-                    }),
-                    stroke: new ol.style.Stroke({
-                        color: '#ffcc33',
-                        width: 2
-                    })
-                })
-            };
             var dragBox = new ol.interaction.DragBox({
                 condition: function(){
                     return MetadataEditorViewer.enableDragBoxControl;
-                },
-                style: styleObj.style
+                }
             });
             MetadataEditorViewer.map.addInteraction(dragBox);
             var startX,startY,endX,endY;

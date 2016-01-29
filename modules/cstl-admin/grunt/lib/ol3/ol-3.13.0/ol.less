@@ -1,16 +1,22 @@
+.ol-control,.ol-scale-line{
+  position:absolute;
+  padding:2px
+}
+.ol-box{
+  box-sizing:border-box;
+  border-radius:2px;
+  border:2px solid #00f
+}
 .ol-mouse-position{
   top:8px;
   right:8px;
   position:absolute
 }
 .ol-scale-line{
-  background:#95b9e6;
   background:rgba(0,60,136,.3);
   border-radius:4px;
   bottom:8px;
-  left:8px;
-  padding:2px;
-  position:absolute
+  left:8px
 }
 .ol-scale-line-inner{
   border:1px solid #eee;
@@ -37,11 +43,8 @@
   -webkit-tap-highlight-color:transparent
 }
 .ol-control{
-  position:absolute;
-  background-color:#eee;
   background-color:rgba(255,255,255,.4);
-  border-radius:4px;
-  padding:2px
+  border-radius:4px
 }
 .ol-control:hover{
   background-color:rgba(255,255,255,.6)
@@ -85,7 +88,6 @@
   height:1.375em;
   width:1.375em;
   line-height:.4em;
-  background-color:#7b98bc;
   background-color:rgba(0,60,136,.5);
   border:none;
   border-radius:2px
@@ -111,7 +113,6 @@
 }
 .ol-control button:focus,.ol-control button:hover{
   text-decoration:none;
-  background-color:#4c6079;
   background-color:rgba(0,60,136,.7)
 }
 .ol-zoom .ol-zoom-in{
@@ -144,7 +145,8 @@
 }
 .ol-attribution img{
   max-height:2em;
-  max-width:inherit
+  max-width:inherit;
+  vertical-align:middle
 }
 .ol-attribution button,.ol-attribution ul{
   display:inline-block
@@ -181,25 +183,14 @@
 .ol-zoomslider{
   top:4.5em;
   left:.5em;
-  width:24px;
   height:200px
 }
-.ol-zoomslider-thumb{
-  position:absolute;
-  background:#7b98bc;
-  background:rgba(0,60,136,.5);
-  border-radius:2px;
-  cursor:pointer;
-  height:10px;
-  width:22px;
-  margin:3px
+.ol-zoomslider button{
+  position:relative;
+  height:10px
 }
 .ol-touch .ol-zoomslider{
-  top:5.5em;
-  width:2.052em
-}
-.ol-touch .ol-zoomslider-thumb{
-  width:1.8em
+  top:5.5em
 }
 .ol-overviewmap{
   left:.5em;
