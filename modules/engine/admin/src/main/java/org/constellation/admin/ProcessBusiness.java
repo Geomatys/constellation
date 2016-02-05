@@ -18,43 +18,12 @@
  */
 package org.constellation.admin;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigInteger;
-import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.api.TaskState;
 import org.constellation.business.IProcessBusiness;
@@ -71,11 +40,14 @@ import org.constellation.util.ParamUtilities;
 import org.geotoolkit.io.DirectoryWatcher;
 import org.geotoolkit.io.PathChangeListener;
 import org.geotoolkit.io.PathChangedEvent;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessingRegistry;
+import org.geotoolkit.processing.chain.ChainProcessDescriptor;
+import org.geotoolkit.processing.chain.model.Chain;
+import org.geotoolkit.processing.chain.model.ChainMarshallerPool;
+import org.geotoolkit.processing.quartz.ProcessJobDetail;
 import org.geotoolkit.utility.parameter.ParametersExt;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.metadata.Identifier;
@@ -85,13 +57,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobKey;
-import org.quartz.JobListener;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,12 +68,27 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geotoolkit.processing.chain.ChainProcessDescriptor;
-import org.geotoolkit.processing.chain.model.Chain;
-import org.geotoolkit.processing.chain.model.ChainMarshallerPool;
-import org.geotoolkit.processing.quartz.ProcessJobDetail;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.math.BigInteger;
+import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
 /**
  *
@@ -345,8 +326,8 @@ public class ProcessBusiness implements IProcessBusiness {
         //change the description, always encapsulate in the same namespace and name
         //jaxb object factory can not reconize changing names without a namespace
         final ParameterDescriptorGroup idesc = processDesc.getInputDescriptor();
-        final GeneralParameterDescriptor retypedDesc =
-                new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
+        final GeneralParameterDescriptor retypedDesc = new ParameterBuilder().addName("input").setRequired(true)
+                .createGroup(idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
 
         final ParameterValueGroup params;
         final ParameterValueReader reader = new ParameterValueReader(retypedDesc);

@@ -18,14 +18,11 @@
  */
 package org.constellation.process.service;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.utility.parameter.ExtendedParameterDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -42,33 +39,41 @@ public class GetConfigServiceDescriptor extends AbstractCstlProcessDescriptor {
     public static final String NAME = "service.get_config";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Get configuration of an existing map service (WMS, WMTS, WFS, WCS) in constellation.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
     public static final String SERVICE_TYPE_NAME = "service_type";
     private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS, WCS.";
     private static final String[] SERVICE_TYPE_VALID_VALUES = SUPPORTED_SERVICE_TYPE.toArray(new String[SUPPORTED_SERVICE_TYPE.size()]);
-    public static final ParameterDescriptor<String> SERVICE_TYPE = 
-            new ExtendedParameterDescriptor<>(SERVICE_TYPE_NAME, SERVICE_TYPE_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true, null);
-
+    public static final ParameterDescriptor<String> SERVICE_TYPE = BUILDER
+            .addName(SERVICE_TYPE_NAME)
+            .setRemarks(SERVICE_TYPE_REMARKS)
+            .setRequired(true)
+            .createEnumerated(String.class, SERVICE_TYPE_VALID_VALUES, null);
 
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the service instance.";
-    public static final ParameterDescriptor<String> IDENTIFIER =
-            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
+    public static final ParameterDescriptor<String> IDENTIFIER = BUILDER
+            .addName(IDENTIFIER_NAME)
+            .setRemarks(IDENTIFIER_REMARKS)
+            .setRequired(true)
+            .create(String.class, "default");
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(SERVICE_TYPE, IDENTIFIER);
 
 
     public static final String CONFIG_NAME = "configuration";
     private static final String CONFIG_REMARKS = "The configuration object for the specified service instance.";
-    public static final ParameterDescriptor<Object> CONFIGURATION =
-            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, Object.class, null, false);
+    public static final ParameterDescriptor<Object> CONFIGURATION = BUILDER
+            .addName(CONFIG_NAME)
+            .setRemarks(CONFIG_REMARKS)
+            .setRequired(false)
+            .create(Object.class, null);
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters", new GeneralParameterDescriptor[] {CONFIGURATION});
-
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup(CONFIGURATION);
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */

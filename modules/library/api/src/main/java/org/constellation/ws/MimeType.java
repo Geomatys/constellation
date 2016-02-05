@@ -65,5 +65,7 @@ public final class MimeType {
     public static final String APP_GML3        = "application/vnd.ogc.gml3";
 
     public static final String APP_SE_XML      = "application/vnd.ogc.se_xml";
+    
+    public static final String APP_JSON        = "application/json";
 
 }

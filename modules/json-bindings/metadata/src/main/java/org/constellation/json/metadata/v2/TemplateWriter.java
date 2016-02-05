@@ -26,10 +26,9 @@ import static org.constellation.json.JsonMetadataConstants.DATE_READ_ONLY;
 import org.constellation.json.metadata.ParseException;
 import org.constellation.json.metadata.binding.RootObj;
 import org.constellation.util.ReflectionUtilities;
-import org.geotoolkit.util.StringUtilities;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
-import org.opengis.util.Enumerated;
+import org.opengis.util.ControlledVocabulary;
 
 /**
  *  Metadata Object ===> RootObj
@@ -245,8 +244,8 @@ public class TemplateWriter extends AbstractTemplateHandler {
              * Above were unquoted cases. Below are texts to quote.
              */
             
-            if (value instanceof Enumerated) {
-                p = Types.getStandardName(value.getClass()) + '.' + Types.getCodeName((Enumerated) value);
+            if (value instanceof ControlledVocabulary) {
+                p = Types.getStandardName(value.getClass()) + '.' + Types.getCodeName((ControlledVocabulary) value);
             } else if (value instanceof Date) {
                 if (DATE_READ_ONLY.equals(n.render)) {
                     synchronized (DATE_HOUR_FORMAT) {

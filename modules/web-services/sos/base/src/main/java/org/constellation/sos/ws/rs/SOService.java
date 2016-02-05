@@ -47,7 +47,7 @@ import org.geotoolkit.sos.xml.InsertResultTemplate;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
+import org.geotoolkit.sos.xml.GetFeatureOfInterestTime;
 import org.geotoolkit.swes.xml.DeleteSensor;
 import org.geotoolkit.swes.xml.DescribeSensor;
 import org.geotoolkit.swes.xml.InsertSensor;
@@ -86,9 +86,11 @@ import static org.constellation.sos.ws.SOSConstants.OUTPUT_FORMAT;
 import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
 import static org.constellation.sos.ws.SOSConstants.PROCEDURE_DESCRIPTION_FORMAT;
 import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT_V200;
 import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
 import static org.constellation.sos.ws.SOSConstants.RESULT_MODEL;
 import static org.constellation.sos.ws.SOSConstants.SRS_NAME;
+import org.constellation.sos.ws.SOSUtils;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
@@ -179,10 +181,12 @@ public class SOService extends OGCWebService<SOSworker> {
 
                 String outputFormat = go.getResponseFormat();
                 if (outputFormat != null) {
-                    if (outputFormat.startsWith(MimeType.TEXT_XML)) {
+                    if (outputFormat.startsWith(MimeType.TEXT_XML) || outputFormat.equals(RESPONSE_FORMAT_V200)) {
                         outputFormat = MimeType.TEXT_XML;
-                    } else if (outputFormat.startsWith("text/")) {
+                    } else if (outputFormat.startsWith(MimeType.TEXT_PLAIN)) {
                         outputFormat = MimeType.TEXT_PLAIN;
+                    } else if (outputFormat.startsWith(MimeType.APP_JSON)) {
+                        outputFormat = MimeType.APP_JSON;
                     }
                 }
                 final Object marshalled;
@@ -195,8 +199,20 @@ public class SOService extends OGCWebService<SOSworker> {
              }
              
              if (request instanceof GetObservationById) {
-                final GetObservationById ds   = (GetObservationById)request;
-                return Response.ok(worker.getObservationById(ds), MimeType.TEXT_XML).build();
+                final GetObservationById go = (GetObservationById)request;
+                String outputFormat = go.getResponseFormat();
+                if (outputFormat != null) {
+                    if (outputFormat.startsWith(MimeType.TEXT_XML) || outputFormat.equals(RESPONSE_FORMAT_V200)) {
+                        outputFormat = MimeType.TEXT_XML;
+                    } else if (outputFormat.startsWith(MimeType.TEXT_PLAIN)) {
+                        outputFormat = MimeType.TEXT_PLAIN;
+                    } else if (outputFormat.startsWith(MimeType.APP_JSON)) {
+                        outputFormat = MimeType.APP_JSON;
+                    }
+                } else {
+                    outputFormat = MimeType.TEXT_XML;
+                }
+                return Response.ok(worker.getObservationById(go), outputFormat).build();
              }
 
              if (request instanceof DescribeSensor) {
@@ -207,17 +223,20 @@ public class SOService extends OGCWebService<SOSworker> {
              if (request instanceof GetFeatureOfInterest) {
                 final GetFeatureOfInterest gf     = (GetFeatureOfInterest)request;
                 final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf), currentVersion);
-                return Response.ok(response, MimeType.TEXT_XML).build();
+                final String outputFormat = gf.getResponseFormat();
+                return Response.ok(response, outputFormat).build();
              }
 
              if (request instanceof InsertObservation) {
                 final InsertObservation is = (InsertObservation)request;
-                return Response.ok(worker.insertObservation(is), MimeType.TEXT_XML).build();
+                final String outputFormat = is.getResponseFormat();
+                return Response.ok(worker.insertObservation(is), outputFormat).build();
              }
 
              if (request instanceof GetResult) {
                 final GetResult gr = (GetResult)request;
-                return Response.ok(worker.getResult(gr), MimeType.TEXT_XML).build();
+                final String outputFormat = gr.getResponseFormat();
+                return Response.ok(worker.getResult(gr), outputFormat).build();
              }
 
              if (request instanceof InsertSensor) {
@@ -232,17 +251,20 @@ public class SOService extends OGCWebService<SOSworker> {
              
              if (request instanceof InsertResult) {
                 final InsertResult rs = (InsertResult)request;
-                return Response.ok(worker.insertResult(rs), MimeType.TEXT_XML).build();
+                final String outputFormat = rs.getResponseFormat();
+                return Response.ok(worker.insertResult(rs), outputFormat).build();
              }
              
              if (request instanceof InsertResultTemplate) {
                 final InsertResultTemplate rs = (InsertResultTemplate)request;
-                return Response.ok(worker.insertResultTemplate(rs), MimeType.TEXT_XML).build();
+                final String outputFormat = rs.getResponseFormat();
+                return Response.ok(worker.insertResultTemplate(rs), outputFormat).build();
              }
              
              if (request instanceof GetResultTemplate) {
                 final GetResultTemplate rs = (GetResultTemplate)request;
-                return Response.ok(worker.getResultTemplate(rs), MimeType.TEXT_XML).build();
+                final String outputFormat = rs.getResponseFormat();
+                return Response.ok(worker.getResultTemplate(rs), outputFormat).build();
              }
 
              if (request instanceof GetFeatureOfInterestTime) {
@@ -319,6 +341,8 @@ public class SOService extends OGCWebService<SOSworker> {
 
          } else if ("GetFeatureOfInterest".equalsIgnoreCase(request)) {
              return createGetFeatureOfInterest(w);
+         } else if ("GetFeatureOfInterestTime".equalsIgnoreCase(request)) {
+             return createGetFeatureOfInterestTime(w);
          } else if ("GetObservation".equalsIgnoreCase(request)) {
              return createGetObservation(w);
          } else if ("GetResult".equalsIgnoreCase(request)) {
@@ -491,7 +515,32 @@ public class SOService extends OGCWebService<SOSworker> {
             } else {
                 spatialFilter = null;
             }
-            return buildGetFeatureOfInterest(currentVersion, service, foids, observedProperties, procedures, spatialFilter);
+            final Object extension = getParameter("extension", false);
+            final List<Object> extensions = new ArrayList<>();
+            if (extension != null) {
+                extensions.add(extension);
+            }
+            return buildGetFeatureOfInterest(currentVersion, service, foids, observedProperties, procedures, spatialFilter, extensions);
+        }
+    }
+    
+    private GetFeatureOfInterestTime createGetFeatureOfInterestTime(final Worker worker) throws CstlServiceException {
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        if (service.isEmpty()) {
+            throw new CstlServiceException("The parameter service must be specified", MISSING_PARAMETER_VALUE, "service");
+        } else if (!"SOS".equals(service)) {
+            throw new CstlServiceException("The parameter service value must be \"SOS\"", INVALID_PARAMETER_VALUE, "service");
+        }
+        final String currentVersion = getParameter(VERSION_PARAMETER, true);
+        if (currentVersion.isEmpty()) {
+            throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
+        }
+        worker.checkVersionSupported(currentVersion, false);
+        if (currentVersion.equals("1.0.0")) {
+            return new org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime(getParameter(VERSION_PARAMETER, true), getParameter("FeatureOfInterestId", true));
+        } else {
+            throw new CstlServiceException("The operation GetFeatureOfInterestTime is only requestable in 1.0.0 version",
+                                                  OPERATION_NOT_SUPPORTED, "GetFeatureOfInterestTime");
         }
     }
     
@@ -556,7 +605,12 @@ public class SOService extends OGCWebService<SOSworker> {
             if (tempStr != null) {
                 temporalFilters.add(parseTemporalFilter(tempStr));
             }
-            return buildGetResult(currentVersion, service, offering, observedProperty, foids, spatialFilter, temporalFilters);
+            final Object extension = getParameter("extension", false);
+            final List<Object> extensions = new ArrayList<>();
+            if (extension != null) {
+                extensions.add(extension);
+            }
+            return buildGetResult(currentVersion, service, offering, observedProperty, foids, spatialFilter, temporalFilters, extensions);
         } else {
             throwUnsupportedGetMethod("GetResult");
             return null;
@@ -583,7 +637,12 @@ public class SOService extends OGCWebService<SOSworker> {
         if (observedProperty.isEmpty()) {
             throw new CstlServiceException("The parameter observedProperty must be specified", MISSING_PARAMETER_VALUE, OBSERVED_PROPERTY);
         }
-        return buildGetResultTemplate(currentVersion, service, offering, observedProperty);
+        final Object extension = getParameter("extension", false);
+        final List<Object> extensions = new ArrayList<>();
+        if (extension != null) {
+            extensions.add(extension);
+        }
+        return buildGetResultTemplate(currentVersion, service, offering, observedProperty, extensions);
     }
     
     private GetObservationById createGetObservationById(final Worker worker) throws CstlServiceException {
@@ -603,6 +662,7 @@ public class SOService extends OGCWebService<SOSworker> {
         final QName resultModel;
         final ResponseModeType responseMode;
         final String responseFormat;
+        final List<Object> extensions = new ArrayList<>();
         if (currentVersion.equals("2.0.0")) {
             final String observationList = getParameter(OBSERVATION, true);
             if (observationList.isEmpty()) {
@@ -614,6 +674,10 @@ public class SOService extends OGCWebService<SOSworker> {
             resultModel    = null;
             responseMode   = null;
             responseFormat = null;
+            final Object extension = getParameter("extension", false);
+            if (extension != null) {
+                extensions.add(extension);
+            }
         } else {
             final String observationList = getParameter(OBSERVATION_ID, true);
             if (observationList.isEmpty()) {
@@ -638,7 +702,7 @@ public class SOService extends OGCWebService<SOSworker> {
                 responseMode = null;
             }
         }
-        return buildGetObservationById(currentVersion, service, observations, resultModel, responseMode, srsName, responseFormat);
+        return buildGetObservationById(currentVersion, service, observations, resultModel, responseMode, srsName, responseFormat, extensions);
     }
     
     private GetObservation createGetObservation(final Worker worker) throws CstlServiceException {

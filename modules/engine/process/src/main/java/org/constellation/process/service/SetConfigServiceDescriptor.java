@@ -18,15 +18,13 @@
  */
 package org.constellation.process.service;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.dto.Details;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.utility.parameter.ExtendedParameterDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -43,6 +41,7 @@ public class SetConfigServiceDescriptor extends AbstractCstlProcessDescriptor {
     public static final String NAME = "service.set_config";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS, WCS) in constellation.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
 
     public static final String SERVICE_TYPE_NAME = "service_type";
     private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS, WCS.";
@@ -53,27 +52,36 @@ public class SetConfigServiceDescriptor extends AbstractCstlProcessDescriptor {
 
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the service instance.";
-    public static final ParameterDescriptor<String> IDENTIFIER =
-            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
+    public static final ParameterDescriptor<String> IDENTIFIER = BUILDER
+            .addName(IDENTIFIER_NAME)
+            .setRemarks(IDENTIFIER_REMARKS)
+            .setRequired(true)
+            .create(String.class, "default");
 
 
     public static final String CONFIG_NAME = "configuration";
     private static final String CONFIG_REMARKS = "LayerContext object use to update instance configuration. If not specified the instance will be configured from default LayerContext.";
-    public static final ParameterDescriptor<Object> CONFIGURATION =
-            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, Object.class, null, false);
+    public static final ParameterDescriptor<Object> CONFIGURATION = BUILDER
+            .addName(CONFIG_NAME)
+            .setRemarks(CONFIG_REMARKS)
+            .setRequired(false)
+            .create(Object.class, null);
 
     public static final String SERVICE_METADATA_NAME = "serviceMetadata";
     private static final String SERVICE_METADATA_REMARKS = "The service metadata to apply.";
-    public static final ParameterDescriptor<Details> SERVICE_METADATA =
-            new DefaultParameterDescriptor(SERVICE_METADATA_NAME, SERVICE_METADATA_REMARKS, Details.class, null, false);
+    public static final ParameterDescriptor<Details> SERVICE_METADATA = BUILDER
+            .addName(SERVICE_METADATA_NAME)
+            .setRemarks(SERVICE_METADATA_REMARKS)
+            .setRequired(false)
+            .create(Details.class, null);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA);
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

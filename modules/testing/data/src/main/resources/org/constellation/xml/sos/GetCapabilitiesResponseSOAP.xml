@@ -68,6 +68,9 @@
                     <ows:Parameter name="AcceptFormats">
                         <ows:AllowedValues>
                             <ows:Value>text/xml</ows:Value>
+                            <ows:Value>application/xml</ows:Value>
+                            <ows:Value>text/plain</ows:Value>
+                            <ows:Value>application/json</ows:Value>
                         </ows:AllowedValues>
                     </ows:Parameter>
                 </ows:Operation>

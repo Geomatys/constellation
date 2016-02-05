@@ -19,14 +19,12 @@
 
 package org.constellation.process.service;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -39,36 +37,41 @@ public class RemoveDataFromMapContextDescriptor extends AbstractCstlProcessDescr
     
     public static final String NAME = "remove-data-from-map-context";
 
-    public static final ParameterDescriptor<String> CONTEXT_PROVIDER_ID =
-            new DefaultParameterDescriptor("context-provider", "The provider identifier of the coverages group", 
-            String.class, null, true);
-    
-    public static final ParameterDescriptor<String> CONTEXT_NAME =
-            new DefaultParameterDescriptor("context-name", "The name of the group to add the layer", 
-            String.class, null, true);
-    
-    public static final ParameterDescriptor<String> DATA_NAME =
-            new DefaultParameterDescriptor("data-name", "The name of the data to add int the group ", 
-            String.class, null, true);
-    
-    public static final ParameterDescriptor<String> DATA_PROVIDER_ID =
-            new DefaultParameterDescriptor("data-provider-id", "The identifier of the data provider", 
-            String.class, null, true);
+    protected static final ParameterBuilder BUILDER = new ParameterBuilder();
 
-    /** 
-     * Input Parameters 
-     */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{CONTEXT_PROVIDER_ID, CONTEXT_NAME, DATA_NAME, DATA_PROVIDER_ID});
+    public static final ParameterDescriptor<String> CONTEXT_PROVIDER_ID = BUILDER
+            .addName("context-provider")
+            .setRemarks("The provider identifier of the coverages group")
+            .setRequired(true)
+            .create(String.class, null);
 
+    public static final ParameterDescriptor<String> CONTEXT_NAME = BUILDER
+            .addName("context-name")
+            .setRemarks("The name of the group to add the layer")
+            .setRequired(true)
+            .create(String.class, null);
+
+    public static final ParameterDescriptor<String> DATA_NAME = BUILDER
+            .addName("data-name")
+            .setRemarks("The name of the data to add int the group ")
+            .setRequired(true)
+            .create(String.class, null);
+
+    public static final ParameterDescriptor<String> DATA_PROVIDER_ID = BUILDER
+            .addName("data-provider-id")
+            .setRemarks( "The identifier of the data provider")
+            .setRequired(true)
+            .create(String.class, null);
+
+    /**Input parameters */
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(CONTEXT_PROVIDER_ID, CONTEXT_NAME, DATA_NAME, DATA_PROVIDER_ID);
     
-     /** 
-     * Output Parameters 
-     */
-    public static final ParameterDescriptorGroup OUTPUT_DESC =
-            new DefaultParameterDescriptorGroup("OutputParameters");
-    
+    /**Output parameters */
+    public static final ParameterDescriptorGroup OUTPUT_DESC =  BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
+
+
     public static final ProcessDescriptor INSTANCE = new RemoveDataFromMapContextDescriptor();
     
     public RemoveDataFromMapContextDescriptor() {

@@ -92,6 +92,7 @@ import static org.constellation.sos.ws.SOSUtils.extractTimeBounds;
 import static org.constellation.sos.ws.SOSUtils.getCollectionBound;
 import static org.constellation.sos.ws.SOSUtils.getIDFromObject;
 import static org.constellation.sos.ws.SOSUtils.getSensorPosition;
+import static org.constellation.sos.ws.SOSUtils.isCompleteEnvelope3D;
 import static org.constellation.sos.ws.SOSUtils.samplingPointMatchEnvelope;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
@@ -100,7 +101,6 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.gml.GmlInstant;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.gml.xml.AbstractTimePosition;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -183,7 +183,7 @@ import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeDuring;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeEquals;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
 import org.geotoolkit.sos.xml.SosInsertionMetadata;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
+import org.geotoolkit.sos.xml.GetFeatureOfInterestTime;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
@@ -1182,7 +1182,7 @@ public class SOSworker extends AbstractWorker {
                 if (requestObservation.getSpatialFilter() instanceof BBOX) {
                     final Envelope e = getEnvelopeFromBBOX(currentVersion, (BBOX)requestObservation.getSpatialFilter());
 
-                    if (e != null && e.isCompleteEnvelope2D()) {
+                    if (e != null && e.isCompleteEnvelope2D() || isCompleteEnvelope3D(e)) {
                         boolean add = false;
                         final List<String> matchingFeatureOfInterest = new ArrayList<>();
                         if (localOmFilter.isBoundedObservation()) {
@@ -1440,6 +1440,8 @@ public class SOSworker extends AbstractWorker {
 
         final String currentVersion         = request.getVersion().toString();
         final String observationTemplateID  = request.getObservationTemplateId();
+        final List<String> fois             = new ArrayList<>();
+        ObservationOffering offering        = null;          
         final String procedure;
         final String observedProperty;
         final TemporalObject time;
@@ -1459,6 +1461,10 @@ public class SOSworker extends AbstractWorker {
                 procedure        = ((Process) template.getProcedure()).getHref();
                 time             = template.getSamplingTime();
                 observedProperty = null;
+                final String foi = SOSUtils.extractFOID(template);
+                if (foi != null) {
+                    fois.add(foi);
+                }
                 if (template instanceof Measurement) {
                     resultModel = MEASUREMENT_QNAME;
                 } else {
@@ -1470,12 +1476,12 @@ public class SOSworker extends AbstractWorker {
                 if (request.getOffering() == null || request.getOffering().isEmpty()) {
                     throw new CstlServiceException("The offering parameter must be specified", MISSING_PARAMETER_VALUE, "offering");
                 } else {
-                    final ObservationOffering off = omReader.getObservationOffering(request.getOffering(), currentVersion);
-                    if (off== null) {
+                    offering = omReader.getObservationOffering(request.getOffering(), currentVersion);
+                    if (offering== null) {
                         throw new CstlServiceException("The offering parameter is invalid",
                                                   INVALID_PARAMETER_VALUE, "offering");
                     } 
-                    procedure = off.getProcedures().get(0);
+                    procedure = offering.getProcedures().get(0);
                 }
                 if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
                     throw new CstlServiceException("The observedProperty parameter must be specified", MISSING_PARAMETER_VALUE, "observedProperty");
@@ -1487,6 +1493,7 @@ public class SOSworker extends AbstractWorker {
                 }
                 time = null;
                 resultModel = OBSERVATION_QNAME;
+                fois.addAll(request.getFeatureOfInterest());
             }
 
             //we begin to create the sql request
@@ -1495,6 +1502,60 @@ public class SOSworker extends AbstractWorker {
             // phenomenon property
             if (observedProperty !=  null) {
                 localOmFilter.setObservedProperties(Arrays.asList(observedProperty));
+            }
+            
+            // offering
+            if (offering != null) {
+                localOmFilter.setOfferings(Arrays.asList(offering));
+            }
+            
+            // spatial filter
+             // if the request is a spatial operator
+            if (request.getSpatialFilter() != null) {
+                // for a BBOX Spatial ops
+                if (request.getSpatialFilter() instanceof BBOX) {
+                    final Envelope e = getEnvelopeFromBBOX(currentVersion, (BBOX)request.getSpatialFilter());
+
+                    if (e != null && e.isCompleteEnvelope2D()) {
+                        if (localOmFilter.isBoundedObservation()) {
+                            localOmFilter.setBoundingBox(e);
+                        } else {
+                            for (String refStation : offering.getFeatureOfInterestIds()) {
+                                // TODO for SOS 2.0 use observed area
+                                final org.geotoolkit.sampling.xml.SamplingFeature station = (org.geotoolkit.sampling.xml.SamplingFeature) omReader.getFeatureOfInterest(refStation, currentVersion);
+                                if (station == null) {
+                                    throw new CstlServiceException("the feature of interest is not registered",
+                                            INVALID_PARAMETER_VALUE);
+                                }
+                                if (station.getGeometry() instanceof Point) {
+                                    if (samplingPointMatchEnvelope((Point)station.getGeometry(), e)) {
+                                        fois.add(getIDFromObject(station));
+                                    } else {
+                                        LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(station));
+                                    }
+
+                                } else if (station instanceof AbstractFeature) {
+                                    final AbstractFeature sc = (AbstractFeature) station;
+                                    if (BoundMatchEnvelope(sc, e)) {
+                                        fois.add(sc.getId());
+                                    }
+                                } else {
+                                    LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
+                                }
+                            }
+                        }
+
+                    } else {
+                        throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
+                    }
+                } else {
+                    throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
+                }
+            }
+            
+            //foi filter
+            if (!fois.isEmpty()) {
+                localOmFilter.setFeatureOfInterest(fois);
             }
 
             //we treat the time constraint
@@ -1596,10 +1657,8 @@ public class SOSworker extends AbstractWorker {
             final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
             localOmFilter.initFilterGetFeatureOfInterest();
 
-            // for now we don't support time filter on FOI
-            if (request.getTemporalFilters().size() > 0) {
-                throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
-            }
+            // filtering on time
+            treatEventTimeRequest(currentVersion, request.getTemporalFilters(), false, localOmFilter);
         
             boolean ofilter = false;
             if (request.getObservedProperty() != null && !request.getObservedProperty().isEmpty()) {

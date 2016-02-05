@@ -18,25 +18,24 @@
  */
 package org.constellation.provider.serverstore;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.geotoolkit.client.ClientFactory;
 import org.geotoolkit.client.ClientFinder;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
-import org.opengis.util.GenericName;
 
 /**
  *
@@ -47,6 +46,7 @@ import org.opengis.util.GenericName;
 public class ServerStoreProviderService extends AbstractProviderFactory
         <GenericName,Data,DataProvider> implements DataProviderFactory {
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 
     static {
@@ -56,16 +56,12 @@ public class ServerStoreProviderService extends AbstractProviderFactory
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();
 
-            final DefaultParameterDescriptorGroup mindesc = new DefaultParameterDescriptorGroup(
-                    Collections.singletonMap("name", desc.getName()),
-                    0, 1,
-                    desc.descriptors().toArray(new GeneralParameterDescriptor[0]));
-
+            final ParameterDescriptorGroup mindesc = BUILDER.addName(desc.getName())
+                    .createGroup(0, 1, desc.descriptors().toArray(new GeneralParameterDescriptor[0]));
             descs.add(mindesc);
         }
-
-        SOURCE_CONFIG_DESCRIPTOR = new DefaultParameterDescriptorGroup(
-            "choice", descs.toArray(new GeneralParameterDescriptor[0]));
+        SOURCE_CONFIG_DESCRIPTOR = BUILDER.addName("choice").setRequired(true)
+                .createGroup(descs.toArray(new GeneralParameterDescriptor[descs.size()]));
 
     }
 

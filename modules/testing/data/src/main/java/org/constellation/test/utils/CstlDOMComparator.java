@@ -19,6 +19,8 @@
 package org.constellation.test.utils;
 
 import org.apache.sis.test.XMLComparator;
+import org.apache.sis.util.CharSequences;
+import org.junit.Assert;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -56,7 +58,28 @@ public class CstlDOMComparator extends XMLComparator {
         if (i != -1) {
             actualNodeName = actualNodeName.substring(i + 1);
         }
-        assertPropertyEquals("name",      expectedNodeName,     actualNodeName,     expected, actual);
+        assertPropertyEquals("name", expectedNodeName, actualNodeName, expected, actual);
     }
 
+    /**
+     * Override compareNode to add special case on Lower and Upper corners of bbox from capabilities documents.
+     * Compare actual double values of bboxes instead of sloppy String comparison.
+     *
+     * @param expected
+     * @param actual
+     */
+    @Override
+    protected void compareNode(Node expected, Node actual) {
+        if (expected.getLocalName() != null) {
+            switch (expected.getLocalName()) {
+                case "LowerCorner": //fall trough
+                case "UpperCorner":
+                    double[] expectedDoubles = CharSequences.parseDoubles(expected.getTextContent(), ' ');
+                    double[] actualDoubles = CharSequences.parseDoubles(actual.getTextContent(), ' ');
+                    Assert.assertArrayEquals(expectedDoubles, actualDoubles, 0.01);
+                    return;
+            }
+        }
+        super.compareNode(expected, actual);
+    }
 }

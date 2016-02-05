@@ -18,11 +18,10 @@
  */
 package org.constellation.admin.process;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -38,25 +37,36 @@ import org.opengis.parameter.ParameterValueGroup;
 public final class RestartDescriptor extends AbstractProcessDescriptor {
 
     public static final String NAME = "restart";
-    
+
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     // Constellation
-    public static final GeneralParameterDescriptor CSTL_WS_INSTANCE = new DefaultParameterDescriptor("WSInstance",
-            "Name of the WebService instance.",String.class,"default", true);
-    public static final GeneralParameterDescriptor CSTL_WS_TYPE = new DefaultParameterDescriptor("WSType",
-            "Type of the WebService.",String.class,null, true);
-    public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
-            new DefaultParameterDescriptorGroup("Constellation",
-                                                 ConstellationServerFactory.URL,
-                                                 ConstellationServerFactory.USER,
-                                                 ConstellationServerFactory.PASSWORD,
-                                                 CSTL_WS_INSTANCE,
-                                                 CSTL_WS_TYPE);
-    
+    public static final GeneralParameterDescriptor CSTL_WS_INSTANCE = BUILDER
+            .addName("WSInstance")
+            .setRemarks("Name of the WebService instance.")
+            .setRequired(true)
+            .create(String.class, "default");
+
+    public static final GeneralParameterDescriptor CSTL_WS_TYPE = BUILDER
+            .addName("WSType")
+            .setRemarks("Type of the WebService.")
+            .setRequired(true)
+            .create(String.class, null);
+
+    public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP = BUILDER.addName("Constellation").setRequired(true)
+            .createGroup(ConstellationServerFactory.URL,
+                    ConstellationServerFactory.USER,
+                    ConstellationServerFactory.PASSWORD,
+                    CSTL_WS_INSTANCE,
+                    CSTL_WS_TYPE);
+
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters", CSTL_DESCRIPTOR_GROUP);
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(CSTL_DESCRIPTOR_GROUP);
 
     /** Output parameters : nothing */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
 
     
     /**

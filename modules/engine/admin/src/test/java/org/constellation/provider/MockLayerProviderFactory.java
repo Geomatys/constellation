@@ -19,23 +19,18 @@
 
 package org.constellation.provider;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.storage.DataStore;
 import org.constellation.api.DataType;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.util.NamesExt;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.geotoolkit.util.NamesExt;
 import org.opengis.util.GenericName;
+
+import java.util.*;
 
 /**
  *
@@ -44,14 +39,26 @@ import org.opengis.util.GenericName;
 public class MockLayerProviderFactory extends AbstractProviderFactory
         <GenericName,Data,DataProvider> implements DataProviderFactory {
 
-    public static final ParameterDescriptor<String> LAYERS =
-             new DefaultParameterDescriptor<>("layers","", String.class, null, false);
-    public static final ParameterDescriptor<Boolean> CRASH_CREATE =
-             new DefaultParameterDescriptor<>("crashOnCreate","", Boolean.class, false, false);
-    public static final ParameterDescriptor<Boolean> CRASH_DISPOSE =
-             new DefaultParameterDescriptor<>("crashOnDispose","", Boolean.class, false, false);
-    public static final ParameterDescriptorGroup PARAMETERS_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup("MockParameters",LAYERS,CRASH_CREATE,CRASH_DISPOSE);
+
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
+    public static final ParameterDescriptor<String> LAYERS =  BUILDER
+            .addName("layers")
+            .setRemarks("")
+            .setRequired(false)
+            .create(String.class, null);
+    public static final ParameterDescriptor<Boolean> CRASH_CREATE = BUILDER
+            .addName("crashOnCreate")
+            .setRemarks("")
+            .setRequired(false)
+            .create(Boolean.class, Boolean.FALSE);
+    public static final ParameterDescriptor<Boolean> CRASH_DISPOSE = BUILDER
+            .addName("crashOnDispose")
+            .setRemarks("")
+            .setRequired(false)
+            .create(Boolean.class, Boolean.FALSE);
+    public static final ParameterDescriptorGroup PARAMETERS_DESCRIPTOR = BUILDER.addName("MockParameters").setRequired(true)
+            .createGroup(LAYERS,CRASH_CREATE,CRASH_DISPOSE);
     private static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             ProviderParameters.createDescriptor(PARAMETERS_DESCRIPTOR);
 

@@ -18,25 +18,24 @@
  */
 package org.constellation.provider.featurestore;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.GenericName;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
-import org.opengis.util.GenericName;
 
 /**
  *
@@ -54,28 +53,27 @@ public class FeatureStoreProviderService extends AbstractProviderFactory
     private static final String ERROR_MSG = "[PROVIDER]> Invalid featurestore provider config";
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     static {
-        final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
+        final List<ParameterDescriptorGroup> descs = new ArrayList<>();
         final Iterator<FeatureStoreFactory> ite = FeatureStoreFinder.getAllFactories(null).iterator();
+
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();
 
-            final DefaultParameterDescriptorGroup mindesc = new DefaultParameterDescriptorGroup(
-                    Collections.singletonMap("name", desc.getName()),
-                    0, 1,
-                    desc.descriptors().toArray(new GeneralParameterDescriptor[0]));
-
+            final ParameterDescriptorGroup mindesc = BUILDER.addName(desc.getName())
+                    .createGroup(0, 1, desc.descriptors().toArray(new GeneralParameterDescriptor[0]));
             descs.add(mindesc);
         }
 
-        SOURCE_CONFIG_DESCRIPTOR = new DefaultParameterDescriptorGroup(
-            "choice", descs.toArray(new GeneralParameterDescriptor[0]));
+        SOURCE_CONFIG_DESCRIPTOR = BUILDER.addName("choice").setRequired(true)
+                .createGroup(descs.toArray(new GeneralParameterDescriptor[descs.size()]));
 
     }
 
-    public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR = createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public FeatureStoreProviderService(){
         super(NAME);

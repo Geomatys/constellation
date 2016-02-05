@@ -19,19 +19,12 @@
 
 package org.constellation.provider.configuration;
 
-import org.apache.sis.parameter.DefaultParameterDescriptorGroup;
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.ArgumentChecks;
 import org.constellation.provider.DataProvider;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +37,8 @@ import static org.geotoolkit.parameter.Parameters.value;
  */
 public final class ProviderParameters {
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     ////////////////////////////////////////////////////////////////////////////
     // Source parameters ///////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -52,54 +47,52 @@ public final class ProviderParameters {
     /** /!\ NO ! Keep ALL the arguments, because we need them for old configuration import.
      */
     public static final ParameterDescriptor<String> SOURCE_ID_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("id","source id",String.class,null,true);
+            BUILDER.addName("id").setRemarks("source id").setRequired(true).create(String.class, null);
     public static final ParameterDescriptor<Boolean> SOURCE_LOADALL_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("load_all","source load all datas",Boolean.class,true,true);
+            BUILDER.addName("load_all").setRemarks("source load all datas").setRequired(true).create(Boolean.class, Boolean.TRUE);
     public static final ParameterDescriptor<Date> SOURCE_DATE_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("date","source creation date",Date.class,null,false);
+            BUILDER.addName("date").setRemarks("source creation date").setRequired(false).create(Date.class, null);
     public static final ParameterDescriptor<String> SOURCE_TYPE_DESCRIPTOR =
-            new DefaultParameterDescriptor<>("providerType","provider type",String.class,null,false);
+            BUILDER.addName("providerType").setRemarks("provider type").setRequired(false).create(String.class, null);
 
     public static final ParameterDescriptor<Boolean> SOURCE_CREATEDATASET_DESCRIPTOR =
-            new DefaultParameterDescriptor<>("create_dataset","optional internal parameters",Boolean.class,null,false);
+            BUILDER.addName("create_dataset").setRemarks("optional internal parameters").setRequired(false).create(Boolean.class, null);
 
     ////////////////////////////////////////////////////////////////////////////
     // Source layer parameters /////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     public static final ParameterDescriptor<String> LAYER_NAME_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("name","layer name",String.class,null,true);
+            BUILDER.addName("name").setRemarks("layer name").setRequired(true).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_STYLE_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("style","layer styles",String.class,null,false);
+            BUILDER.addName("style").setRemarks("layer styles").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_DATE_START_FIELD_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("periode_start","layer date start field",String.class,null,false);
+            BUILDER.addName("periode_start").setRemarks("layer date start field").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_DATE_END_FIELD_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("periode_end","layer date end field",String.class,null,false);
+            BUILDER.addName("periode_end").setRemarks("layer date end field").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_ELEVATION_START_FIELD_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("elevation_start","layer elevation start field",String.class,null,false);
+            BUILDER.addName("elevation_start").setRemarks("layer elevation start field").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_ELEVATION_END_FIELD_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("elevation_end","layer elevation end field",String.class,null,false);
+            BUILDER.addName("elevation_end").setRemarks("layer elevation end field").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_ELEVATION_MODEL_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("elevation_model","layer elevation model",String.class,null,false);
+            BUILDER.addName("elevation_model").setRemarks("layer elevation model").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<Boolean> LAYER_IS_ELEVATION_MODEL_DESCRIPTOR =
-             new DefaultParameterDescriptor<>("is_elevation_model","layer is elevation model",Boolean.class,false,false);
+            BUILDER.addName("is_elevation_model").setRemarks("layer is elevation model").setRequired(false).create(Boolean.class, Boolean.FALSE);
     public static final ParameterDescriptor<String> LAYER_QUERY_LANGUAGE =
-             new DefaultParameterDescriptor<>("language","layer query language",String.class,null,false);
+            BUILDER.addName("language").setRemarks("layer query language").setRequired(false).create(String.class, null);
     public static final ParameterDescriptor<String> LAYER_QUERY_STATEMENT =
-             new DefaultParameterDescriptor<>("statement","layer query statement",String.class,null,false);
-    public static final ParameterDescriptorGroup LAYER_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(
-                Collections.singletonMap("name", "Layer"),
-                0, Integer.MAX_VALUE,
-                LAYER_NAME_DESCRIPTOR,
-                LAYER_STYLE_DESCRIPTOR,
-                LAYER_DATE_START_FIELD_DESCRIPTOR,
-                LAYER_DATE_END_FIELD_DESCRIPTOR,
-                LAYER_ELEVATION_START_FIELD_DESCRIPTOR,
-                LAYER_ELEVATION_END_FIELD_DESCRIPTOR,
-                LAYER_ELEVATION_MODEL_DESCRIPTOR,
-                LAYER_IS_ELEVATION_MODEL_DESCRIPTOR,
-                LAYER_QUERY_LANGUAGE,
-                LAYER_QUERY_STATEMENT);
+            BUILDER.addName("statement").setRemarks("layer query statement").setRequired(false).create(String.class, null);
+    public static final ParameterDescriptorGroup LAYER_DESCRIPTOR =  BUILDER.addName("Layer")
+                    .createGroup(0, Integer.MAX_VALUE,
+                            LAYER_NAME_DESCRIPTOR,
+                            LAYER_STYLE_DESCRIPTOR,
+                            LAYER_DATE_START_FIELD_DESCRIPTOR,
+                            LAYER_DATE_END_FIELD_DESCRIPTOR,
+                            LAYER_ELEVATION_START_FIELD_DESCRIPTOR,
+                            LAYER_ELEVATION_END_FIELD_DESCRIPTOR,
+                            LAYER_ELEVATION_MODEL_DESCRIPTOR,
+                            LAYER_IS_ELEVATION_MODEL_DESCRIPTOR,
+                            LAYER_QUERY_LANGUAGE,
+                            LAYER_QUERY_STATEMENT);
 
 
     private ProviderParameters(){}
@@ -111,11 +104,9 @@ public final class ProviderParameters {
      *  -> layers
      */
     public static ParameterDescriptorGroup createDescriptor(final GeneralParameterDescriptor sourceConfigDescriptor){
-        final ParameterDescriptorGroup sourceDescriptor = new org.apache.sis.parameter.DefaultParameterDescriptorGroup(
-                Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),1, Integer.MAX_VALUE,
+        return BUILDER.addName(SOURCE_DESCRIPTOR_NAME).setRequired(true).createGroup(1, Integer.MAX_VALUE,
                 SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,SOURCE_TYPE_DESCRIPTOR,
                 SOURCE_CREATEDATASET_DESCRIPTOR, sourceConfigDescriptor,LAYER_DESCRIPTOR);
-        return sourceDescriptor;
     }
 
     public static boolean isLoadAll(final ParameterValueGroup source){

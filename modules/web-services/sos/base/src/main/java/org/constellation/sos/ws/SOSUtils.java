@@ -81,6 +81,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.admin.SpringHelper;
+import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.observation.xml.AbstractObservation;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
@@ -646,5 +649,21 @@ public final class SOSUtils {
             return obj;
         }
         throw new DataStoreException("the observation file does not contain a valid O&M object");
+    }
+    
+    public static boolean isCompleteEnvelope3D(Envelope e) {
+        return e.getLowerCorner() != null && e.getUpperCorner() != null
+                && e.getLowerCorner().getCoordinate().length == 3 && e.getUpperCorner().getCoordinate().length == 3;
+    }
+    
+    public static String extractFOID(Observation obs) {
+        if (obs.getFeatureOfInterest() instanceof AbstractFeature) {
+            return ((AbstractFeature)obs.getFeatureOfInterest()).getId();
+        } else if (obs instanceof AbstractObservation) {
+            AbstractObservation aobs = (AbstractObservation) obs;
+            FeatureProperty featProp = aobs.getPropertyFeatureOfInterest();
+            return featProp.getHref();
+        }
+        return null;
     }
 }

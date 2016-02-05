@@ -18,12 +18,10 @@
  */
 package org.constellation.process.provider;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -38,30 +36,37 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
     public static final String NAME = "provider.update";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update a provider from constellation.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
     /*
      * Provider to update identifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove.";
-    public static final ParameterDescriptor<String> PROVIDER_ID =
-            new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
+    public static final ParameterDescriptor<String> PROVIDER_ID = BUILDER
+            .addName(PROVIDER_ID_NAME)
+            .setRemarks(PROVIDER_ID_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
 
     /*
      * Source use to update.
      */
     public static final String SOURCE_NAME = "source";
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to update provider source.";
-    public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
-            new DefaultParameterDescriptor(SOURCE_NAME, SOURCE_REMARKS, ParameterValueGroup.class, null, true);
+    public static final ParameterDescriptor<ParameterValueGroup> SOURCE = BUILDER
+            .addName(SOURCE_NAME)
+            .setRemarks(SOURCE_REMARKS)
+            .setRequired(true)
+            .create(ParameterValueGroup.class, null);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_ID, SOURCE});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(PROVIDER_ID, SOURCE);
 
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = BUILDER.addName("OutputParameters").setRequired(true)
+            .createGroup();
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.

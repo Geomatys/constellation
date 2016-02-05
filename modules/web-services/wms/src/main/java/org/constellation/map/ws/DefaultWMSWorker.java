@@ -691,7 +691,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     (_abstract != null) ? _abstract.toString() : null,
                     ( keyword  != null) ?  keyword .toString() : null,
                     supportedCrs, bbox, outputBBox, queryable, dimensions, styles);
-            if(nativeBBox!=null){
+            if(nativeBBox!=null && !nativeBBox.getCRSCode().equals(outputBBox.getCRSCode())){
                 ((List)outputLayerO.getBoundingBox()).add(0, nativeBBox);
             }
 

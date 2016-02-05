@@ -18,12 +18,10 @@
  */
 package org.constellation.process.provider;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -38,33 +36,44 @@ public class CreateProviderDescriptor extends AbstractCstlProcessDescriptor {
     public static final String NAME = "provider.create";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
 
+    private static final ParameterBuilder BUILDER = new ParameterBuilder();
+
     /**
      * {@link org.constellation.provider.ProviderFactoryType}
      */
     public static final String PROVIDER_TYPE_NAME = "provider_type";
     private static final String PROVIDER_TYPE_REMARKS = "Provider factory name like 'feature-store', 'coverage-store', ... .";
-    public static final ParameterDescriptor<String> PROVIDER_TYPE =
-            new DefaultParameterDescriptor<String>(PROVIDER_TYPE_NAME, PROVIDER_TYPE_REMARKS, String.class, null, true);
+    public static final ParameterDescriptor<String> PROVIDER_TYPE = BUILDER
+            .addName(PROVIDER_TYPE_NAME)
+            .setRemarks(PROVIDER_TYPE_REMARKS)
+            .setRequired(true)
+            .create(String.class, null);
 
 
     public static final String SOURCE_NAME = "parameters";
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to create provider.";
-    public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
-            new DefaultParameterDescriptor(SOURCE_NAME, SOURCE_REMARKS, ParameterValueGroup.class, null, true);
-    
+    public static final ParameterDescriptor<ParameterValueGroup> SOURCE = BUILDER
+            .addName(SOURCE_NAME)
+            .setRemarks(SOURCE_REMARKS)
+            .setRequired(true)
+            .create(ParameterValueGroup.class, null);
+
     public static final String DOMAIN_ID_NAME = "domain-id";
     private static final String DOMAIN_ID_REMARKS = "Identifier of the domain to add data.";
-    public static final ParameterDescriptor<Integer> DOMAIN_ID =
-            new DefaultParameterDescriptor(DOMAIN_ID_NAME, DOMAIN_ID_REMARKS, Integer.class, null, false);
+    public static final ParameterDescriptor<Integer> DOMAIN_ID = BUILDER
+            .addName(DOMAIN_ID_NAME)
+            .setRemarks(DOMAIN_ID_REMARKS)
+            .setRequired(false)
+            .create(Integer.class, null);
 
     /**Input parameters */
-    public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_TYPE, SOURCE, DOMAIN_ID});
+    public static final ParameterDescriptorGroup INPUT_DESC = BUILDER.addName("InputParameters").setRequired(true)
+            .createGroup(PROVIDER_TYPE, SOURCE, DOMAIN_ID);
 
 
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = new ParameterBuilder().addName("OutputParameters").setRequired(true)
+            .createGroup();
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
