@@ -54,9 +54,8 @@ public class WebConfigurer implements ServletContextListener {
         log.info("Web application configuration");
 
         log.debug("Configuring Spring root application context");
-        
-        
-        Object rootContextObject = servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+
+        Object rootContextObject = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         AbstractRefreshableWebApplicationContext rootContext;
         if(rootContextObject==null) {
             AnnotationConfigWebApplicationContext annotationRootContext = new AnnotationConfigWebApplicationContext();
@@ -65,11 +64,14 @@ public class WebConfigurer implements ServletContextListener {
             servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, annotationRootContext);
             rootContext = annotationRootContext;
             
-        }else {
-            rootContext = (AbstractRefreshableWebApplicationContext) rootContextObject;
+        } else {
+            if (rootContextObject instanceof AbstractRefreshableWebApplicationContext) {
+                rootContext = (AbstractRefreshableWebApplicationContext) rootContextObject;
+            } else {
+                throw new IllegalStateException("Root web application context not an instance " +
+                        "of AbstractRefreshableWebApplicationContext"+ rootContextObject);
+            }
         }
-        
-
 
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
