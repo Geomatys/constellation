@@ -253,8 +253,12 @@ public final class DefaultConfigurator implements Configurator {
             String propertyValue = Application.getProperty(AppProperty.DATA_AUTO_ANALYSE);
             boolean doAnalysis = propertyValue == null ? false : Boolean.valueOf(propertyValue);
 
+            final Set<GenericName> names = provider.getKeys();
+            if(names.isEmpty()) {
+                throw new ConstellationException("Constellation failed to decode the data! please contact an administrator to get the reason of this failure.");
+            }
             // Add new layer.
-            for (final GenericName key : provider.getKeys()) {
+            for (final GenericName key : names) {
                 final QName name = new QName(NamesExt.getNamespace(key), key.tip().toString());
                 String ns = name.getNamespaceURI();
                 if(ns.isEmpty()) ns = null;
