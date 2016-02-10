@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- * Copyright 2014 Geomatys.
+ * Copyright 2013-2016 Geomatys.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,52 +16,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.constellation.client;
 
-package org.constellation.admin.service;
-
-
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.AcknowlegementType;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.ClientResponse;
-
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.AcknowlegementType;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 
 /**
- * Constellation RESTful API client.
  *
- * @author Bernard Fabien (Geomatys).
- * @author Benjamin Garcia (Geomatys).
- * @version 0.9
- * @since 0.9
+ * @author Bernard Fabien (Geomatys)
+ * @author Benjamin Garcia (Geomatys)
+ * @author Guilhem Legal (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public final class ConstellationClient {
+public class ConstellationClient {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
 
@@ -80,30 +64,22 @@ public final class ConstellationClient {
      */
     private final String version;
 
-    /**
-     * API methods related to services administration.
-     */
-    public final ServicesAPI services;
-
-    /**
-     * API methods related to providers administration.
-     */
-    public final ProvidersAPI providers;
-
-    /**
-     * API methods related to tasks administration.
-     */
-    public final TasksAPI tasks;
-
-    /**
-     * API methods related to csw administration.
-     */
-    public final CswAPI csw;
-
-    /**
-     * API methods related to constellation administration.
-     */
-    public final AdminAPI admin;
+    public final AdminAPI adminApi;
+    public final CswAPI cswApi;
+    public final DataAPI dataApi;
+    public final DataSetAPI datasetApi;
+    public final MapAPI mapApi;
+    public final MapContextAPI mapcontextApi;
+    public final MetadataAPI metadataApi;
+    public final PortrayalAPI portrayalApi;
+    public final ProviderAPI providerApi;
+    public final SensorAPI sensorApi;
+    public final ServicesAPI servicesApi;
+    public final SosAPI sosApi;
+    public final StyleAPI styleApi;
+    public final TaskAPI taskApi;
+    public final UserAPI userApi;
+    public final WpsAPI wpsApi;
 
     /**
      * Creates a new client instance ready to communicate with the Constellation server.
@@ -129,20 +105,37 @@ public final class ConstellationClient {
         // Initialize Jersey client.
         final Configuration config = new ClientConfig(NodeReader.class, ParameterValueGroupWriter.class);
         this.client = ClientBuilder.newClient(config);
-        connectTimeout(5000);
-        readTimeout(20000);
+        setConnectTimeout(5000);
+        setReadTimeout(20000);
 
         this.url        = url.endsWith("/") ? url : url + "/";
         this.version    = version;
-        this.services   = new ServicesAPI(this);
-        this.providers  = new ProvidersAPI(this);
-        this.csw        = new CswAPI(this);
-        this.admin      = new AdminAPI(this);
-        this.tasks      = new TasksAPI(this);
+
+        adminApi        = new AdminAPI(this);
+        cswApi          = new CswAPI(this);
+        dataApi         = new DataAPI(this);
+        datasetApi      = new DataSetAPI(this);
+        mapApi          = new MapAPI(this);
+        mapcontextApi   = new MapContextAPI(this);
+        metadataApi     = new MetadataAPI(this);
+        portrayalApi    = new PortrayalAPI(this);
+        providerApi     = new ProviderAPI(this);
+        sensorApi       = new SensorAPI(this);
+        servicesApi     = new ServicesAPI(this);
+        sosApi          = new SosAPI(this);
+        styleApi        = new StyleAPI(this);
+        taskApi         = new TaskAPI(this);
+        userApi         = new UserAPI(this);
+        wpsApi          = new WpsAPI(this);
+
     }
 
     public String getUrl() {
         return url;
+    }
+
+    public WebTarget getWebTarget() {
+        return client.target(url);
     }
 
     /**
@@ -152,87 +145,32 @@ public final class ConstellationClient {
      * @param password the user password
      * @return the {@link ConstellationClient} instance
      */
-    public ConstellationClient basicAuth(final String login, final String password) {
+    public ConstellationClient authenticate(final String login, final String password) throws IOException {
         ensureNonNull("login",    login);
         ensureNonNull("password", password);
-        this.client.register(new BasicAuthenticator(login, password));
+        final String token = TokenAuthenticator.requestToken(url, login, password);
+        this.client.register(new TokenAuthenticator(token));
         return this;
-    }
-
-    public ConstellationClient auth(final String login, final String password) {
-
-        String str = url + "j_spring_security_check?";
-        InputStream stream = null;
-        HttpURLConnection cnx = null;
-        try {
-            final URL url = new URL(str);
-            cnx = (HttpURLConnection) url.openConnection();
-            cnx.setDoOutput(true);
-            cnx.setInstanceFollowRedirects(false);
-
-            final OutputStream os = cnx.getOutputStream();
-            final String s = "j_username=" + login + "&j_password=" + password;
-            os.write(s.getBytes());
-
-            stream = cnx.getInputStream();
-
-            String cookie = cnx.getHeaderField("Set-Cookie");
-            Pattern pattern = Pattern.compile("JSESSIONID=([^;]+);.*");
-            Matcher matcher = pattern.matcher(cookie);
-            if(matcher.matches()){
-               final String cookieValue = "JSESSIONID=" + matcher.group(1);
-               System.out.println("cookie=" + cookieValue);
-               this.client.register(new ClientRequestFilter() {
-                    private List<Object> cookies = Arrays.asList((Object)cookieValue);
-
-                    @Override
-                    public void filter(ClientRequestContext request) throws IOException {
-                        if (cookies != null) {
-                            request.getHeaders().put("Cookie", cookies);
-                        }
-                    }
-                });
-               return this;
-            }
-        } catch (Exception ex) {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                }
-            }
-            if (cnx != null) {
-                cnx.disconnect();
-            }
-        }
-        return null;
     }
 
     /**
      * Configures the Jersey {@link Client} read timeout for HTTP communication.
      *
      * @param timeout the timeout value (in ms)
-     * @return the {@link ConstellationClient} instance
      */
-    public ConstellationClient readTimeout(final int timeout) {
+    public void setReadTimeout(final int timeout) {
         ensureStrictlyPositive("timeout", timeout);
         this.client.property(ClientProperties.READ_TIMEOUT, timeout);
-        return this;
     }
 
     /**
      * Configures the Jersey {@link Client} connection timeout for HTTP communication.
      *
      * @param timeout the timeout value (in ms)
-     * @return the {@link ConstellationClient} instance
      */
-    public ConstellationClient connectTimeout(final int timeout) {
+    public void setConnectTimeout(final int timeout) {
         ensureStrictlyPositive("timeout", timeout);
         this.client.property(ClientProperties.CONNECT_TIMEOUT, timeout);
-        return this;
     }
 
     /**
@@ -377,8 +315,6 @@ public final class ConstellationClient {
             }
         }
 
-
-
         /**
          * Ensures that the response has a "success" status code {@code 2xx}.
          *
@@ -419,7 +355,4 @@ public final class ConstellationClient {
         this.client.close();
     }
 
-    public WebTarget target() {
-        return client.target(url);
-    }
 }

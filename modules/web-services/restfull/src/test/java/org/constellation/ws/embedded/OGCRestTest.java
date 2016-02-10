@@ -41,7 +41,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.service.ConstellationClient;
+import org.constellation.client.ConstellationClient;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IMetadataBusiness;
 import org.constellation.business.IProviderBusiness;
@@ -198,11 +198,11 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
 
         client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort() + "/");
 
-        Instance in = client.services.getInstance(ServiceDef.Specification.CSW, "default");
+        Instance in = client.servicesApi.getInstance(ServiceDef.Specification.CSW, "default");
 
         assertNotNull(in);
 
-        Object s = client.services.getInstanceConfiguration(ServiceDef.Specification.CSW, "default");
+        Object s = client.servicesApi.getConfiguration(ServiceDef.Specification.CSW, "default");
 
         assertTrue(s instanceof Automatic);
 
@@ -210,9 +210,9 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
 
         auto.setFormat("TEST");
 
-        client.services.setInstanceConfiguration(ServiceDef.Specification.CSW, "default", auto);
+        client.servicesApi.setConfiguration(ServiceDef.Specification.CSW, "default", auto);
 
-        s = client.services.getInstanceConfiguration(ServiceDef.Specification.CSW, "default");
+        s = client.servicesApi.getConfiguration(ServiceDef.Specification.CSW, "default");
 
         assertTrue(s instanceof Automatic);
 
@@ -226,9 +226,9 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         waitForStart();
 
         client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort() + "/");
-        client.connectTimeout(3000000);
-        client.readTimeout(3000000);
-        final Node node = client.csw.getMetadata("intern", "42292_5p_19900609195600");
+        client.setConnectTimeout(3000000);
+        client.setReadTimeout(3000000);
+        final Node node = client.cswApi.getMetadata("intern", "42292_5p_19900609195600");
         assertNotNull(node);
         assertEquals("MD_Metadata", node.getLocalName());
     }

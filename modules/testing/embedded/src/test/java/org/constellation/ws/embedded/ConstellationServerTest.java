@@ -22,7 +22,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.business.IServiceBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.service.ConstellationClient;
+import org.constellation.client.ConstellationClient;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
@@ -169,37 +169,25 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
     }
 
     @Test
-    @Order(order=1)
-    public void testgetDescriptor() throws Exception {
-
+    @Order(order=2)
+    public void testImportFile() throws Exception {
         waitForStart();
 
         final ConstellationClient client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort());
-        final ConstellationClient administrator = client.auth("", "");
-        assertNotNull(administrator);
-        GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("feature-store");
-        assertNotNull(desc);
-    }
-
-    @Test
-    @Order(order=2)
-    public void testImportFile() throws Exception {
-
-        final ConstellationClient client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort());
-        final ConstellationClient administrator = client.auth("", "");
+        final ConstellationClient administrator = client.authenticate("", "");
         assertNotNull(administrator);
         final File f = FileUtilities.getFileFromResource("org.constellation.embedded.test.urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58.xml");
 
-        final boolean inserted = administrator.csw.importMetadata("default", f);
+        final boolean inserted = administrator.cswApi.importRecord("default", f);
         assertTrue(inserted);
 
-        boolean exist = administrator.csw.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        boolean exist = administrator.cswApi.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertTrue(exist);
 
-        final boolean deleted = administrator.csw.deleteMetadata("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        final boolean deleted = administrator.cswApi.removeMetadata("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertTrue(deleted);
 
-        exist = administrator.csw.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        exist = administrator.cswApi.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertFalse(exist);
 
     }

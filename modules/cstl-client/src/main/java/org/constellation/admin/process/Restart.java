@@ -19,15 +19,19 @@
 package org.constellation.admin.process;
 
 
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import org.constellation.ServiceDef;
+import org.constellation.client.ConstellationClient;
+import org.geotoolkit.client.AbstractClientFactory;
 
 import static org.geotoolkit.io.X364.BOLD;
 import static org.geotoolkit.io.X364.FOREGROUND_DEFAULT;
@@ -43,8 +47,8 @@ public class Restart extends AbstractCstlProcess {
     
     private static final AtomicBoolean ACTIVE = new AtomicBoolean(false);
     private final ParameterValueGroup CSTL_CONFIG;
-    private final String WS_INSTANCE;
-    private final String WS_TYPE;
+    private final String wsInstance;
+    private final String wsType;
     
 
     /**
@@ -54,19 +58,19 @@ public class Restart extends AbstractCstlProcess {
         super(desc, parameter);
         
         CSTL_CONFIG   = inputParameters.groups(RestartDescriptor.CSTL_DESCRIPTOR_GROUP.getName().getCode()).get(0);
-        WS_INSTANCE   = CSTL_CONFIG.parameter(RestartDescriptor.CSTL_WS_INSTANCE.getName().getCode()).stringValue();
-        WS_TYPE       = CSTL_CONFIG.parameter(RestartDescriptor.CSTL_WS_TYPE.getName().getCode()).stringValue();
+        wsInstance   = CSTL_CONFIG.parameter(RestartDescriptor.CSTL_WS_INSTANCE.getName().getCode()).stringValue();
+        wsType       = CSTL_CONFIG.parameter(RestartDescriptor.CSTL_WS_TYPE.getName().getCode()).stringValue();
         
     }
 
-    //// parametres ////////////////////////////////////////////////////////////
-    
-    private ConstellationServer createConstellationClient() throws MalformedURLException {
-        return new ConstellationServer(CSTL_CONFIG);
+    private ConstellationClient createConstellationClient() throws MalformedURLException, IOException {
+        final URL url = (URL) CSTL_CONFIG.parameter(AbstractClientFactory.URL.getName().getCode()).getValue();
+        final String login  = CSTL_CONFIG.parameter(RefreshIndexDescriptor.USER.getName().getCode()).stringValue();
+        final String passw  = CSTL_CONFIG.parameter(RefreshIndexDescriptor.PASSWORD.getName().getCode()).stringValue();
+        final String version = "1";
+        return new ConstellationClient(url.toString(), version).authenticate(login, passw);
     }
 
-    // traitement //////////////////////////////////////////////////////////////
-    
     @Override
     public void execute() {
         
@@ -97,18 +101,22 @@ public class Restart extends AbstractCstlProcess {
     }
 
     /**
-     * Verify constellation accesibility
+     * Verify constellation accessibility
      */
     private boolean constellationRunning() {
-        final ConstellationServer cstlServer = ConstellationServer.login(CSTL_CONFIG);
-        return cstlServer != null;
+        try {
+            final ConstellationClient cstlClient = createConstellationClient();
+            return cstlClient != null;
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "Error while login to cstl server", ex);
+            return false;
+        }
     }
-    
     
     private void restartService() {
         try {
-            final ConstellationServer cstl = createConstellationClient();
-            cstl.services.restartInstance(WS_TYPE, WS_INSTANCE);
+            final ConstellationClient cstl = createConstellationClient();
+            cstl.servicesApi.restart(ServiceDef.Specification.valueOf(wsType), wsInstance, true);
 
             console(FOREGROUND_GREEN, "OK", FOREGROUND_DEFAULT, "\n");
         } catch (MalformedURLException ex) {

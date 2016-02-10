@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- * Copyright 2014 Geomatys.
+ * Copyright 2013-2016 Geomatys.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.constellation.admin.service;
-
-import java.io.IOException;
+package org.constellation.client;
 
 /**
- * Signals a non 2xx HTTP response.
  *
- * @author Fabien Bernard (Geomatys).
- * @since 0.9
  */
-public final class HttpResponseException extends IOException {
+public class SosAPI {
 
-    private final int statusCode;
+    /**
+     * Client used to communicate with the Constellation server.
+     */
+    private final ConstellationClient client;
 
-    public HttpResponseException(final int statusCode, final String msg) {
-        super(msg);
-        this.statusCode = statusCode;
+    /**
+     *
+     * @param client the client to use
+     */
+    SosAPI(final ConstellationClient client) {
+        this.client = client;
     }
-
-    public int getStatusCode() {
-        return this.statusCode;
-    }
+    
 }

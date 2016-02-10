@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.admin.service;
+package org.constellation.client;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

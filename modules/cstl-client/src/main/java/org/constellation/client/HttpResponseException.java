@@ -17,19 +17,26 @@
  * limitations under the License.
  */
 
-package org.constellation.admin.service;
+package org.constellation.client;
 
-import org.opengis.parameter.ParameterValueGroup;
-
-import java.util.EventListener;
-
+import java.io.IOException;
 
 /**
+ * Signals a non 2xx HTTP response.
  *
- * @author Cédric Briançon (Geomatys)
+ * @author Fabien Bernard (Geomatys).
+ * @since 0.9
  */
-public interface ConstellationListener extends EventListener{
-    void providerCreated(final String serviceName, final ParameterValueGroup config);
-    void providerDeleted(final String id);
-    void providerUpdated(final String serviceName, final String id, final ParameterValueGroup config);
+public final class HttpResponseException extends IOException {
+
+    private final int statusCode;
+
+    public HttpResponseException(final int statusCode, final String msg) {
+        super(msg);
+        this.statusCode = statusCode;
+    }
+
+    public int getStatusCode() {
+        return this.statusCode;
+    }
 }

@@ -20,8 +20,8 @@ package org.constellation.admin.process;
 
 import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.process.ConstellationProcessFactory;
+import org.geotoolkit.client.AbstractClientFactory;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -54,9 +54,9 @@ public final class RestartDescriptor extends AbstractProcessDescriptor {
             .create(String.class, null);
 
     public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP = BUILDER.addName("Constellation").setRequired(true)
-            .createGroup(ConstellationServerFactory.URL,
-                    ConstellationServerFactory.USER,
-                    ConstellationServerFactory.PASSWORD,
+            .createGroup(AbstractClientFactory.URL,
+                    RefreshIndexDescriptor.USER,
+                    RefreshIndexDescriptor.PASSWORD,
                     CSTL_WS_INSTANCE,
                     CSTL_WS_TYPE);
 

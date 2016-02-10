@@ -20,11 +20,12 @@ package org.constellation.admin.process;
 
 import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.process.ConstellationProcessFactory;
+import org.geotoolkit.client.AbstractClientFactory;
 import org.geotoolkit.process.Process;
 import org.geotoolkit.processing.AbstractProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -51,10 +52,22 @@ public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
             .setRequired(true)
             .create(Boolean.class, Boolean.TRUE);
 
+    public static final ParameterDescriptor<String> USER = BUILDER
+            .addName("User")
+            .setRemarks("User login")
+            .setRequired(true)
+            .create(String.class,null);
+
+    public static final ParameterDescriptor<String> PASSWORD = BUILDER
+            .addName("Password")
+            .setRemarks("User password")
+            .setRequired(true)
+            .create(String.class,null);
+
     public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP = BUILDER.addName("Constellation").setRequired(true)
-                    .createGroup(ConstellationServerFactory.URL,
-                            ConstellationServerFactory.USER,
-                            ConstellationServerFactory.PASSWORD,
+                    .createGroup(AbstractClientFactory.URL,
+                            USER,
+                            PASSWORD,
                             CSTL_CSW_INSTANCE,
                             CSTL_ASYNCHRONOUS);
 

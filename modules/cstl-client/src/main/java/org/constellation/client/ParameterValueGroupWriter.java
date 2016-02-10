@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.admin.service;
+package org.constellation.client;
 
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.ParameterValueGroup;
