@@ -1573,6 +1573,12 @@ p.error-select-one{
     float: left;
     padding: 0 10px;
     font-size: 12px;
+
+  &.block-owner {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 .dashboard .item-list .item .bottom .block:last-child {
     border: none;
@@ -2558,6 +2564,10 @@ body.modal-open{
   .dashboard .searchbox {
     width: 130px;
   }
+
+  .dashboard .item-list .item .bottom .block-owner {
+    max-width: 220px;
+  }
 }
 
 @media screen and (min-width: @screen-sm)and (max-width: @screen-sm-max){
@@ -2855,6 +2865,10 @@ body.modal-open{
   .item-title.title-bloc{
     width: 210px;
   }
+
+  .dashboard .item-list .item .bottom .block-owner {
+    max-width: 140px;
+  }
 }
 
 @media screen and (min-width: @screen-md)and (max-width: @screen-md-max) {
@@ -3017,6 +3031,10 @@ body.modal-open{
   .btn-emprise{
     margin-left:7px;
   }
+
+  .dashboard .item-list .item .bottom .block-owner {
+    max-width: 270px;
+  }
 }
 
 
@@ -3065,6 +3083,10 @@ body.modal-open{
   //responsive
   .btn-emprise{
     margin-left:14px;
+  }
+
+  .dashboard .item-list .item .bottom .block-owner {
+    max-width: 350px;
   }
 }
 

@@ -275,13 +275,13 @@
                                                                 <div class="block tooltipicon"
                                                                      style="margin-top:0;text-shadow: none;">
                                                                     <i class="fa fa-calendar"
-                                                                       tooltip data-placement="bottom"
+                                                                       tooltip data-placement="top"
                                                                        title="{{cswdata.createDate | date:'yyyy-MM-dd'}}"></i>
                                                                 </div>
                                                                 <div class="block tooltipicon"
                                                                      style="margin-top:0;text-shadow: none;">
                                                                     <i class="fa fa-user"
-                                                                       tooltip data-placement="bottom"
+                                                                       tooltip data-placement="top"
                                                                        title="{{cswdata.creator}}"></i>
                                                                 </div>
                                                             </div>
@@ -289,7 +289,9 @@
                                                                 <div class="block">
                                                                     <i class="fa fa-calendar"></i>{{cswdata.createDate | date:'yyyy-MM-dd'}}
                                                                 </div>
-                                                                <div class="block">
+                                                                <div class="block block-owner"
+                                                                     tooltip-html-unsafe="{{cswdata.creator}}"
+                                                                     tooltip-placement="top">
                                                                     <i class="fa fa-user"></i>{{cswdata.creator}}
                                                                 </div>
                                                             </div>
