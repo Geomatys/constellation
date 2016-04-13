@@ -1,0 +1,48 @@
+preview-map {
+  display: block;
+  width: 100%;
+  height: 250px;
+  margin-bottom: 10px;
+  border: 1px solid;
+  border-radius: 4px;
+
+  > .ol-viewport {
+    border-radius: 3px;
+  }
+
+  // Cursor
+  // ----------
+
+  &:active {
+    cursor: move;
+  }
+
+  // Fullscreen
+  // ----------
+
+  .fullscreen-overview() {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  &:-moz-full-screen,
+  &:-moz-full-screen > .ol-viewport {
+    .fullscreen-overview();
+  }
+  &:-webkit-full-screen,
+  &:-webkit-full-screen > .ol-viewport  {
+    .fullscreen-overview();
+  }
+  &:-ms-fullscreen,
+  &:-ms-fullscreen > .ol-viewport  {
+    .fullscreen-overview();
+  }
+  &:fullscreen,
+  &:fullscreen > .ol-viewport {
+    .fullscreen-overview();
+  }
+}

@@ -165,6 +165,7 @@ module.exports = function(grunt) {
                     '<%= target_dir %>/js/cstl.js': [
                         '<%= src_dir %>/js/app-dependencies.js',
                         '<%= src_dir %>/js/app.js',
+                        '<%= src_dir %>/components/**/*.js',
                         '<%= src_dir %>/js/directives.js',
                         '<%= src_dir %>/js/restapi.js',
                         '<%= src_dir %>/js/services.js',
