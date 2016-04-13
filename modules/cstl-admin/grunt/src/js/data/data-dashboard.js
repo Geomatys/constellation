@@ -17,8 +17,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-data-dashboard', [
+    'cstl-restapi',
+    'cstl-services',
+    'cstl.components.previewMap',
+    'ui.bootstrap.modal'])
 
     .constant('defaultDatasetQuery', {
         page: 1,
@@ -82,6 +85,9 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
 
         // Indicates if "singleton" datasets must be displayed.
         self.showSingleton = CstlConfig['dataset.listing.show_singleton'];
+
+        // Overview layer instance.
+        self.preview = { layer: undefined, extent: undefined };
 
         // Variable to store dataset or/and data selection.
         var selection = self.selection = { dataset: null, data: null, style: null };
@@ -176,13 +182,6 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
 
         // Display the data in the preview map.
         self.updatePreview = function() {
-            // Reset map state.
-            if (DataDashboardViewer.map) {
-                DataDashboardViewer.map.setTarget(undefined);
-            }
-            DataDashboardViewer.initConfig();
-            DataDashboardViewer.fullScreenControl = true;
-
             if (selection.data) {
                 // Generate layer name.
                 var layerName = selection.data.name;
@@ -226,12 +225,12 @@ angular.module('cstl-data-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boot
                     layer.get('params').ts = new Date().getTime();
 
                     // Display the layer and zoom on its extent.
-                    DataDashboardViewer.layers = [layer];
-                    DataDashboardViewer.extent = targetData.extent;
-                    DataDashboardViewer.initMap('dataPreviewMap');
+                    self.preview.extent = targetData.extent;
+                    self.preview.layer = layer;
                 });
             } else {
-                DataDashboardViewer.initMap('dataPreviewMap');
+                self.preview.extent = [-180, -90, 180, 90];
+                self.preview.layer = undefined;
             }
         };
 
