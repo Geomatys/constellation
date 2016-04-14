@@ -47,6 +47,7 @@ angular.module('CstlAdminDep', [
     'cstl-services',
     'cstl-admin',
     'cstl-data',
+    'cstl-metadata',
     'cstl-main',
     'cstl-mapcontext',
     'cstl-process',

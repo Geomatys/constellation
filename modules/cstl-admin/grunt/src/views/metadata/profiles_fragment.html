@@ -1,0 +1,34 @@
+<div>
+    <div class="bg-white" style="padding-bottom:30px;">
+        <h4 ng-if="options.wizard =='convert' || options.wizard =='createnew'"
+            style="margin-top: 0"
+            translate="label.metadata.convert.profile.selection.header">Select the metadata profile</h4>
+        <div ng-if="options.wizard =='upload'">
+            <p ng-if="!options.usedDefaultProfile">{{'label.metadata.profile.found' | translate}} {{record.type | translate}}</p>
+            <p ng-if="options.usedDefaultProfile"><i class="fa fa-info-circle" style="font-size: 17px"></i> {{'label.metadata.profile.notFound' | translate}} {{record.type | translate}}</p>
+            <p ng-if="options.usedDefaultProfile" translate="label.metadata.profile.alternative"></p>
+        </div>
+        <div>
+            <div>
+                <p ng-if="options.wizard =='convert'">
+                    <span translate="label.metadata.profile.old">Old metadata profile</span>
+                    <i style="margin-left: 10px;">{{record.type | translate}}</i>
+                </p>
+                <br/>
+                <div class="panel panel-default mdtheme">
+                    <div class="panel-heading">
+                        <span translate="label.metadata.convert.profile.title">Available profiles</span>
+                    </div>
+                    <div class="list-group">
+                        <a ng-repeat="profile in options.profileList"
+                           class="list-group-item"
+                           ng-class="{'active':profile.name == options.selectedProfile}"
+                           ng-if="options.wizard =='createnew' || profile.name != record.type"
+                           style="cursor: pointer;"
+                           ng-click="options.selectedProfile = profile.name">{{profile.name | translate}}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

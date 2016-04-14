@@ -170,6 +170,7 @@ module.exports = function(grunt) {
                         '<%= src_dir %>/js/services.js',
                         '<%= src_dir %>/js/admin/*.js',
                         '<%= src_dir %>/js/data/*.js',
+                        '<%= src_dir %>/js/metadata/*.js',
                         '<%= src_dir %>/js/main/*.js',
                         '<%= src_dir %>/js/mapcontext/*.js',
                         '<%= src_dir %>/js/process/*.js',

@@ -94,7 +94,19 @@ angular.module('cstl-services', ['cstl-restapi'])
         'cstl.version': (new Date()).getFullYear(),
 
         // Navigation additional buttons
-        'cstl.navigation' : [], //keep empty since cstl declare its own links directly in the header, this array is overrided by subprojects.
+        // cstl declare its own links directly in the header
+        // and some links can be replaced by subproject,
+        // this array store commons links that can be replaced by others and it is overrided by subprojects.
+        'cstl.navigation' : [
+            {
+                'id': 'metadataLink',
+                'href': '#/metadata',
+                'cssClass': 'metadata',
+                'iconClass': 'glyphicon glyphicon-file',
+                'labelKey': 'global.menu.metadata',
+                'defaultLabel': 'Metadata'
+            }
+        ],
 
         // Defines if the data overview must use the "conform pyramid" associated
         // to the selected data (if exists). If false, always use the "raw" data.
@@ -707,9 +719,9 @@ angular.module('cstl-services', ['cstl-restapi'])
             if(self.hasRole('cstl-admin')){
                 return true;
             }else if(self.hasRole('cstl-publish')){
-                return perm === "publish" ||  perm === "data";
+                return perm === "publish" ||  perm === "data" || perm === "contribute" ||  perm === "moderate";
             } else if(self.hasRole('cstl-data')){
-                return perm === "data";
+                return perm === "data" || perm === "contribute";
             }
             return false;
         };

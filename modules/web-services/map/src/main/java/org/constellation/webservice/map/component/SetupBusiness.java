@@ -49,10 +49,12 @@ import javax.inject.Named;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.SpringHelper;
+import org.constellation.business.IProviderBusiness;
 import org.constellation.business.IStyleBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
+import org.constellation.database.api.jooq.tables.pojos.Provider;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.provider.DataProvider;
@@ -96,6 +98,9 @@ public class SetupBusiness {
 
     @Inject
     private IStyleBusiness styleBusiness;
+
+    @Inject
+    private IProviderBusiness providerBusiness;
 
     @PostConstruct
     public void contextInitialized() {
@@ -373,6 +378,22 @@ public class SetupBusiness {
         }
 
         /**
+         * Returns {@code true} if provider exists for given identifier, otherwise return {@code false}
+         * @param identifier given provider identifier
+         * @return boolean
+         */
+        private boolean providerExists(final String identifier) {
+            //check in loaded provider instances
+            DataProvider provider = DataProviders.getInstance().getProvider(identifier);
+            if(provider != null) {
+                return true;
+            }
+            //check in database
+            final Provider prov = providerBusiness.getProvider(identifier);
+            return prov != null;
+        }
+
+        /**
          * Initialize default vector data for displaying generic features in
          * data editors.
          */
@@ -382,8 +403,7 @@ public class SetupBusiness {
 
                 final String featureStoreStr = "feature-store";
                 final String shpProvName = "generic_shp";
-                DataProvider shpProvider = DataProviders.getInstance().getProvider(shpProvName);
-                if (shpProvider == null) {
+                if (! providerExists(shpProvName)) {
                     // Acquire SHP provider service instance.
                     ProviderFactory shpService = null;
                     for (final ProviderFactory service : DataProviders.getInstance().getFactories()) {
@@ -420,7 +440,6 @@ public class SetupBusiness {
                                                                  // happen
                     } catch (ProcessException ex) {
                         LOGGER.log(Level.WARNING, "An error occurred when creating default SHP provider.", ex);
-                        return;
                     }
                 }
             } catch (IOException ex) {
@@ -438,8 +457,7 @@ public class SetupBusiness {
 
                 final String coverageFileStr = "coverage-store";
                 final String tifProvName = "generic_world_tif";
-                DataProvider tifProvider = DataProviders.getInstance().getProvider(tifProvName);
-                if (tifProvider == null) {
+                if (! providerExists(tifProvName)) {
                     // Acquire TIFF provider service instance.
                     ProviderFactory tifService = null;
                     for (final ProviderFactory service : DataProviders.getInstance().getFactories()) {
@@ -477,7 +495,6 @@ public class SetupBusiness {
                                                                  // happen
                     } catch (ProcessException ex) {
                         LOGGER.log(Level.WARNING, "An error occurred when creating default TIFF provider.", ex);
-                        return;
                     }
                 }
             } catch (IOException ex) {

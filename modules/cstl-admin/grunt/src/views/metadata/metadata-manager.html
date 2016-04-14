@@ -1,0 +1,334 @@
+<div class="frame" style="padding-bottom: 20px;">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div>
+                <ul class="nav navbar-nav">
+                    <li>
+                        <div class="label-nav">
+                            <span translate="label.metadata.manager.period">Showing on the period :</span>
+                        </div>
+                    </li>
+                    <li style="padding-bottom: 6px;padding-top: 10px;width: 160px;">
+                        <select class="form-control form-control-fix"
+                                ng-model="managerCtrl.options.selectedPeriod"
+                                ng-change="managerCtrl.changePeriod()">
+                            <option value="week" translate="label.metadata.period.select.week">Current week</option>
+                            <option value="month" translate="label.metadata.period.select.month">Current month</option>
+                            <option value="3months" translate="label.metadata.period.select.3months">Last 3 months</option>
+                            <option value="6months" translate="label.metadata.period.select.6months">Last 6 months</option>
+                            <option value="year" translate="label.metadata.period.select.year">Current year</option>
+                            <option value="_all" translate="label.metadata.period.select.all">From the beginning</option>
+                        </select>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right"
+                    ng-if="managerCtrl.options.groupsList.length >0">
+                    <li>
+                        <div class="label-nav">
+                            <span translate="label.metadata.manager.group">Group :</span>
+                        </div>
+                    </li>
+                    <li style="padding-bottom: 6px;padding-top: 10px;min-width: 120px;"
+                        ng-if="managerCtrl.permission.hasPermission('admin')">
+                        <select class="form-control form-control-fix"
+                                ng-model="managerCtrl.options.selectedGroup"
+                                ng-change="managerCtrl.changeGroup()"
+                                ng-options="group.id as group.name for group in managerCtrl.options.groupsList">
+                            <option value="" translate="label.metadata.group.all">All groups</option>
+                        </select>
+                    </li>
+                    <li style="padding-bottom: 6px;padding-top: 10px;min-width: 120px;"
+                        ng-if="!managerCtrl.permission.hasPermission('admin')">
+                        <span class="btn disabled form-control form-control-fix">{{managerCtrl.getUserGroupName()}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="dash-inner row">
+        <div class="col-xs-4">
+            <div class="thumbnail block-mg-stats">
+                <div class="caption">
+                    <h4 style="margin-bottom: 20px;text-align: center;"
+                        translate="label.metadata.general.recordsState">Metadata summary</h4>
+                    <div style="text-align: center;">
+                        <p>{{'label.metadata.stats.total' | translate}} <b>{{managerCtrl.options.fullStats.general.total}}</b></p>
+                        <p><span translate="{{'label.metadata.stats.validated' | translate}}"></span> <b>{{managerCtrl.options.fullStats.general.validated}}</b></p>
+                        <p><span translate="{{'label.metadata.stats.published' | translate}}"></span> <b>{{managerCtrl.options.fullStats.general.published}}</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="thumbnail block-mg-stats" style="padding: 0">
+                <div class="caption" style="padding: 0">
+                    <div id="carousel-metadata-stats"
+                         style="height: 220px;"
+                         class="carousel slide"
+                         data-ride="carousel"
+                         data-interval="false">
+                        <div class="carousel-inner">
+                            <div class="item active">
+                                <div>
+                                    <div style="height: 210px;text-align: center;">
+                                        <h5 translate="label.metadata.chart.header.types">Types distribution</h5>
+                                        <div id="chart1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div>
+                                    <div style="height: 210px;text-align: center;">
+                                        <h5 translate="label.metadata.chart.header.completionLevels">Metadata completion</h5>
+                                        <div id="chart2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div>
+                                    <div style="height: 210px;text-align: center;">
+                                        <h5 translate="label.metadata.chart.header.PublishedStates">Metadata publication</h5>
+                                        <div id="chart3"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a data-slide="prev"
+                           class="left carousel-control"
+                           onclick="$('#carousel-metadata-stats').carousel('prev');">
+                            <span style="margin-left: -6px;" class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
+                        <a data-slide="next"
+                           class="right carousel-control"
+                           onclick="$('#carousel-metadata-stats').carousel('next');">
+                            <span style="margin-left: -10px;" class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="thumbnail block-mg-stats">
+                <div class="caption">
+                    <h4 style="margin-bottom: 20px;text-align: center;"
+                        translate="label.metadata.manager.todolist">TO-DO List</h4>
+                    <div style="text-align: center;">
+                        <p>{{managerCtrl.options.fullStats.general.waitingToValidate}} {{'label.metadata.manager.toValidate' | translate}}</p>
+                        <button class="btn btn-csw"
+                                type="button"
+                                ng-click="managerCtrl.showToValidate()">
+                            <i class="fa fa-mail-forward"></i>
+                            <span translate="label.metadata.manager.show.toValidate">Show metadata to validate</span>
+                        </button>
+                        <p style="margin-top: 10px;">{{managerCtrl.options.fullStats.general.waitingToPublish}} {{'label.metadata.manager.toPublish' | translate}}</p>
+                        <button class="btn btn-csw"
+                                type="button"
+                                ng-click="managerCtrl.showToPublish()">
+                            <i class="fa fa-mail-forward"></i>
+                            <span translate="label.metadata.manager.show.toPublish">Show metadata to publish</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dash-inner row"
+         style="margin-top: 20px;"
+         ng-if="managerCtrl.options.fullStats.groupsStatList.length > 0">
+        <div class="col-xs-12">
+            <div class="thumbnail block-mg-table">
+                <table class="table table-condensed table-striped table-bordered">
+                    <caption>
+                        <div class="pagination-wrapper pagination-csw">
+                            <label translate="label.metadata.manager.table.header.groups">Groups</label>
+                            <input type="text"
+                                   ng-model="managerCtrl.options.scopeGroups.wrap.filtertext"
+                                   placeholder="{{'label.search' | translate}}"
+                                   style="width: 200px;"
+                                   class="form-control form-control-fix pull-right"/>
+                            <select class="form-control form-control-fix pull-right"
+                                    style="margin-right: 15px;width: 65px;"
+                                    ng-model="managerCtrl.options.scopeGroups.wrap.nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                            <div class="pull-right"
+                                 style="margin: 0 15px 0 0;font-size: 13px;"
+                                 page-switcher="{'page':managerCtrl.options.scopeGroups.wrap.currentpage,'size':managerCtrl.options.scopeGroups.wrap.nbbypage,'count':managerCtrl.options.scopeGroups.wrap.countdata}"
+                                 on-select-page="managerCtrl.options.scopeGroups.displayPage(page)"></div>
+                        </div>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeGroups.wrap,'name')"
+                                style="cursor: pointer;">
+                                <span translate="label.metadata.manager.table.column.group">Group</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'name' && managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'name' && !managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                            </th>
+                            <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeGroups.wrap,'tovalidate')"
+                                style="cursor: pointer;">
+                                <span translate="label.metadata.manager.table.column.toValidate">Metadata to validate</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'tovalidate' && !managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'tovalidate' && managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                            </th>
+                            <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeGroups.wrap,'topublish')"
+                                style="cursor: pointer;">
+                                <span translate="label.metadata.manager.table.column.toPublish">Metadata to publish</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'topublish' && !managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'topublish' && managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                            </th>
+                            <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeGroups.wrap,'published')"
+                                style="cursor: pointer;">
+                                <span translate="label.metadata.manager.table.column.published">Published metadata</span>
+                                <i class="fa fa-caret-up"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'published' && !managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                                <i class="fa fa-caret-down"
+                                   ng-if="managerCtrl.options.scopeGroups.wrap.ordertype === 'published' && managerCtrl.options.scopeGroups.wrap.orderreverse"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="group in managerCtrl.options.scopeGroups.wrap.dataList">
+                            <td>{{group.name}}</td>
+                            <td>
+                                <button class="btn btn-default"
+                                        type="button"
+                                        title="{{'label.metadata.manager.show.toValidate' | translate}}"
+                                        ng-click="managerCtrl.showToValidateGroup(group.id)">
+                                    <i class="fa fa-mail-forward"></i>
+                                </button>
+                                <span>{{group.tovalidate}}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-default"
+                                        type="button"
+                                        title="{{'label.metadata.manager.show.toPublish' | translate}}"
+                                        ng-click="managerCtrl.showToPublishGroup(group.id)">
+                                    <i class="fa fa-mail-forward"></i>
+                                </button>
+                                <span>{{group.topublish}}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-default"
+                                        type="button"
+                                        title="{{'label.metadata.manager.show.published' | translate}}"
+                                        ng-click="managerCtrl.showPublishedGroup(group.id)">
+                                    <i class="fa fa-mail-forward"></i>
+                                </button>
+                                <span>{{group.published}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="dash-inner row" style="margin-top: 20px;">
+        <div class="col-xs-12">
+            <div class="thumbnail block-mg-table">
+                <table class="table table-condensed table-striped table-bordered">
+                    <caption>
+                        <div class="pagination-wrapper pagination-csw">
+                            <label translate="label.metadata.manager.table.header.contributors">Contributors</label>
+                            <input type="text"
+                                   ng-model="managerCtrl.options.scopeContributors.wrap.filtertext"
+                                   placeholder="{{'label.search' | translate}}"
+                                   style="width: 200px;"
+                                   class="form-control form-control-fix pull-right"/>
+                            <select class="form-control form-control-fix pull-right"
+                                    style="margin-right: 15px;width: 65px;"
+                                    ng-model="managerCtrl.options.scopeContributors.wrap.nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <div class="pull-right"
+                                 style="margin: 0 15px 0 0;font-size: 13px;"
+                                 page-switcher="{'page':managerCtrl.options.scopeContributors.wrap.currentpage,'size':managerCtrl.options.scopeContributors.wrap.nbbypage,'count':managerCtrl.options.scopeContributors.wrap.countdata}"
+                                 on-select-page="managerCtrl.options.scopeContributors.displayPage(page)"></div>
+                        </div>
+                    </caption>
+                    <thead>
+                    <tr>
+                        <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeContributors.wrap,'name')"
+                            style="cursor: pointer;">
+                            <span translate="label.metadata.manager.table.column.contributor">Contributor</span>
+                            <i class="fa fa-caret-up"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'name' && managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                            <i class="fa fa-caret-down"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'name' && !managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                        </th>
+                        <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeContributors.wrap,'tovalidate')"
+                            style="cursor: pointer;">
+                            <span translate="label.metadata.manager.table.column.toValidate">Metadata to validate</span>
+                            <i class="fa fa-caret-up"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'tovalidate' && !managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                            <i class="fa fa-caret-down"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'tovalidate' && managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                        </th>
+                        <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeContributors.wrap,'topublish')"
+                            style="cursor: pointer;">
+                            <span translate="label.metadata.manager.table.column.toPublish">Metadata to publish</span>
+                            <i class="fa fa-caret-up"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'topublish' && !managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                            <i class="fa fa-caret-down"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'topublish' && managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                        </th>
+                        <th ng-click="managerCtrl.sortBy(managerCtrl.options.scopeContributors.wrap,'published')"
+                            style="cursor: pointer;">
+                            <span translate="label.metadata.manager.table.column.published">Published metadata</span>
+                            <i class="fa fa-caret-up"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'published' && !managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                            <i class="fa fa-caret-down"
+                               ng-if="managerCtrl.options.scopeContributors.wrap.ordertype === 'published' && managerCtrl.options.scopeContributors.wrap.orderreverse"></i>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="contributor in managerCtrl.options.scopeContributors.wrap.dataList">
+                        <td>{{contributor.name}}</td>
+                        <td>
+                            <button class="btn btn-default"
+                                    type="button"
+                                    title="{{'label.metadata.manager.show.toValidate' | translate}}"
+                                    ng-click="managerCtrl.showToValidateContrib(contributor.id)">
+                                <i class="fa fa-mail-forward"></i>
+                            </button>
+                            <span>{{contributor.tovalidate}}</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-default"
+                                    type="button"
+                                    title="{{'label.metadata.manager.show.toPublish' | translate}}"
+                                    ng-click="managerCtrl.showToPublishContrib(contributor.id)">
+                                <i class="fa fa-mail-forward"></i>
+                            </button>
+                            <span>{{contributor.topublish}}</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-default"
+                                    type="button"
+                                    title="{{'label.metadata.manager.show.published' | translate}}"
+                                    ng-click="managerCtrl.showPublishedContrib(contributor.id)">
+                                <i class="fa fa-mail-forward"></i>
+                            </button>
+                            <span>{{contributor.published}}</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

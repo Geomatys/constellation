@@ -1,0 +1,31 @@
+<div>
+    <div class="bg-white" style="padding-bottom:30px;">
+        <div>
+            <form id="uploadMetadata" class="form-horizontal">
+                <label translate="label.metadata.upload.xmlfile">Import metadata file (xml format)</label>
+                <div class="fileinput fileinput-new" style="margin-top:5px;"  data-provides="fileinput">
+                    <div class="input-group">
+                        <div class="form-control form-control-fix uneditable-input" data-trigger="fileinput">
+                            <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                            <span class="fileinput-filename"></span>
+                        </div>
+                        <span class="input-group-addon btn btn-default btn-file">
+                            <span class="fileinput-new" translate="data.modal.select">Select file</span>
+                            <span class="fileinput-exists" translate="data.modal.change">Change</span>
+                            <input id="metadataFile"
+                                   type="file"
+                                   name="metadataFileInput"
+                                   onchange="angular.element(this).scope().verifyExtension(this.value);"/>
+                        </span>
+                        <a class="input-group-addon btn btn-default fileinput-exists"
+                           data-dismiss="fileinput"
+                           translate="data.modal.remove">Remove</a>
+                    </div>
+                </div>
+                <div ng-if="options.extensionError" class="row alert alert-danger" style="margin:0;">
+                    <span translate="label.metadata.upload.badExtension">Bad file extension, only xml is supported.</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -131,15 +131,16 @@ cstlAdminApp
                     controller: 'WebServiceCreateController',
                     resolve: angular.extend({},PermissionResolver.factory('publish'))
                 })
-                .when('/editmetadata/:template/:type/:id', {
-                    templateUrl: 'views/data/description.html',
-                    controller: 'EditMetadataController',
-                    resolve: angular.extend({},PermissionResolver.factory('data'))
-                })
-                .when('/data/:tab?', {
+                .when('/data', {
                     templateUrl: 'views/data/data.html',
                     controller: 'DatasetDashboardController',
                     controllerAs: 'dc',
+                    resolve: angular.extend({},PermissionResolver.factory('data'))
+                })
+                .when('/metadata', {
+                    templateUrl: 'views/metadata/metadata.html',
+                    controller: 'MetadataDashboardController',
+                    controllerAs: 'mdCtrl',
                     resolve: angular.extend({},PermissionResolver.factory('data'))
                 })
                 .when('/sensors/:id?', {

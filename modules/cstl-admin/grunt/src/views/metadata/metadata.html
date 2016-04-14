@@ -1,0 +1,51 @@
+<div class="logo-wrapper row">
+    <div class="col-sm-9">
+        <h3 class="header-title" translate="page.header.title.metadata">Metadata Dashboard</h3>
+    </div>
+    <div class="col-sm-3">
+        <div class="dropdown pull-right">
+            <a data-toggle="dropdown"
+               class="btn btn-add btn-lg btn-csw dropdown-toggle"
+               style="margin-top:8px;padding:15px 19px;">
+                <span class="fa fa-plus" style="margin-right:5px;"></span>
+                <span translate="label.add.metadata">Add metadata</span>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li ng-repeat="way in mdCtrl.waysToAddMetadata">
+                    <a id="{{way.idHTML}}"
+                       ng-click="way.bindFunction();"
+                       translate="{{way.translateKey}}">{{way.defaultTranslateValue}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="tab-content">
+    <div class="tab-pane active"
+         style="padding-top:0;">
+        <div id="metadataDashboardPanel"
+             class="row">
+            <div class="col-sm-12">
+                <div class="frame dashboard">
+                    <div class="navbar navbar-default"
+                         style="margin-bottom:0;"
+                         ng-include="'views/metadata/metadata-navbar-header.html'">
+                    </div>
+                    <div class="navbar sort-navbar"
+                         style="margin-bottom: 0"
+                         ng-include="'views/metadata/metadata-navbar-sort.html'">
+                    </div>
+                    <div class="dash-inner row"
+                         style="padding-bottom: 10pt;margin-top: 10px;"
+                         ng-include="'views/metadata/metadata-dashboard-inner.html'">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<scroll-top></scroll-top>
+

@@ -1,0 +1,522 @@
+<div class="pull-left"
+     id="contentList"
+     style="width: 60%;"
+     ng-init="mdCtrl.smallMode=false">
+    <div id="list" data-role="list">
+        <div class="pagination-wrapper pagination-csw">
+            <div class="row" style="margin: 0;">
+                <strong class="col-md-6">
+                    <span class="nb-results pull-left">{{mdCtrl.page.total || 0}}&nbsp;</span>
+                    <span class="nb-results" translate="label.count.metadata">available metadata</span>
+                </strong>
+                <div class="hidden-sm hidden-xs pull-right col-md-6" style="padding-right:0;">
+                    <button type="button"
+                            ng-click="mdCtrl.smallMode=true"
+                            class="pull-right btn btn-xs btn-info btn-csw"
+                            ng-class="{'btn-small-selected':mdCtrl.smallMode}"
+                            style="border-radius:0 3px 3px 0; margin-top: 5px; width:32px; height:34px;">
+                        <img src="img/btn-display-reduced.svg" alt="" />
+                    </button>
+                    <button type="button"
+                            ng-click="mdCtrl.smallMode=false"
+                            class="pull-right btn btn-xs btn-info btn-csw"
+                            ng-class="{'btn-small-selected':!mdCtrl.smallMode}"
+                            style="margin-left: 10px; border-radius:3px 0 0 3px; margin-top: 5px; width:32px; height:34px;">
+                        <img src="img/btn-display-normal.svg" alt="" />
+                    </button>
+                    <p class="pull-right" style="margin-top:12px;" translate="label.display">Display :</p>
+                </div>
+            </div>
+            <div class="row" style="margin: 5px 0 0 0;">
+                <div class="col-xs-3"
+                     style="padding: 0;">
+                    <a class="btn btn-default"
+                       ng-click="mdCtrl.toggleSelectAll()">
+                        <span class="fa"
+                              ng-class="{'fa-check-square-o':mdCtrl.selectedAll,'fa-square-o':!mdCtrl.selectedAll}"></span>
+                        {{'label.select.all' | translate}}
+                    </a>
+                </div>
+                <div class="col-xs-7">
+                    <div style="margin: 2px 0 0 15px;padding: 0;"
+                         page-switcher="{page:mdCtrl.page.number,size:mdCtrl.page.size,count:mdCtrl.page.total}"
+                         on-select-page="mdCtrl.setPage(page)"></div>
+                </div>
+                <div class="pull-right col-xs-2" style="padding: 0;">
+                    <select class="nb-per-page input-small form-control pull-right"
+                            ng-model="mdCtrl.query.size"
+                            ng-change="mdCtrl.setPage(1);">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="item-list">
+            <div ng-repeat="item in mdCtrl.page.content"
+                 ng-class="{'col-xs-6':mdCtrl.smallMode}"
+                 style="padding-left:0;">
+                <div class="item metadata"
+                     ng-class="{'metadata-image':item.type=='profile_dataset','selected':mdCtrl.isSelectedItem(item),'style-small':mdCtrl.smallMode}"
+                     ng-click="mdCtrl.toggleItemSelection(item);mdCtrl.openDetails(item);"
+                     ng-cloak>
+                    <div class="top">
+                        <span class="item-title csw-title"
+                              title="{{item.title}}">{{item.title ? item.title : '&nbsp;'}}</span>
+                        <div class="pull-right cell-state">
+                            <span><i class="fa"
+                                     ng-class="{'fa-check icon-state-success':item.isValidated,'fa-close icon-state-fail':!item.isValidated}"></i>Validée</span>
+                            <span><i class="fa"
+                                     ng-class="{'fa-check icon-state-success':item.isPublished,'fa-close icon-state-fail':!item.isPublished}"></i>Publiée</span>
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <div ng-class="{'hidden':!mdCtrl.smallMode}">
+                            <div class="block tooltipicon"
+                                 style="margin-top:0;text-shadow: none;">
+                                <i class="fa fa-calendar"
+                                   tooltip data-placement="top"
+                                   title="{{item.updateDate | date:'yyyy-MM-dd HH:mm:ss'}}"></i>
+                            </div>
+                            <div class="block tooltipicon"
+                                 style="margin-top:0;text-shadow: none;">
+                                <i class="fa fa-user"
+                                   tooltip data-placement="top"
+                                   title="{{item.user.login}}"></i>
+                            </div>
+                            <div class="block tooltipicon"
+                                 style="margin-top:0;text-shadow: none;">
+                                <i class="fa fa-file-powerpoint-o"
+                                   tooltip data-placement="top"
+                                   title="{{item.type | translate}}"></i>
+                            </div>
+                            <div class="block tooltipicon"
+                                 style="margin-top:0;text-shadow: none;">
+                                <i class="fa fa-tasks"
+                                   tooltip data-placement="top"
+                                   title="{{item.levelCompletion | translate}}"></i>
+                            </div>
+                        </div>
+                        <div ng-class="{'hidden':mdCtrl.smallMode}">
+                            <div class="block">
+                                <i class="fa fa-calendar"></i>{{item.updateDate | date:'yyyy-MM-dd HH:mm:ss'}}
+                            </div>
+                            <div class="block">
+                                <i class="fa fa-user"></i>{{item.user.login}}
+                            </div>
+                            <div class="block" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;width:140px;">
+                                <span title="{{item.type | translate}}">
+                                    <i class="fa fa-file-powerpoint-o"></i>{{item.type | translate}}
+                                </span>
+                            </div>
+                            <div class="block">
+                                <i class="fa fa-tasks"></i>{{item.levelCompletion  | translate}}
+                            </div>
+                        </div>
+                        <div class="block mdprogress-bar" style="height:30px;text-shadow:none;"
+                             ng-if="item.mdCompletion">
+                            <div style="width:60px;margin-top:10px;"
+                                 tooltip-html-unsafe="{{'data.listing.metadata.completion' | translate}}"
+                                 tooltip-placement="top">
+                                <progressbar max="100"
+                                             value="item.mdCompletion"
+                                             animate="true"
+                                             class="progress-striped"
+                                             style="margin: 0;height:12px;"
+                                             type="{{item.mdCompletion<25?'danger':item.mdCompletion<50?'warning':item.mdCompletion<75?'info':'success'}}">
+                                    <span style="font-size: 10px;position: absolute;top:0;left:12px;">{{item.mdCompletion}}%</span>
+                                </progressbar>
+                            </div>
+                        </div>
+                        <div ng-if="item.validationRequired != 'REQUIRED'"
+                             ng-class="{'sprite-bothstate-half':(item.isPublished && !item.isValidated) || (!item.isPublished && item.isValidated),'sprite-bothstate-fail':!item.isPublished && !item.isValidated,'sprite-bothstate-success':item.isPublished && item.isValidated}">
+                            <i class="fa fa-frown-o"
+                               ng-if="item.validationRequired == 'REJECTED'"
+                               style="position: absolute;bottom: 1px;right: -5px;"
+                               title="{{'label.metadata.validation.rejected' | translate }}"></i>
+                        </div>
+                        <div ng-if="item.validationRequired == 'REQUIRED'"
+                             class="sprite-bothstate-none">
+                            <i class="fa fa-envelope-o"
+                               style="position: absolute;bottom: 1px;right: -5px;"
+                               title="{{'label.metadata.validation.inProgress' | translate }}"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pull-left" style="width: 40%;">
+    <div id="block-information-right">
+        <div class="sous-block-information">
+            <div>
+                <div class="alert alert-info alert-csw"
+                     style="margin-bottom: 0;"
+                     ng-if="!mdCtrl.isThereSelectedItems()">
+                    <h4 translate="label.no.selected.metadata">No selected metadata</h4>
+                    <p style="font-weight:normal;"
+                       translate="msg.no.selected.metadata">Click on a metadata to display more information</p>
+                </div>
+                <div ng-if="mdCtrl.isThereSelectedItems()">
+                    <div ng-if="mdCtrl.selectionApi.getLength() > 1"
+                         class="selected-item"
+                         style="margin-bottom: 6px;">
+                        <div id="block-multi-action"
+                             class="block-header block-header-md"
+                             ng-click="mdCtrl.toggleUpDownSelectedMD('block-multi-action')">
+                            <i class="fa fa-chevron-right pull-left"></i>
+                            <strong class="item-title title-bloc">{{mdCtrl.selectionApi.getLength()}} {{'label.metadata.selected.metadata' | translate}}</strong>
+                            <i class="fa fa-times-circle pull-right"
+                               style="font-size: 18px;"
+                               ng-click="mdCtrl.unselectAll();$event.stopPropagation();"></i>
+                        </div>
+                        <div style="display: none;">
+                            <div class="block-content">
+                                <h6 style="margin-bottom: 16px;"
+                                    translate="label.metadata.multi.edition.title">Change the selected records</h6>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.modify.owner">Change the owner</span>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="mdCtrl.batch.user.selected"
+                                                ng-options="user.id as user.login for user in mdCtrl.batch.user.list">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-3" style="padding-left: 0;">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-default"
+                                                    ng-click="mdCtrl.applyOwnerMulti();">
+                                                <span translate="label.metadata.apply.multi"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.modify.validation">Change the validation</span>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="mdCtrl.batch.validation.selected">
+                                            <option value=""></option>
+                                            <option value="valid" translate="label.mdfilter.validity.true">Validated</option>
+                                            <option value="notvalid" translate="label.mdfilter.validity.false">Not validated</option>
+                                        </select>
+                                        <textarea ng-if="mdCtrl.batch.validation.selected == 'notvalid'"
+                                                  ng-init="mdCtrl.batch.validation.comment='';"
+                                                  class="form-control form-control-fix"
+                                                  ng-model="mdCtrl.batch.validation.comment"
+                                                  placeholder="{{'label.metadata.validation.placeholderComment' | translate }}"
+                                                  rows="3"></textarea>
+                                    </div>
+                                    <div class="col-xs-3" style="padding-left: 0;">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-default"
+                                                    ng-click="mdCtrl.applyValidationMulti();">
+                                                <span translate="label.metadata.apply.multi"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.modify.publication">Change the published state</span>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="mdCtrl.batch.publication.selected">
+                                            <option value=""></option>
+                                            <option value="published" translate="label.mdfilter.published.true">Published</option>
+                                            <option value="notpublished" translate="label.mdfilter.published.false">Not published</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-3" style="padding-left: 0;">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-default"
+                                                    ng-click="mdCtrl.applyPublicationMulti();">
+                                                <span translate="label.metadata.apply.multi"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="!mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.validation.askToValidateMultiple">Ask moderator to validate this selection of metadata</span>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="mdCtrl.askForValidationMultiple();">
+                                            <i class="fa fa-envelope-o"></i>
+                                            <span translate="label.metadata.validation.clickToAsk">Click to ask validation</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block-action">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-batch"
+                                                    ng-click="mdCtrl.exportMultiple();"
+                                                    data-placement="bottom"
+                                                    title="{{'label.metadata.exportmultiple.selected' | translate }}" tooltip>
+                                                <i class="fa fa-download"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    id="deleteMultiRecords"
+                                                    class="btn btn-batch"
+                                                    ng-click="mdCtrl.deleteMultiple();"
+                                                    data-placement="bottom"
+                                                    title="{{'label.metadata.deletemultiple.selected' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="mdCtrl.selectionApi.getLength() <= mdCtrl.displayCount"
+                         ng-repeat="selectedMetadata in mdCtrl.selectionApi.getList()"
+                         id="selected-item-{{selectedMetadata.id}}"
+                         class="selected-item"
+                         ng-style="$index > 0 ? {'margin-top':'6px'}:{}">
+                        <div id="block-single-action{{selectedMetadata.id}}"
+                             class="block-header block-header-md"
+                             style="position: relative;"
+                             ng-click="mdCtrl.loadMDItem(selectedMetadata);">
+                            <i class="fa fa-chevron-right pull-left"></i>
+                            <strong class="item-title title-bloc"
+                                    style="display: block;"
+                                    title="{{selectedMetadata.title}}">{{selectedMetadata.title ? selectedMetadata.title : '&nbsp;'}}</strong>
+                            <i class="fa fa-times-circle pull-right"
+                               style="font-size: 18px;position: absolute;right: 10px;top: 0;"
+                               ng-click="mdCtrl.toggleItemSelection(selectedMetadata);$event.stopPropagation();"></i>
+                        </div>
+                        <div style="display: none;" class="blockDetails">
+                            <div class="block-content">
+                                <h6 translate="label.resume">Abstract</h6>
+                                <p style="text-align: justify;">{{selectedMetadata.resume}}</p>
+                                <hr style="border-color: #c1c1c1;margin: 10px 0 10px 0;"/>
+                                <div class="row description-block">
+                                    <div class="col-xs-6">
+                                        <i style="font-size: 17px;" class="fa fa-user"></i>
+                                        <span>{{selectedMetadata.user.login}}</span>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <i style="font-size: 17px;" class="fa fa-calendar"></i>
+                                        <span>{{selectedMetadata.updateDate | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-top: 12px;">
+                                    <div class="col-xs-10">
+                                        <i style="font-size: 17px;" class="fa fa-file-powerpoint-o"></i>
+                                        {{selectedMetadata.type | translate}}
+                                    </div>
+                                </div>
+                                <hr style="border-color: #c1c1c1;margin: 10px 0 10px 0;"/>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.modify.owner">Change the owner</span>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="selectedMetadata.user.id"
+                                                ng-change="mdCtrl.applyOwnerSelected(selectedMetadata);"
+                                                ng-options="user.id as user.login for user in mdCtrl.batch.user.list">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="!selectedMetadata.isValidated">
+                                    <div ng-if="selectedMetadata.validationRequired =='REJECTED'">
+                                        <div class="col-xs-12" style="margin-bottom: 5px;">
+                                            <i class="fa fa-frown-o"></i>
+                                            <span translate="label.metadata.validation.alreadyRejected">The validation of this metadata has been rejected.</span>
+                                            <button type="button"
+                                                    class="btn btn-default"
+                                                    style="border-radius: 4px;"
+                                                    ng-click="mdCtrl.showCommentModerator(selectedMetadata)"
+                                                    title="{{'label.metadata.validation.showComment' | translate }}" tooltip>
+                                                <i class="fa fa-comment-o"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div ng-if="!mdCtrl.permission.hasPermission('moderate')">
+                                        <div ng-if="selectedMetadata.validationRequired =='REQUIRED'">
+                                            <div class="col-xs-12" style="margin-bottom: 5px;">
+                                                <i class="fa fa-envelope-o"></i>
+                                                <span translate="label.metadata.validation.inProgress">Validation request is in progress</span>
+                                            </div>
+                                        </div>
+                                        <div ng-if="selectedMetadata.validationRequired !='REQUIRED' && selectedMetadata.user.id == mdCtrl.userAccount.id">
+                                            <div class="col-xs-12" style="margin-bottom: 5px;">
+                                                <span translate="label.metadata.validation.askToValidate">Ask moderator to validate this metadata</span>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <button type="button" class="btn btn-default"
+                                                        style="border-radius: 4px;"
+                                                        ng-click="mdCtrl.askForValidationSelected(selectedMetadata);">
+                                                    <i class="fa fa-envelope-o"></i>
+                                                    <span translate="label.metadata.validation.clickToAsk">Click to ask validation</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="selectedMetadata.validationRequired != 'REQUIRED' && mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.modify.validation">Change the validation</span>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="selectedMetadata.isValidated"
+                                                ng-change="mdCtrl.applyValidationSelected(selectedMetadata);"
+                                                ng-options="opt.value as ('label.mdfilter.validity.'+opt.value | translate) for opt in mdCtrl.booleanOptions">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="selectedMetadata.validationRequired == 'REQUIRED' && mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <i class="fa fa-flag"></i>
+                                        <span translate="label.metadata.validation.needToAccept">This metadata has been submitted for validation by the contributor</span>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <button type="button"
+                                                class="btn btn-danger"
+                                                style="border-radius: 4px;"
+                                                ng-click="mdCtrl.rejectValidationSelected(selectedMetadata)">
+                                            <i class="fa fa-times"></i>
+                                            <span translate="label.metadata.validation.reject">Reject</span>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-success"
+                                                style="border-radius: 4px;"
+                                                ng-click="mdCtrl.acceptValidationSelected(selectedMetadata)">
+                                            <i class="fa fa-thumbs-o-up"></i>
+                                            <span translate="label.metadata.validation.accept">Accept</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row description-block" style="margin-bottom: 6px;"
+                                     ng-if="selectedMetadata.isValidated && mdCtrl.permission.hasPermission('moderate')">
+                                    <div class="col-xs-12" style="margin-bottom: 5px;">
+                                        <span translate="label.metadata.modify.publication">Change the published state</span>
+                                    </div>
+                                    <div class="col-xs-8">
+                                        <select class="form-control form-control-fix"
+                                                ng-model="selectedMetadata.isPublished"
+                                                ng-change="mdCtrl.applyPublicationSelected(selectedMetadata);"
+                                                ng-options="opt.value as ('label.mdfilter.published.'+opt.value | translate) for opt in mdCtrl.booleanOptions">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block-action">
+                                <div class="row" style="padding-bottom: 5px;padding-top: 5px;">
+                                    <div class="col-xs-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    id="seeMetadata"
+                                                    class="btn btn-csw"
+                                                    ng-click="mdCtrl.displayMetadata(selectedMetadata)"
+                                                    data-placement="bottom"
+                                                    title="{{'dataset.metadata.listing.selected.view.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-file"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-2"
+                                         ng-if="mdCtrl.permission.hasPermission('moderate') || selectedMetadata.user.id == mdCtrl.userAccount.id">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-csw"
+                                                    ng-click="mdCtrl.displayMetadataEditor(selectedMetadata);"
+                                                    data-placement="bottom"
+                                                    title="{{'dataset.metadata.listing.selected.edit.button' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-pencil"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-2"
+                                         ng-if="mdCtrl.permission.hasPermission('moderate') || selectedMetadata.user.id == mdCtrl.userAccount.id">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-csw"
+                                                    ng-click="mdCtrl.convertMetadata(selectedMetadata);"
+                                                    data-placement="bottom"
+                                                    title="{{'label.metadata.action.convert.button' | translate }}" tooltip>
+                                                <i class="fa fa-share-square-o"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-csw"
+                                                    ng-click="mdCtrl.duplicateMetadata(selectedMetadata);"
+                                                    data-placement="bottom"
+                                                    title="{{'label.metadata.action.duplicate.button' | translate }}" tooltip>
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-csw"
+                                                    ng-click="mdCtrl.exportMetadata(selectedMetadata);"
+                                                    data-placement="bottom"
+                                                    title="{{'dataset.metadata.listing.selected.export.button' | translate }}" tooltip>
+                                                <i class="fa fa-download"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="col-xs-2"
+                                         ng-if="mdCtrl.permission.hasPermission('moderate') || selectedMetadata.user.id == mdCtrl.userAccount.id">
+                                        <span class="tooltipicon">
+                                            <button type="button"
+                                                    class="btn btn-csw"
+                                                    ng-click="mdCtrl.deleteMetadata(selectedMetadata);"
+                                                    data-placement="bottom"
+                                                    title="{{'label.metadata.delete.selected' | translate }}" tooltip>
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info alert-stats" style="margin-top: 10px;">
+                    <p style="font-weight:normal;">{{'label.metadata.stats.total' | translate}} <b>{{mdCtrl.stats.total}}</b></p>
+                    <p style="font-weight:normal;"><span translate="{{'label.metadata.stats.validated' | translate}}"></span> <b>{{mdCtrl.stats.validated}}</b></p>
+                    <p style="font-weight:normal;"><span translate="{{'label.metadata.stats.published' | translate}}"></span> <b>{{mdCtrl.stats.published}}</b></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

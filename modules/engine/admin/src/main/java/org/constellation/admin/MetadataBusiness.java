@@ -916,7 +916,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         if ("vector".equalsIgnoreCase(dataType)) {
             //vector template
             templateName = "profile_default_vector";
-        } else if ("raster".equalsIgnoreCase(dataType)) {
+        } else if ("raster".equalsIgnoreCase(dataType) || "coverage".equalsIgnoreCase(dataType)) {
             //raster template
             templateName = "profile_default_raster";
         } else {
@@ -936,7 +936,7 @@ public class MetadataBusiness implements IMetadataBusiness {
         if ("vector".equalsIgnoreCase(dataType)) {
             //vector template
             templateName = "profile_default_vector";
-        } else if ("raster".equalsIgnoreCase(dataType)) {
+        } else if ("raster".equalsIgnoreCase(dataType) || "coverage".equalsIgnoreCase(dataType)) {
             //raster template
             templateName = "profile_default_raster";
         } else {
@@ -1055,7 +1055,15 @@ public class MetadataBusiness implements IMetadataBusiness {
      */
     @Override
     public List<String> getAllProfiles() {
-        return new ArrayList<>(Template.getAvailableNames());
+        final Set<String> names = Template.getAvailableNames();
+        final List<String> result = new ArrayList<>();
+        for(final String name : names) {
+            //add only iso 19115 profiles raster and vector
+            if(name.startsWith("profile_default_")) {
+                result.add(name);
+            }
+        }
+        return result;
     }
 
     @Override

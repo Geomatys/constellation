@@ -1,0 +1,40 @@
+<div class="modal-dialog modal-dialog-resp-height"
+     ng-class="{'modal-dialog-responsive':options.mode.editorView}">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="dismiss()">×</button>
+            <h4 class="modal-title" translate="label.metadata.convert.profile.header">Change metadata profile</h4>
+        </div>
+        <div class="modal-body" style="height: 575px;overflow-y: auto;">
+            <div ng-if="options.mode.editorView && !contentError">
+                <div ng-include="'views/data/metadata_fragment.html'"></div>
+            </div>
+            <div ng-if="options.mode.editorView && contentError"
+                 class="row alert alert-danger"
+                 style="margin:0;">
+                <span translate="metadata.edition.content.error">Loading content error.</span>
+            </div>
+            <div ng-if="options.mode.profileListView">
+                <div ng-include="'views/metadata/profiles_fragment.html'"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="dismiss()"
+                    translate="data.modal.cancel">Cancel</button>
+            <button type="button"
+                    ng-if="options.mode.profileListView && options.selectedProfile"
+                    class="btn btn-csw"
+                    ng-click="nextStep()">
+                <span translate="label.next">Next</span>
+            </button>
+            <button type="button"
+                    ng-if="options.mode.editorView && metadataValues.length>0"
+                    class="btn btn-csw"
+                    ng-click="save2()">
+                <span translate="metadata.edition.heading.save">Save modifications</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,216 @@
+<div class="navbar-inner">
+    <ul class="nav nav-style">
+        <li ng-click="mdCtrl.sortBy('title')">
+            <a>
+                <span translate="label.title">Title</span>
+                <i class="fa" ng-class="mdCtrl.getOrderIcon('title')"></i>
+            </a>
+        </li>
+        <li class="divider-vertical"></li>
+        <li ng-click="mdCtrl.sortBy('updateDate')">
+            <a>
+                <span translate="label.date">Date</span>
+                <i class="fa" ng-class="mdCtrl.getOrderIcon('updateDate')"></i>
+            </a>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown pointer"
+            ng-class="{'filter-enabled':(mdCtrl.getFilter('owner')!==null && mdCtrl.getFilter('owner')!=='_all') || mdCtrl.getFilter('group')==='_mygroup'}">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+                <span>
+                    <span class="hidden-tablet"
+                          translate="label.owner">Owner</span>
+                    <b class="fa fa-caret-down"></b>
+                </span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('owner')==='_me'}"
+                       ng-click="mdCtrl.updateFilterBy('group',null);mdCtrl.filterBy('owner','_me')">
+                        <span translate="label.mdfilter.owner.me">Me</span>
+                    </a>
+                </li>
+                <li ng-hide="mdCtrl.hideGroupFilter">
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('group')==='_mygroup'}"
+                       ng-click="mdCtrl.updateFilterBy('owner',null);mdCtrl.filterBy('group','_mygroup')">
+                        <span translate="label.mdfilter.owner.mygroup">My group</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('owner')==='_all'}"
+                       ng-click="mdCtrl.updateFilterBy('group',null);mdCtrl.filterBy('owner','_all')">
+                        <span translate="label.mdfilter.owner.all">All</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown pointer"
+            ng-class="{'filter-enabled':mdCtrl.getFilter('profile')!==null && mdCtrl.getFilter('profile')!=='_all'}">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+                <span>
+                    <span class="hidden-tablet"
+                          translate="label.mdfilter.profile.header">Profile</span>
+                    <b class="fa fa-caret-down"></b>
+                </span>
+            </a>
+            <ul class="dropdown-menu">
+                <li ng-repeat="profile in mdCtrl.profileList">
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('profile')===profile.name}"
+                       ng-click="mdCtrl.filterBy('profile',profile.name)">
+                        <span>{{profile.name | translate}}</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('profile')==='_all'}"
+                       ng-click="mdCtrl.filterBy('profile','_all')">
+                        <span translate="label.mdfilter.profile.all">All</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown pointer"
+            ng-class="{'filter-enabled':mdCtrl.getFilter('level')!==null && mdCtrl.getFilter('level')!=='_all'}">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+                <span>
+                    <span class="hidden-tablet"
+                          translate="label.mdfilter.completion.header">Completion</span>
+                    <b class="fa fa-caret-down"></b>
+                </span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('level')==='NONE'}"
+                       ng-click="mdCtrl.filterBy('level','NONE')">
+                        <span translate="label.mdfilter.completion.none">None</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('level')==='ELEMENTARY'}"
+                       ng-click="mdCtrl.filterBy('level','ELEMENTARY')">
+                        <span translate="label.mdfilter.completion.elementary">Elementary</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('level')==='EXTENDED'}"
+                       ng-click="mdCtrl.filterBy('level','EXTENDED')">
+                        <span translate="label.mdfilter.completion.extended">Extended</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('level')==='COMPLETE'}"
+                       ng-click="mdCtrl.filterBy('level','COMPLETE')">
+                        <span translate="label.mdfilter.completion.completed">Completed</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('level')==='_all'}"
+                       ng-click="mdCtrl.filterBy('level','_all')">
+                        <span translate="label.mdfilter.completion.all">All</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown pointer"
+            ng-class="{'filter-enabled':mdCtrl.getFilter('validated')!==null && mdCtrl.getFilter('validated')!=='_all'}">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+                <span>
+                    <span class="hidden-tablet"
+                          translate="label.mdfilter.validity.header">Validity</span>
+                    <b class="fa fa-caret-down"></b>
+                </span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('validated')==='true'}"
+                       ng-click="mdCtrl.updateFilterBy('validation_required',null);mdCtrl.filterBy('validated','true')">
+                        <span translate="label.mdfilter.validity.true">Validated</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('validation_required')==='REQUIRED'}"
+                       ng-click="mdCtrl.updateFilterBy('validation_required','REQUIRED');mdCtrl.filterBy('validated','false')">
+                        <span translate="label.mdfilter.validity.requested">Waiting for validation</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('validation_required')==='NONE'}"
+                       ng-click="mdCtrl.updateFilterBy('validation_required','NONE');mdCtrl.filterBy('validated','false')">
+                        <span translate="label.mdfilter.validity.notRequested">Not submitted for validation</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('validation_required')==='REJECTED'}"
+                       ng-click="mdCtrl.updateFilterBy('validation_required','REJECTED');mdCtrl.filterBy('validated','false')">
+                        <span translate="label.mdfilter.validity.rejected">Rejected validation</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('validated')==='_all'}"
+                       ng-click="mdCtrl.updateFilterBy('validation_required',null);mdCtrl.filterBy('validated','_all')">
+                        <span translate="label.mdfilter.validity.all">All</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="dropdown pointer"
+            ng-class="{'filter-enabled':mdCtrl.getFilter('published')!==null && mdCtrl.getFilter('published')!=='_all'}">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+                <span>
+                    <span class="hidden-tablet"
+                          translate="label.mdfilter.published.header">Publication</span>
+                    <b class="fa fa-caret-down"></b>
+                </span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('published')==='true'}"
+                       ng-click="mdCtrl.filterBy('published','true')">
+                        <span translate="label.mdfilter.published.true">Published</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('published')==='false'}"
+                       ng-click="mdCtrl.filterBy('published','false')">
+                        <span translate="label.mdfilter.published.false">Not published</span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-class="{'filter_active' : mdCtrl.getFilter('published')==='_all'}"
+                       ng-click="mdCtrl.filterBy('published','_all')">
+                        <span translate="label.mdfilter.published.all">All</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="divider-vertical"></li>
+    </ul>
+    <button type="button"
+            ng-click="mdCtrl.resetFilters();"
+            title="{{'label.search.refresh' | translate }}"
+            class="btn btn-xs btn-info btn-csw">
+        <i class="fa fa-times"></i>
+    </button>
+    <div class="pull-right quick-search-panel">
+        <div class="col-sm-7 pull-right input-group"
+             style="padding-left: 5px;padding-right: 5px;">
+            <input type="text"
+                   class="searchbox search-query form-control form-control-fix"
+                   ng-model="mdCtrl.searchMetadataTerm"
+                   onkeyup="if(event.keyCode == 13){$('.mdsearchbtn').click(); return false;}"
+                   placeholder="{{'label.search' | translate}}..."/>
+            <span class="input-group-btn">
+                <button class="btn btn-info btn-csw mdsearchbtn"
+                        type="button"
+                        ng-click="mdCtrl.callSearchMD();"
+                        title="{{'label.search' | translate}}"
+                        style="height: 30px;margin: 0;">
+                    <i class="glyphicon glyphicon-search" style="vertical-align: top;"></i>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>

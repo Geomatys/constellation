@@ -18,11 +18,7 @@
     </div>
 </div>
 
-<div ng-include="'views/data/data-nav-tabs.html'"></div>
-
-<div class="tab-content">
-    <div class="tab-pane active" ng-if="dc.tab === 'dataset'" style="padding-top:0;" ng-init="dc.updatePreview()">
-        <div id="dataDashboard" class="row" ng-controller="DatasetListingController as lc">
+        <div id="dataDashboard" class="row" ng-controller="DatasetListingController as lc" ng-init="dc.updatePreview()">
             <div class="col-sm-12">
                 <div class="frame dashboard">
                     <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -364,15 +360,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="tab-pane active" ng-if="dc.tab === 'metadata'" style="padding-top:0;">
-        <div id="metadataDashboard"
-             class="row"
-             ng-controller="DataController"
-             ng-init="init(); dataCtrl.published=null; dataCtrl.observation=null">
-            <ng-include src="'views/data/dataset.html'"></ng-include>
-        </div>
-    </div>
 </div>
 
 <scroll-top></scroll-top>

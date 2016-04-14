@@ -9,6 +9,17 @@
     </div>
     <div class="col-sm-2">
         <span class="tooltipicon">
+            <a id="gotoMetadata"
+               class="btn btn-default"
+               tooltip-html-unsafe="{{'layer.listing.selected.gotometadata.button' | translate }}"
+               tooltip-placement="bottom"
+               ng-href="{{'admin.html#/metadata?id=' + dc.selection.data.providerIdentifier}}">
+                <i class="fa fa-mail-forward"></i>
+            </a>
+        </span>
+    </div>
+    <div class="col-sm-2">
+        <span class="tooltipicon">
             <a id="exportData" class="btn btn-info" tooltip-placement="bottom" tooltip-html-unsafe="{{'layer.listing.selected.export.button' | translate }}"
                ng-href="{{'api/1/domain/1/data/export/' + dc.selection.data.providerIdentifier + '/' + dc.selection.data.name | cstlContext:true}}">
                 <i class="fa fa-download"></i>

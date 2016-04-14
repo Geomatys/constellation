@@ -1,0 +1,17 @@
+<div class="modal-dialog" style="margin-top: 50pt;">
+    <div class="modal-content" >
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="$close()">×</button>
+            <h4 class="modal-title" translate="label.metadata.validation.commentsRejectTitle">Comment of refusal for the validation</h4>
+        </div>
+        <div class="modal-body">
+            <span translate="label.metadata.validation.commentaryLeft">Comment left by the moderator</span>
+            <p class="breadcrumb" style="margin-top: 20px">{{commentsCtrl.record.comment}}</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="$close()">Ok</button>
+        </div>
+    </div>
+</div>

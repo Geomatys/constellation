@@ -852,7 +852,7 @@ public class MetadataRest {
                 map.put("status","ok");
                 return Response.ok(map).build();
             }catch(Exception ex) {
-                LOGGER.log(Level.WARNING,"Cannot proceed to ask validation for metadata list due to exception error : "+ ex.getLocalizedMessage());
+                LOGGER.log(Level.WARNING,"Cannot proceed to ask validation for metadata list due to exception error : "+ ex.getLocalizedMessage(),ex);
                 map.put("msg",ex.getLocalizedMessage());
                 return Response.status(403).entity(map).build();
             }
@@ -1150,8 +1150,7 @@ public class MetadataRest {
     }
 
     /**
-     * TODO will be removed after 1.1 ie : after migration of the new metadata dashboard in the project we will call uploadGraphicOverview().
-     * this is used by the old metadata page which still use string identifier instead of integer.
+     * this is used by metadata dashboard page when passing string for new creation of metadata.
      */
     @POST
     @Path("/uploadGraphicOverview2/{fileIdentifier}")

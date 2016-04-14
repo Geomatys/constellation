@@ -700,7 +700,7 @@ public class JooqMetadataRepository extends AbstractJooqRespository<MetadataReco
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional
     public void setValidationRequired(int id, String state, String validationState) {
         UpdateSetFirstStep<MetadataRecord> update = dsl.update(METADATA);
         update.set(METADATA.VALIDATION_REQUIRED, state)
