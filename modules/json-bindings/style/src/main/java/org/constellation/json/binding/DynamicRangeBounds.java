@@ -20,14 +20,10 @@
 package org.constellation.json.binding;
 
 import org.constellation.json.util.StyleUtilities;
-import org.geotoolkit.cql.CQL;
 import org.geotoolkit.display2d.ext.dynamicrange.DynamicRangeSymbolizer;
 
 import java.io.Serializable;
 
-/**
- * Created by bgarcia on 27/02/15.
- */
 public class DynamicRangeBounds implements Serializable {
 
     private String value;
@@ -36,7 +32,7 @@ public class DynamicRangeBounds implements Serializable {
     }
 
     public DynamicRangeBounds(DynamicRangeSymbolizer.DRBound lower) {
-        value = CQL.write(lower.getValue());
+        value = StyleUtilities.toCQL(lower.getValue());
     }
 
     public String getValue() {

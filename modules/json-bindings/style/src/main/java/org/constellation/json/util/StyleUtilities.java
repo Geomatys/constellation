@@ -49,8 +49,10 @@ import org.constellation.json.binding.StyleElement;
 import org.constellation.json.binding.Symbolizer;
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
+import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.NilExpression;
 
 import java.awt.*;
 import java.io.IOException;
@@ -82,6 +84,31 @@ public final class StyleUtilities extends Static {
         } catch (CQLException ex) {
             return Expression.NIL;
         }
+    }
+
+    /**
+     * Convert expression to String CQL
+     * if exp is NilExpression then returns empty string because NilExpression is not supported by CQL
+     * @param exp {Expression exp}
+     * @return {String}
+     */
+    public static String toCQL(final Expression exp) {
+        if(exp instanceof NilExpression) {
+            return "";
+        } else {
+            return CQL.write(exp);
+        }
+    }
+
+    /**
+     * Convert filter to String CQL.
+     * if the filter contains NilExpression then return null literal because Nil is not supported by CQL
+     * @param f {Filter}
+     * @return {String}
+     */
+    public static String toCQL(Filter f) {
+        f = (Filter) f.accept(new NoNilFilter(),null);
+        return CQL.write(f);
     }
 
     public static Expression opacity(final double opacity) {
@@ -269,5 +296,12 @@ public final class StyleUtilities extends Static {
      */
     public static boolean isAssignableToPoint(final Class<?> clazz) {
         return Point.class.isAssignableFrom(clazz) || MultiPoint.class.isAssignableFrom(clazz);
+    }
+
+    private static class NoNilFilter extends DuplicatingFilterVisitor {
+        @Override
+        public Object visit(NilExpression expression, Object extraData) {
+            return ff.literal(null);
+        }
     }
 }

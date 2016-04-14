@@ -20,7 +20,6 @@ package org.constellation.json.binding;
 
 
 import org.constellation.json.util.StyleUtilities;
-import org.geotoolkit.cql.CQL;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.FF;
-import static org.constellation.json.util.StyleUtilities.*;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -50,13 +48,13 @@ public class PieSymbolizer implements Symbolizer {
             size = symbolizer.getSize().evaluate(null, Double.class);
         }
         if (symbolizer.getGroup() != null) {
-            group = CQL.write(symbolizer.getGroup());
+            group = StyleUtilities.toCQL(symbolizer.getGroup());
         }
         if (symbolizer.getValue() != null) {
-            value = CQL.write(symbolizer.getValue());
+            value = StyleUtilities.toCQL(symbolizer.getValue());
         }
         if (symbolizer.getQuarter() != null) {
-            quarter = CQL.write(symbolizer.getQuarter());
+            quarter = StyleUtilities.toCQL(symbolizer.getQuarter());
         }
         if (symbolizer.getColorQuarters() != null) {
             for (final org.geotoolkit.display2d.ext.pie.PieSymbolizer.ColorQuarter colorQuarter : symbolizer.getColorQuarters()) {

@@ -20,7 +20,7 @@
 package org.constellation.json.binding;
 
 import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.cql.CQL;
+import org.constellation.json.util.StyleUtilities;
 import org.opengis.filter.expression.Expression;
 
 import java.util.ArrayList;
@@ -57,15 +57,15 @@ public final class Font implements StyleElement<org.opengis.style.Font> {
 
         final Expression sizeExp = font.getSize();
         if(sizeExp != null){
-            size = CQL.write(sizeExp);
+            size = StyleUtilities.toCQL(sizeExp);
         }
         final Expression weightExp = font.getWeight();
-        final String weightStr = CQL.write(weightExp);
+        final String weightStr = StyleUtilities.toCQL(weightExp);
         if (weightExp != null && weightStr != null) {
             bold = weightStr.toLowerCase().contains("bold");
         }
         final Expression styleExp = font.getStyle();
-        final String styleStr = CQL.write(styleExp);
+        final String styleStr = StyleUtilities.toCQL(styleExp);
         if (styleExp != null && styleStr != null) {
             italic = styleStr.toLowerCase().contains("italic");
         }

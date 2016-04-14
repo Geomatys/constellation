@@ -20,7 +20,7 @@
 package org.constellation.json.binding;
 
 import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.cql.CQL;
+import org.constellation.json.util.StyleUtilities;
 import org.opengis.filter.expression.Expression;
 
 import java.util.logging.Level;
@@ -58,7 +58,7 @@ public final class RasterSymbolizer implements Symbolizer {
         name = symbolizer.getName();
         final Expression opacityExp = symbolizer.getOpacity();
         if(opacityExp!=null){
-            final String opacityStr = CQL.write(opacityExp);
+            final String opacityStr = StyleUtilities.toCQL(opacityExp);
             try{
                 opacity = Double.parseDouble(opacityStr);
             }catch(NumberFormatException ex){

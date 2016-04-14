@@ -20,6 +20,7 @@
 package org.constellation.json.binding;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.cql.CQL;
 import org.opengis.filter.expression.Expression;
 
@@ -61,12 +62,12 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         color = toHex(col);
         final Expression opacityExp = stroke.getOpacity();
         if(opacityExp != null){
-            opacity = CQL.write(opacityExp);
+            opacity = StyleUtilities.toCQL(opacityExp);
         }
 
         final Expression widthExp = stroke.getWidth();
         if(widthExp != null){
-            width = CQL.write(widthExp);
+            width = StyleUtilities.toCQL(widthExp);
         }
         dashed  = (stroke.getDashArray() != null);
         lineJoin = stroke.getLineJoin().evaluate(null, String.class);

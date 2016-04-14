@@ -19,14 +19,15 @@
 
 package org.constellation.json.binding;
 
-import org.geotoolkit.cql.CQL;
+import org.constellation.json.util.StyleUtilities;
 import org.opengis.filter.expression.Expression;
 import org.opengis.style.GraphicalSymbol;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
-import static org.constellation.json.util.StyleUtilities.*;
-import static org.constellation.json.util.StyleUtilities.singletonType;
 
 /**
  * @author Fabien Bernard (Geomatys).
@@ -39,6 +40,7 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
     private String opacity  = "1.0";
     private String rotation = "0.0";
     private Mark mark       = new Mark();
+    private ExternalGraphic externalGraphic;
 
     public Graphic() {
     }
@@ -47,19 +49,23 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
         ensureNonNull("graphic", graphic);
         final Expression sizeExp = graphic.getSize();
         if(sizeExp!=null){
-            this.size = CQL.write(sizeExp);
+            this.size = StyleUtilities.toCQL(sizeExp);
         }
         final Expression opacityExp = graphic.getOpacity();
         if(opacityExp!=null){
-            this.opacity = CQL.write(opacityExp);
+            this.opacity = StyleUtilities.toCQL(opacityExp);
         }
         final Expression rotationExp = graphic.getRotation();
         if(rotationExp!=null){
-            this.rotation = CQL.write(rotationExp);
+            this.rotation = StyleUtilities.toCQL(rotationExp);
         }
         for (final GraphicalSymbol gs : graphic.graphicalSymbols()) {
             if (gs instanceof org.opengis.style.Mark) {
                 this.mark = new Mark((org.opengis.style.Mark) gs);
+                break;
+            }
+            if (gs instanceof org.opengis.style.ExternalGraphic) {
+                this.externalGraphic = new ExternalGraphic((org.opengis.style.ExternalGraphic) gs);
                 break;
             }
         }
@@ -97,13 +103,29 @@ public final class Graphic implements StyleElement<org.opengis.style.Graphic> {
         this.mark = mark;
     }
 
+    public ExternalGraphic getExternalGraphic() {
+        return externalGraphic;
+    }
+
+    public void setExternalGraphic(ExternalGraphic externalGraphic) {
+        this.externalGraphic = externalGraphic;
+    }
+
     @Override
     public org.opengis.style.Graphic toType() {
+        final List<GraphicalSymbol> graphicalSymbols = new ArrayList<>();
+
+        if(externalGraphic != null) {
+            graphicalSymbols.add(externalGraphic.toType());
+        }
+        if(mark != null) {
+            graphicalSymbols.add(mark.toType());
+        }
         return SF.graphic(
-                singletonType(mark),
-                parseExpression(opacity),
-                parseExpression(size),
-                parseExpression(rotation),
+                graphicalSymbols,
+                StyleUtilities.parseExpression(opacity),
+                StyleUtilities.parseExpression(size),
+                StyleUtilities.parseExpression(rotation),
                 null,
                 null);
     }

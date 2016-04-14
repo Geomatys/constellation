@@ -19,6 +19,7 @@
 
 package org.constellation.json.binding;
 
+import org.constellation.json.util.StyleUtilities;
 import org.geotoolkit.cql.CQL;
 import org.opengis.filter.expression.Expression;
 
@@ -46,7 +47,7 @@ public final class TextSymbolizer implements Symbolizer {
         name = symbolizer.getName();
         final Expression labelExp = symbolizer.getLabel();
         if (labelExp != null) {
-            this.label = CQL.write(labelExp);
+            this.label = StyleUtilities.toCQL(labelExp);
         }
         if (symbolizer.getFont() != null) {
             this.font = new Font(symbolizer.getFont());
