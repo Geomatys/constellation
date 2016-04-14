@@ -992,6 +992,8 @@ public class MetadataBusiness implements IMetadataBusiness {
             meta.setTitle(title);
             meta.setIsPublished(false);
             meta.setIsValidated(false);
+            meta.setDataId(null);
+            meta.setDatasetId(null);
 
             final MetadataComplete duplicated = new MetadataComplete(meta, bboxes);
             final int newID = metadataRepository.create(duplicated);
