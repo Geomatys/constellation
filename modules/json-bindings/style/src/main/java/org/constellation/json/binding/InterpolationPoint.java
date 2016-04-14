@@ -49,7 +49,7 @@ public final class InterpolationPoint implements StyleElement<org.geotoolkit.sty
         if(Double.isNaN(value)){
             data = null;
         }else {
-            data = Math.round(value*1000d)/1000d; //FIXME why?
+            data = value;
         }
 		if(interpolationPoint.getValue() instanceof DefaultLiteral){
 			final Object obj = ((DefaultLiteral)interpolationPoint.getValue()).getValue();
