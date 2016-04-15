@@ -258,13 +258,6 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     //  Private utility methods
     // -------------------------------------------------------------------------
 
-    private static Field<Integer> countData(Field<Integer> datasetId) {
-        return DSL.selectCount().from(DATA)
-                .where(DATA.DATASET_ID.eq(datasetId))
-                .and(isIncludedAndNotHiddenData(DATA))
-                .asField();
-    }
-
     private static Field<Integer> countDataOfType(Field<Integer> datasetId, String type) {
         return DSL.selectCount().from(DATA)
                 .where(DATA.DATASET_ID.eq(datasetId))
