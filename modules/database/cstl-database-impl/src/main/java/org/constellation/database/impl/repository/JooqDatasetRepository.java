@@ -60,7 +60,10 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         DatasetRepository {
 
     private static final CommonTableExpression<Record2<Integer, Integer>> FETCH_PAGE_WITH =
-            DSL.name("w").fields("id", "count").as(DSL.select(DATASET.ID, countData(DATASET.ID)).from(DATASET));
+            DSL.name("w").fields("id", "count").as(DSL.select(DATA.DATASET_ID, DSL.count(DATA.ID)).
+                            from(DATA).
+                            where(isIncludedAndNotHiddenData(DATA)).
+                            groupBy(DATA.DATASET_ID));
 
     private static final Field[] ITEM_FIELDS = new Field[]{
             DATASET.ID.as("id"),
