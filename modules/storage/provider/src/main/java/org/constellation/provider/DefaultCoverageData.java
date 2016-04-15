@@ -57,6 +57,7 @@ import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.filestore.FileCoverageReference;
 import org.geotoolkit.storage.coverage.CoverageReference;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
@@ -177,12 +178,15 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
                 final MathTransform mt = CRS.findMathTransform(temporalCRS, CommonCRS.Temporal.JAVA.crs());
 
                 final GridCoverageReader reader = ref.acquireReader();
-                final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(reader.getGridGeometry(ref.getImageIndex()), tempIndex);
+
+                //we extract value at pixel center for dates
+                final GeneralGridGeometry gridGeometry = reader.getGridGeometry(ref.getImageIndex());
+                final NumberRange[] tempValues = GridCombineIterator.extractAxisRanges(gridGeometry.getExtent(),gridGeometry.getGridToCRS(PixelInCell.CELL_CENTER), tempIndex);
                 ref.recycle(reader);
                 double[] sourceDate = new double[1];
                 for (NumberRange nR : tempValues) {
                     //transform extracted values into java time units (timestamp)
-                    sourceDate[0] = nR.getMinDouble();
+                    sourceDate[0] = (nR.getMinDouble() + nR.getMaxDouble()) / 2.0;
                     mt.transform(sourceDate,0,sourceDate,0, 1);
                     dates.add(new Date(Double.valueOf(sourceDate[0]).longValue()));
                 }
@@ -260,7 +264,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
     public String getImageFormat() {
          if (ref instanceof FileCoverageReference) {
             FileCoverageReference fref = (FileCoverageReference) ref;
-            if (fref.getSpi() != null && 
+            if (fref.getSpi() != null &&
                 fref.getSpi().getMIMETypes() != null &&
                 fref.getSpi().getMIMETypes().length > 0) {
                 return fref.getSpi().getMIMETypes()[0];
@@ -291,7 +295,7 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
             ref.recycle(reader);
         }
     }
-    
+
     @Override
     public List<GridSampleDimension> getSampleDimensions() throws DataStoreException {
         final GridCoverageReader reader = ref.acquireReader();

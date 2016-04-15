@@ -182,6 +182,8 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
 import org.opengis.util.GenericName;
 import org.apache.sis.util.logging.Logging;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.operation.MathTransform;
 
 //Geoapi dependencies
 
@@ -510,8 +512,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final CoordinateSystemAxis axis = currentCrs.getCoordinateSystem().getAxis(0);
 
                     if (!COMMONS_DIM.contains(axis.getDirection().name())) {
-
-                        final NumberRange[] numberRanges = GridCombineIterator.extractAxisRanges(gridGeom, key);
+                        //we want values at center, not at corner
+                        final MathTransform gridToCRS = gridGeom.getGridToCRS(PixelInCell.CELL_CENTER);
+                        final NumberRange[] numberRanges = GridCombineIterator.extractAxisRanges(gridGeom.getExtent(), gridToCRS, key);
 
                         final StringBuilder values = new StringBuilder();
                         for (int i = 0; i < numberRanges.length; i++) {
@@ -640,7 +643,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         LOGGER.log(Level.INFO, "Error retrieving data crs for the layer :"+ layer.getName(), ex);
                     }
                 }
-                
+
             } else {
                 /*
                  * TODO
