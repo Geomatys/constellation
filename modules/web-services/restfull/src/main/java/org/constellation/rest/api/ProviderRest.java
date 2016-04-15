@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -45,7 +44,6 @@ import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.collection.Cache;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.business.IDatasetBusiness;
 import org.constellation.business.IProviderBusiness;
@@ -100,11 +98,6 @@ public class ProviderRest {
 
     @Inject
     private LayerProviders layerProviders;
-
-    /**
-     * @FIXME remove this cache used for demo and add more generic cache management (Spring).
-     */
-    private static final Cache<String,DataDescription> CACHE_DATA_DESC = new Cache<>(10, 10, true);
 
     @POST
     @Path("/{id}/test")
@@ -255,17 +248,8 @@ public class ProviderRest {
         try {
             final String id = values.getValues().get("providerId");
             final String layerName = values.getValues().get("dataId");
-            final String cacheKey = id+"_"+layerName;
-
-            return Response.ok(
-                    CACHE_DATA_DESC.getOrCreate(cacheKey, new Callable<DataDescription>() {
-                        @Override
-                        public DataDescription call() throws Exception {
-                            return layerProviders.getDataDescription(id, layerName);
-                        }
-                    })
-            ).build();
-
+            final DataDescription result = layerProviders.getDataDescription(id, layerName);
+            return Response.ok(result).build();
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
