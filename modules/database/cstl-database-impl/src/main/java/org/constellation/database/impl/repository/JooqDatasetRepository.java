@@ -30,9 +30,10 @@ import org.constellation.database.api.jooq.tables.records.MetadataXCswRecord;
 import org.constellation.database.api.pojo.DatasetItem;
 import org.constellation.database.api.repository.DatasetRepository;
 import org.constellation.database.impl.jooq.util.JooqUtils;
+import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.JoinType;
+import org.jooq.Record2;
 import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
@@ -58,13 +59,16 @@ import static org.constellation.database.api.jooq.Tables.SENSORED_DATA;
 public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord, Dataset> implements
         DatasetRepository {
 
+    private static final CommonTableExpression<Record2<Integer, Integer>> FETCH_PAGE_WITH =
+            DSL.name("w").fields("id", "count").as(DSL.select(DATASET.ID, countData(DATASET.ID)).from(DATASET));
+
     private static final Field[] ITEM_FIELDS = new Field[]{
             DATASET.ID.as("id"),
             DATASET.IDENTIFIER.as("name"),
             DATASET.DATE.as("creation_date"),
             DATASET.OWNER.as("owner_id"),
             CSTL_USER.LOGIN.as("owner_login"),
-            DSL.count(DATA.ID).as("data_count")
+            FETCH_PAGE_WITH.field("count").as("data_count")
     };
 
 
@@ -198,19 +202,15 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
                                        Boolean hasCoverageData,
                                        Boolean hasLayerData,
                                        Boolean hasSensorData) {
-        // Data join type.
-        JoinType dataJoinType;
-        if (excludeEmpty) {
-            dataJoinType = JoinType.JOIN;
-        } else {
-            dataJoinType = JoinType.LEFT_OUTER_JOIN;
-        }
 
         // Query filters.
         Condition condition = DSL.trueCondition();
         if (isNotBlank(termFilter)) {
             String likeExpr = '%' + termFilter + '%';
             condition = condition.and(DATASET.IDENTIFIER.likeIgnoreCase(likeExpr).or(CSTL_USER.LOGIN.likeIgnoreCase(likeExpr)).or(DATA.NAME.likeIgnoreCase(likeExpr)));
+        }
+        if (excludeEmpty) {
+            condition = condition.and(DSL.fieldByName(Integer.class, "w.count").greaterThan(0));
         }
         if (hasVectorData != null) {
             Field<Integer> countVectorData = countDataOfType(DATASET.ID, "VECTOR");
@@ -230,20 +230,21 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
         }
 
         // Content query.
-        List<DatasetItem> content = dsl.selectDistinct(ITEM_FIELDS).from(DATASET)
+        List<DatasetItem> content = dsl.with(FETCH_PAGE_WITH).selectDistinct(ITEM_FIELDS).from(DATASET)
+                .join(FETCH_PAGE_WITH).on(DSL.fieldByName(Integer.class, "w.id").eq(DATASET.ID)) // dataset -> with
                 .leftOuterJoin(CSTL_USER).on(CSTL_USER.ID.eq(DATASET.OWNER)) // dataset -> cstl_user
-                .join(DATA, dataJoinType).on(DATA.DATASET_ID.eq(DATASET.ID).and(isIncludedAndNotHiddenData(DATA))) // dataset -> data
+                .leftOuterJoin(DATA).on(DATA.DATASET_ID.eq(DATASET.ID)) // dataset -> data
                 .where(condition)
-                .groupBy(DATASET.ID, DATASET.IDENTIFIER, DATASET.DATE, DATASET.OWNER, CSTL_USER.LOGIN)
                 .orderBy(JooqUtils.sortFields(pageable, ITEM_FIELDS))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .fetchInto(DatasetItem.class);
 
         // Total query.
-        Long total = dsl.selectDistinct(DSL.countDistinct(DATASET.ID)).from(DATASET)
+        Long total = dsl.with(FETCH_PAGE_WITH).selectDistinct(DSL.countDistinct(DATASET.ID)).from(DATASET)
+                .join(FETCH_PAGE_WITH).on(DSL.fieldByName(Integer.class, "w.id").eq(DATASET.ID)) // dataset -> with
                 .leftOuterJoin(CSTL_USER).on(DATASET.OWNER.eq(CSTL_USER.ID)) // dataset -> cstl_user
-                .join(DATA, dataJoinType).on(DATA.DATASET_ID.eq(DATASET.ID).and(isIncludedAndNotHiddenData(DATA))) // dataset -> data
+                .leftOuterJoin(DATA).on(DATA.DATASET_ID.eq(DATASET.ID)) // dataset -> data
                 .where(condition)
                 .fetchOne(0, Long.class);
 
@@ -253,6 +254,13 @@ public class JooqDatasetRepository extends AbstractJooqRespository<DatasetRecord
     // -------------------------------------------------------------------------
     //  Private utility methods
     // -------------------------------------------------------------------------
+
+    private static Field<Integer> countData(Field<Integer> datasetId) {
+        return DSL.selectCount().from(DATA)
+                .where(DATA.DATASET_ID.eq(datasetId))
+                .and(isIncludedAndNotHiddenData(DATA))
+                .asField();
+    }
 
     private static Field<Integer> countDataOfType(Field<Integer> datasetId, String type) {
         return DSL.selectCount().from(DATA)
