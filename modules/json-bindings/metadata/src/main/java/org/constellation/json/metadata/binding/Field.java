@@ -123,7 +123,7 @@ public class Field implements Serializable {
     }
 
     public String getDefaultValue() {
-        if (defaultValue == null || (render != null && (render.equals("integer") || render.equals("decimal")))) {
+        if (defaultValue == null || (render != null && (render.equals("integer") || render.equals("decimal")) && !"NaN".equalsIgnoreCase(value))) {
             return defaultValue;
         } else {
             return '"' + defaultValue + '"';
@@ -135,7 +135,7 @@ public class Field implements Serializable {
     }
 
     public String getValue() {
-        if (value == null || (render != null && (render.equals("integer") || render.equals("decimal")))) {
+        if (value == null || (render != null && (render.equals("integer") || render.equals("decimal")) && !"NaN".equalsIgnoreCase(value))) {
             return value;
         } else {
             return '"' + value + '"';
