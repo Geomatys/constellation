@@ -142,6 +142,7 @@ function previewMapConfig(previewMapOptionsProvider) {
                 new ol.control.ScaleLine(),
                 new ol.control.Zoom(),
                 new ol.control.FullScreen(),
+                new ol.control.Rotate(),
                 new ol.control.Attribution()
             ],
             layers: [
