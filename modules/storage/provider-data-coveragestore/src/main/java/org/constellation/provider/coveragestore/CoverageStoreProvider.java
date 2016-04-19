@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import org.apache.sis.util.logging.WarningListener;
 import org.geotoolkit.storage.coverage.CoverageReference;
 import org.geotoolkit.storage.coverage.CoverageStore;
 import org.geotoolkit.storage.coverage.CoverageStoreFinder;
@@ -56,7 +58,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
 
     public CoverageStoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param){
         super(providerId,service,param);
-        visit();
+        reload();
     }
 
     @Override

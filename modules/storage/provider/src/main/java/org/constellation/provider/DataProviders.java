@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
 import org.geotoolkit.storage.coverage.CoverageReference;
@@ -141,10 +142,28 @@ public final class DataProviders extends Providers implements PropertyChangeList
                                        final ParameterValueGroup params,
                                        final Integer datasetID,
                                        final boolean createDatasetIfNull) throws ConfigurationException{
-        getProviders();
         
         final DataProvider provider = factory.createProvider(id,params);
+
+        //ensure the store is at least correct
+        final DataStore ds = provider.getMainStore();
+        try{
+            if (ds instanceof FeatureStore) {
+                ((FeatureStore) ds).getNames();
+            } else if (ds instanceof CoverageStore) {
+                ((CoverageStore) ds).getNames();
+            }
+        }catch(DataStoreException ex){
+            try {
+                ds.close();
+            } catch (DataStoreException ex1) {
+                //we have try
+            }
+            throw new ConfigurationException(ex.getMessage(),ex);
+        }
+
         //add in the list our provider
+        getProviders();
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
         //save the configuration
