@@ -92,7 +92,7 @@ For example, database configuration can be specified from environment variable `
 #### Available configuration properties
 * **database.url** : application database URL in Hiroku like format. Default value `postgres://cstl:admin@localhost:5432/constellation`
 * **epsg.database.url** : EPSG database URL. Default value same as **database.url**
-* **epsg.database.url** : testing database URL. Default value `postgres://test:test@localhost:5432/cstl-test`
+* **test.database.url** : testing database URL. Default value `postgres://test:test@localhost:5432/cstl-test`
 * **cstl.config** : Path to application external configuration properties file. Optional, default null.
 * **cstl.url** : Constellation application URL. Used by Constellation to generate resources URLs.
 * **cstl.home** : Application home directory, used by Constellation to store logs, indexes, ... . By default, Constellation will create a `.constellation` directory in current user home folder.
