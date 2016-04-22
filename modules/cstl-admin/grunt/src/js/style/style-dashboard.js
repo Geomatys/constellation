@@ -14,7 +14,11 @@
  *  Lesser General Public License for more details..
  */
 
-angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
+angular.module('cstl-style-dashboard', [
+    'cstl-restapi',
+    'cstl-services',
+    'cstl.components.previewMap',
+    'ui.bootstrap.modal'])
 
     .controller('StylesController', function($scope,Dashboard,style,Growl,StyleSharedService,$modal,$window,
                                              $cookieStore,provider) {
@@ -24,6 +28,8 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
         $scope.wrap = {};
 
         $scope.hideScroll = true;
+
+        $scope.preview = { layer: undefined, extent: undefined };
 
         $scope.styleCtrl = {
             cstlUrl:$cookieStore.get('cstlUrl'),
@@ -145,11 +151,6 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
         };
 
         $scope.previewStyledData = function(data,isLayer) {
-            if (StyleDashboardViewer.map) {
-                StyleDashboardViewer.map.setTarget(undefined);
-            }
-            StyleDashboardViewer.initConfig();
-            StyleDashboardViewer.fullScreenControl = true;
             var selectedStyle = $scope.selected;
             if(selectedStyle) {
                 $scope.styleCtrl.currentStyleId=selectedStyle.Id;
@@ -206,25 +207,18 @@ angular.module('cstl-style-dashboard', ['cstl-restapi', 'cstl-services', 'ui.boo
                                 null,null,type!=='vector');
                     //to force the browser cache reloading styled layer.
                     layerData.get('params').ts=new Date().getTime();
-                    StyleDashboardViewer.layers = [layerData];
+                    $scope.preview.layer = layerData;
                     provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
                         function(response) {//success
-                            var bbox = response.boundingBox;
-                            if (bbox) {
-                                StyleDashboardViewer.extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
-                            }
-                            StyleDashboardViewer.initMap('stylePreviewMap');
-                        }, function() {//error
-                            // failed to find an extent bbox, just load the full map
-                            StyleDashboardViewer.initMap('stylePreviewMap');
-                        }
-                    );
-                } else {
-                    StyleDashboardViewer.initMap('stylePreviewMap');
+                            $scope.preview.extent = response.boundingBox;
+                        },
+                        function() {//error
+                            $scope.preview.extent = undefined;
+                        });
                 }
             }else {
-                $scope.styleCtrl.currentStyleId=null;
-                StyleDashboardViewer.initMap('stylePreviewMap');
+                $scope.preview.extent = $scope.preview.layer = undefined;
+                $scope.styleCtrl.currentStyleId = null;
             }
         };
 
