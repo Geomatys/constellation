@@ -28,6 +28,8 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
          */
         $scope.wrap = {};
 
+        $scope.preview = { layer: undefined, extent: undefined };
+
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.cstlUrl = $cookieStore.get('cstlUrl');
@@ -536,13 +538,7 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
         $scope.showLayerDashboardMap = function() {
             if($scope.type !== 'sos' && $scope.type !== 'csw' && $scope.type !== 'wps') {
                 if($scope.type === 'wmts') {
-                    if (WmtsLayerDashboardViewer.map) {
-                        WmtsLayerDashboardViewer.map.setTarget(undefined);
-                    }
-                    WmtsLayerDashboardViewer.initConfig();
-                    WmtsLayerDashboardViewer.fullScreenControl = true;
                     if($scope.service.status !== "STARTED"){
-                        WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
                         return;
                     }
                     if($scope.selected) {
@@ -566,23 +562,15 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                             "style":response.style,
                                             "dataExtent":response.dataExtent
                                         };
-                                        var layerwmts = WmtsLayerDashboardViewer.createLayer(wmtslayerName, $scope.service.identifier, wmtsValues);
-                                        WmtsLayerDashboardViewer.layers = [layerwmts];
-                                        WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
-                                        WmtsLayerDashboardViewer.map.getView().fit(wmtsValues.dataExtent,WmtsLayerDashboardViewer.map.getSize());
+                                        $scope.preview.layer = WmtsLayerDashboardViewer.createLayer(wmtslayerName, $scope.service.identifier, wmtsValues);
+                                        $scope.preview.extent = ol.proj.transformExtent(wmtsValues.dataExtent, WmtsLayerDashboardViewer.projection, 'CRS:84');
                                     });
                             });
                     }else {
-                        WmtsLayerDashboardViewer.initMap('wmtsPreviewMap');
+                        $scope.preview.extent = $scope.preview.layer = undefined;
                     }
                 }else {
-                    if (LayerDashboardViewer.map) {
-                        LayerDashboardViewer.map.setTarget(undefined);
-                    }
-                    LayerDashboardViewer.initConfig();
-                    LayerDashboardViewer.fullScreenControl = true;
                     if($scope.service.status !== "STARTED"){
-                        LayerDashboardViewer.initMap('layerPreviewMap');
                         return;
                     }
                     if($scope.selected) {
@@ -604,22 +592,16 @@ angular.module('cstl-webservice-edit', ['cstl-restapi', 'cstl-services', 'pascal
                                 layerData = LayerDashboardViewer.createLayer($scope.cstlUrl, layerName, providerId,null,type!=='vector');
                             }
                         }
-                        LayerDashboardViewer.layers = [layerData];
+                        $scope.preview.layer = layerData;
                         provider.dataGeoExtent({},{values: {'providerId':providerId,'dataId':layerName}},
                             function(response) {//success
-                                var bbox = response.boundingBox;
-                                if (bbox) {
-                                    var extent = [bbox[0],bbox[1],bbox[2],bbox[3]];
-                                    LayerDashboardViewer.extent = extent;
-                                }
-                                LayerDashboardViewer.initMap('layerPreviewMap');
-                            }, function() {//error
-                                // failed to find a metadata, just load the full map
-                                LayerDashboardViewer.initMap('layerPreviewMap');
-                            }
-                        );
+                                $scope.preview.extent = response.boundingBox;
+                            },
+                            function() {//error
+                                $scope.preview.extent = undefined;
+                            });
                     }else {
-                        LayerDashboardViewer.initMap('layerPreviewMap');
+                        $scope.preview.extent = $scope.preview.layer = undefined;
                     }
                 }
             }

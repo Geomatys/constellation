@@ -459,14 +459,7 @@
                                     </a>
                                 </div>
                                 <div class="sous-block-information sous-block-information-service">
-                                    <div id="wmtsPreviewMap"
-                                         class="dashboardmap data-dashboardmap"
-                                         style="padding:0;"
-                                         ng-if="service.type.toLowerCase() === 'wmts'"></div>
-                                    <div id="layerPreviewMap"
-                                         class="dashboardmap data-dashboardmap"
-                                         style="padding:0;"
-                                         ng-if="service.type.toLowerCase() !== 'wmts' && service.type.toLowerCase() !== 'sos' && service.type.toLowerCase() !== 'csw'"></div>
+                                    <preview-map class="layer-preview" layer="preview.layer" extent="preview.extent"></preview-map>
                                     <div>
                                         <div class="alert alert-info alert-data"
                                              ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}"
