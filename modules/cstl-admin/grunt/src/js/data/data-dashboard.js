@@ -229,8 +229,7 @@ angular.module('cstl-data-dashboard', [
                     self.preview.layer = layer;
                 });
             } else {
-                self.preview.extent = [-180, -90, 180, 90];
-                self.preview.layer = undefined;
+                self.preview.extent = self.preview.layer = undefined;
             }
         };
 

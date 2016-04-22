@@ -74,8 +74,8 @@ function previewMapDirective(previewMapOptions) {
         // Observe "layer" attribute reference changes.
         scope.$watch(attrs.layer, layerChanged, false);
 
-        // Observe "extent" attribute value changes.
-        scope.$watch(attrs.extent, extentChanged, false);
+        // Observe "extent" attribute reference changes.
+        scope.$watch(attrs.extent, extentChanged);
 
         // Properly destroy the map when the directive is unmounted.
         element.on('$destroy', map.setTarget.bind(map, null));
@@ -104,7 +104,10 @@ function previewMapDirective(previewMapOptions) {
         function extentChanged(newExtent) {
             var mapProj = map.getView().getProjection();
             if (angular.isArray(newExtent) && newExtent.length === 4) {
-                newExtent = ol.proj.transformExtent(newExtent, 'CRS:84', mapProj);
+                // TODO → Move this code to an utility service.
+                var crs84Proj = ol.proj.get('CRS:84');
+                newExtent = ol.extent.getIntersection(newExtent, crs84Proj.getExtent());
+                newExtent = ol.proj.transformExtent(newExtent, crs84Proj, mapProj);
                 newExtent = ol.extent.getIntersection(newExtent, mapProj.getExtent());
             } else {
                 newExtent = mapProj.getExtent();
@@ -120,7 +123,7 @@ function previewMapDirective(previewMapOptions) {
 }
 
 /**
- * Configure the preview map module.
+ * Configures the preview map module.
  *
  * Use the {@link PreviewMapOptionsProvider#provide} method in your own
  * application module to override the following default configuration.
@@ -130,13 +133,13 @@ function previewMapDirective(previewMapOptions) {
 function previewMapConfig(previewMapOptionsProvider) {
 
     /**
-     * Creates and returns the overview map options.
+     * Creates and returns the preview map options.
      *
-     * TODO → Use some configuration variables to modify some options.
+     * TODO → Use some configuration variables to modify these options.
      *
-     * @return {Object} The overview map options.
+     * @return {Object} The preview map options.
      */
-    function defaultOverviewMapOptionsFactory() {
+    function defaultPreviewMapOptionsFactory() {
         return {
             controls: [
                 new ol.control.ScaleLine(),
@@ -165,5 +168,5 @@ function previewMapConfig(previewMapOptionsProvider) {
     }
 
     // Configure preview map options.
-    previewMapOptionsProvider.provide(defaultOverviewMapOptionsFactory);
+    previewMapOptionsProvider.provide(defaultPreviewMapOptionsFactory);
 }
