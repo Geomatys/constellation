@@ -21,10 +21,20 @@
 angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'ui.bootstrap.modal'])
 
     .controller('MapcontextController', function($scope, Dashboard, Growl, $modal, $cookieStore, mapcontext, $window){
+
+        var DEFAULT_PREVIEW = {
+            layer: undefined,
+            extent: undefined,
+            projection: 'EPSG:3857',
+            layerOnly: false
+        };
+
         /**
          * To fix angular bug with nested scope.
          */
         $scope.wrap = {};
+
+        $scope.preview = angular.copy(DEFAULT_PREVIEW);
 
         $scope.cstlUrl = $cookieStore.get('cstlUrl');
         $scope.domainId = $cookieStore.get('cstlActiveDomainId');
@@ -144,17 +154,12 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
         };
 
         $scope.showMapContextDashboardMap = function() {
-            if (MapContextDashboardViewer.map) {
-                MapContextDashboardViewer.map.setTarget(undefined);
-            }
-            MapContextDashboardViewer.initConfig();
-            MapContextDashboardViewer.fullScreenControl = true;
             var selectedContext = $scope.selected;
             if(selectedContext) {
                 var mapcontextLayers = $scope.resolveLayers();
                 if (mapcontextLayers && mapcontextLayers.length>0) {
                     var cstlUrl = $cookieStore.get('cstlUrl');
-                    var layersToView = [];
+                    var layerGroup = new ol.layer.Group();
                     for (var i=0; i<mapcontextLayers.length; i++) {
                         var layObj = mapcontextLayers[i];
                         if (layObj.visible) {
@@ -196,32 +201,28 @@ angular.module('cstl-mapcontext-dashboard', ['cstl-restapi', 'cstl-services', 'u
                                 }
                             }
                             layerData.setOpacity(layObj.opacity / 100);
-                            layersToView.push(layerData);
+                            layerGroup.getLayers().push(layerData);
                         }
                     }
-                    MapContextDashboardViewer.layers = layersToView;
+                    $scope.preview.layer = layerGroup;
+                    $scope.preview.projection = selectedContext.crs;
+                    $scope.preview.layerOnly = (selectedContext.crs !== 'EPSG:3857' && selectedContext.crs !== 'EPSG:900913');
+                } else {
+                    $scope.preview = angular.copy(DEFAULT_PREVIEW);
                 }
-                if(selectedContext.crs){
-                    var crsCode = selectedContext.crs;
-                    MapContextDashboardViewer.projection = crsCode;
-                    MapContextDashboardViewer.addBackground= crsCode==='EPSG:3857';
-                    if(crsCode === 'EPSG:4326' || crsCode === 'CRS:84') {
-                        MapContextDashboardViewer.extent=[-180, -90, 180, 90];
-                    }
-                }
-                MapContextDashboardViewer.initMap('mapcontextPreviewMap');
                 if(selectedContext.west && selectedContext.south && selectedContext.east && selectedContext.north && selectedContext.crs) {
                     var extent = [selectedContext.west,selectedContext.south,selectedContext.east,selectedContext.north];
-                    MapContextDashboardViewer.map.updateSize();
                     //because zoomToExtent take extent in EPSG:4326 we need to reproject the zoom extent
                     if(selectedContext.crs !== 'EPSG:4326' && selectedContext.crs !=='CRS:84'){
                         var projection = ol.proj.get(selectedContext.crs);
                         extent = ol.proj.transformExtent(extent, projection,'EPSG:4326');
                     }
-                    MapContextDashboardViewer.zoomToExtent(extent, MapContextDashboardViewer.map.getSize(),true);
+                    $scope.preview.extent = extent;
+                } else {
+                    $scope.preview.extent = undefined;
                 }
             }else {
-                MapContextDashboardViewer.initMap('mapcontextPreviewMap');
+                $scope.preview = angular.copy(DEFAULT_PREVIEW);
             }
         };
 
