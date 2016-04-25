@@ -64,15 +64,22 @@ function PreviewMapOptionsProvider() {
  * @param previewMapOptions {Function}
  * @return {Object} The directive configuration object.
  */
-function previewMapDirective(previewMapOptions) {
+function previewMapDirective($timeout, previewMapOptions) {
 
     function previewMapLink(scope, element, attrs) {
 
         // Create the map instance .
         var map = new ol.Map(angular.extend(previewMapOptions(), { target: element[0] }));
 
+
         // Observe "layer" attribute reference changes.
-        scope.$watch(attrs.layer, layerChanged, false);
+        scope.$watch(attrs.layer, layerChanged);
+
+        // Observe "layer-only" attribute reference changes.
+        scope.$watch(attrs.layerOnly, layerOnlyChanged);
+
+        // Observe "projection" attribute reference changes.
+        scope.$watch(attrs.projection, projectionChanged);
 
         // Observe "extent" attribute reference changes.
         scope.$watch(attrs.extent, extentChanged);
@@ -84,35 +91,66 @@ function previewMapDirective(previewMapOptions) {
         /**
          * Displays the new layer.
          *
-         * @param newLayer {ol.layer.Base} The new layer.
-         * @param oldLayer {ol.layer.Base} The previous layer.
+         * @param newValue {ol.layer.Base} The new layer.
+         * @param oldValue {ol.layer.Base} The previous layer.
          */
-        function layerChanged(newLayer, oldLayer) {
-            if (oldLayer) {
-                map.removeLayer(oldLayer);
+        function layerChanged(newValue, oldValue) {
+            if (oldValue) {
+                map.removeLayer(oldValue);
             }
-            if (newLayer) {
-                map.addLayer(newLayer);
+            if (newValue) {
+                map.addLayer(newValue);
+            }
+        }
+
+        /**
+         * Toggles visibility of other layers.
+         *
+         * @param newValue {Boolean} The new value.
+         */
+        function layerOnlyChanged(newValue) {
+            var currLayer = scope.$eval(attrs.layer);
+            map.getLayers().forEach(function(layer) {
+                layer.setVisible(!newValue || layer === currLayer);
+            });
+        }
+
+        /**
+         * Updates the map projection.
+         *
+         * @param newValue {ol.proj.ProjectionLike} The previous layer.
+         */
+        function projectionChanged(newValue) {
+            var currView = map.getView(),
+                currProjection = currView.getProjection(),
+                newProjection = ol.proj.get(newValue);
+
+            if (newProjection && newProjection !== currProjection) {
+                map.setView(new ol.View({
+                    projection: newValue,
+                    rotation: currView.getRotation()
+                }));
+                extentChanged(scope.$eval(attrs.extent));
             }
         }
 
         /**
          * Zooms to the new extent.
          *
-         * @param newExtent {ol.Extent} The new extent.
+         * @param newValue {ol.Extent} The new extent.
          */
-        function extentChanged(newExtent) {
+        function extentChanged(newValue) {
             var mapProj = map.getView().getProjection();
-            if (angular.isArray(newExtent) && newExtent.length === 4) {
+            if (angular.isArray(newValue) && newValue.length === 4) {
                 // TODO → Move this code to an utility service.
                 var crs84Proj = ol.proj.get('CRS:84');
-                newExtent = ol.extent.getIntersection(newExtent, crs84Proj.getExtent());
-                newExtent = ol.proj.transformExtent(newExtent, crs84Proj, mapProj);
-                newExtent = ol.extent.getIntersection(newExtent, mapProj.getExtent());
+                newValue = ol.extent.getIntersection(newValue, crs84Proj.getExtent());
+                newValue = ol.proj.transformExtent(newValue, crs84Proj, mapProj);
+                newValue = ol.extent.getIntersection(newValue, mapProj.getExtent());
             } else {
-                newExtent = mapProj.getExtent();
+                newValue = mapProj.getExtent();
             }
-            map.getView().fit(newExtent, map.getSize());
+            map.getView().fit(newValue, map.getSize());
         }
     }
 
