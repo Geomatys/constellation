@@ -574,7 +574,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "name": 'default',
                         "title":'',
                         "description":'',
-                        "maxScale":500000000,
+                        "maxScale":5000000000,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -650,7 +650,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "name": 'palette-rule-'+new Date().getTime(),
                         "title":'',
                         "description":'',
-                        "maxScale":500000000,
+                        "maxScale":5000000000,
                         "symbolizers": [{'@symbol':'raster'}],
                         "filter": null
                     };
@@ -701,7 +701,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "name": 'cell-rule-'+new Date().getTime(),
                         "title":'',
                         "description":'',
-                        "maxScale":500000000,
+                        "maxScale":5000000000,
                         "symbolizers": [{
                             '@symbol':'cell',
                             "cellSize":20,
@@ -709,7 +709,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                                 "name": 'default',
                                 "title":'',
                                 "description":'',
-                                "maxScale":500000000,
+                                "maxScale":5000000000,
                                 "symbolizers": [],
                                 "filter": null
                             }
@@ -769,7 +769,7 @@ angular.module('cstl-style-edit', ['cstl-restapi', 'cstl-services', 'ui.bootstra
                         "name": 'dynamic-rule-'+new Date().getTime(),
                         "title":'',
                         "description":'',
-                        "maxScale":500000000,
+                        "maxScale":5000000000,
                         "symbolizers": [{'@symbol':'dynamicrange'}],
                         "filter": null
                     };
