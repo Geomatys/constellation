@@ -358,7 +358,11 @@ public class TemplateReader extends AbstractTemplateHandler {
         Class type;
         if (metadata instanceof ReferenceSystemMetadata || metadata instanceof Period || metadata instanceof AbstractTimePosition || metadata instanceof Instant) {
             final Method getter = ReflectionUtilities.getGetterFromName(node.name, metadata.getClass());
-            return getter.getReturnType();
+            if (getter != null) {
+                type = getter.getReturnType();
+            } else {
+                return null;
+            }
         } else {
             type = standard.asTypeMap(metadata.getClass(), KeyNamePolicy.UML_IDENTIFIER, TypeValuePolicy.ELEMENT_TYPE).get(node.name);
         }
