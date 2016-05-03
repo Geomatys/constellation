@@ -89,7 +89,7 @@
     </div>
     <div class="form-group">
         <label  class="col-sm-4 col-md-3 control-label">Type</label>
-        <div class="col-sm-8 col-md-9">
+        <div class="col-sm-8 col-md-9" ng-init="traitType = (symbolizer.stroke && symbolizer.stroke.dashed ? 'pointille' : '');">
             <select ng-model="traitType"
                     class="form-control form-control-fix"
                     ng-change="$parent.addStrokeDashArray(symbolizer,traitType)">
