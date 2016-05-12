@@ -76,7 +76,11 @@ public class WPSConfigurer extends OGCConfigurer {
             for (ProcessFactory pFacto : context.getProcessFactories()) {
                 final ProcessingRegistry processingRegistry = ProcessFinder.getProcessFactory(pFacto.getAutorityCode());
                 if (pFacto.getLoadAll()) {
-                    count = count + processingRegistry.getDescriptors().size();
+                    for (ProcessDescriptor descriptor : processingRegistry.getDescriptors()) {
+                        if (WPSUtils.isSupportedProcess(descriptor)) {
+                            count++;
+                        }
+                    }
                 } else {
                     count = count + pFacto.getInclude().getProcess().size();
                 }

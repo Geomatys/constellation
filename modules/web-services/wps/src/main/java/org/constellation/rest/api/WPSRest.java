@@ -99,7 +99,15 @@ public class WPSRest {
         }
 
         return results;
-
+    }
+    
+    private boolean isSupportedFactory(final ProcessingRegistry processingRegistry) {
+        for (ProcessDescriptor descriptor : processingRegistry.getDescriptors()) {
+            if (WPSUtils.isSupportedProcess(descriptor)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -126,11 +134,13 @@ public class WPSRest {
                 final ProcessingRegistry processingRegistry = ProcessFinder.getProcessFactory(pFacto.getAutorityCode());
                 if (pFacto.getLoadAll()) {
                     for (ProcessDescriptor descriptor : processingRegistry.getDescriptors()) {
-                        final ProcessDTO dto = new ProcessDTO(descriptor.getIdentifier().getCode());
-                        if (descriptor.getProcedureDescription() != null) {
-                            dto.setDescription(descriptor.getProcedureDescription().toString());
+                        if (WPSUtils.isSupportedProcess(descriptor)) {
+                            final ProcessDTO dto = new ProcessDTO(descriptor.getIdentifier().getCode());
+                            if (descriptor.getProcedureDescription() != null) {
+                                dto.setDescription(descriptor.getProcedureDescription().toString());
+                            }
+                            processes.add(dto);
                         }
-                        processes.add(dto);
                     }
                 } else {
                     final List<Process> list = pFacto.getInclude().getProcess();
@@ -243,18 +253,22 @@ public class WPSRest {
         final ProcessContext context = (ProcessContext) serviceBusiness.getConfiguration("WPS", id);
         
         if (Boolean.TRUE.equals(context.getProcesses().getLoadAll()) ) {
+            context.getProcesses().setLoadAll(Boolean.FALSE);
+            
             for (Iterator<ProcessingRegistry> it = ProcessFinder.getProcessFactories(); it.hasNext();) {
                 final ProcessingRegistry processingRegistry = it.next();
                 final String name = processingRegistry
                         .getIdentification().getCitation().getIdentifiers()
                         .iterator().next().getCode();
                 if (!name.equals(code)) {
-                    context.getProcessFactories().add(new ProcessFactory(name, Boolean.TRUE));
+                    if (isSupportedFactory(processingRegistry)) {
+                        context.getProcessFactories().add(new ProcessFactory(name, Boolean.TRUE));
+                    }
                 } else {
                     final ProcessFactory newFactory = new ProcessFactory(name, Boolean.FALSE);
                     for (ProcessDescriptor descriptor : processingRegistry.getDescriptors()) {
                         final String pid = descriptor.getIdentifier().getCode();
-                        if (!pid.equals(processId)) {
+                        if (!pid.equals(processId) && WPSUtils.isSupportedProcess(descriptor)) {
                             newFactory.getInclude().add(pid);
                         }
                     }
@@ -268,7 +282,7 @@ public class WPSRest {
                     final ProcessingRegistry processingRegistry = ProcessFinder.getProcessFactory(code);
                     for (ProcessDescriptor descriptor : processingRegistry.getDescriptors()) {
                         final String pid = descriptor.getIdentifier().getCode();
-                        if (!pid.equals(processId)) {
+                        if (!pid.equals(processId) && WPSUtils.isSupportedProcess(descriptor)) {
                             factory.getInclude().add(pid);
                         }
                     }
