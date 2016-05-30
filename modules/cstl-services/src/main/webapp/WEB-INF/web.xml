@@ -182,4 +182,10 @@
     <!--tracking-mode>URL</tracking-mode-->
   </session-config>
 
+  <error-page>
+    <!-- Missing login -->
+    <error-code>401</error-code>
+    <location>/login.html</location>
+  </error-page>
+
 </web-app>

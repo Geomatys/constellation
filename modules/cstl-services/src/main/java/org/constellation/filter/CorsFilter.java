@@ -60,13 +60,10 @@ public class CorsFilter implements Filter {
         httpServletResponse.addHeader("Access-Control-Allow-Headers", "Origin, access_token, X-Requested-With, Content-Type, Accept");
         httpServletResponse.addHeader("Access-Control-Allow-Credentials", "true");
 
-        //Test to disable cache for Ajax call
-        String xRequest = httpServletRequest.getHeader("X-Requested-With");
-        if(xRequest!=null && xRequest.equalsIgnoreCase("XMLHttpRequest")){
-            httpServletResponse.setHeader("Cache-Control", "no-cache");
-            httpServletResponse.setDateHeader("Expires", 0);
-            httpServletResponse.setHeader("Pragma", "No-cache");
-        }
+        //add headers to disable cache
+        httpServletResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+        httpServletResponse.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+        httpServletResponse.setHeader("Expires", "0"); // Proxies.
 
         if ("OPTIONS".equals(httpServletRequest.getMethod()))
             httpServletResponse.setStatus(HttpServletResponse.SC_OK);
