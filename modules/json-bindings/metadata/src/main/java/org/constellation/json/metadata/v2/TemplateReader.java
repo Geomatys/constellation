@@ -311,14 +311,21 @@ public class TemplateReader extends AbstractTemplateHandler {
                (metadata instanceof Instant)) {
                 
                 if (value != null) {
-                    final Method setter = ReflectionUtilities.getSetterFromName(node.name, value.getClass(), metadata.getClass());
+                    String attributeName;
+                    // special case
+                    if (node.name.equals("referenceSystemIdentifier") && metadata instanceof ReferenceSystem) {
+                        attributeName = "name";
+                    } else {
+                        attributeName = node.name;
+                    }
+                    final Method setter = ReflectionUtilities.getSetterFromName(attributeName, value.getClass(), metadata.getClass());
                     if (setter != null) {
                         if (setter.getParameterTypes()[0] == Collection.class) {
                             value = Arrays.asList(value);
                         }
                         ReflectionUtilities.invokeMethod(setter, metadata, value);
                     } else {
-                        LOGGER.warning("Unable to find a setter for:" + node.name + " in " + metadata.getClass().getName());
+                        LOGGER.warning("Unable to find a setter for:" + attributeName + " in " + metadata.getClass().getName());
                     }
                 } else {
                     LOGGER.warning("TODO find a setter for null values");

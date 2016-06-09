@@ -610,9 +610,9 @@
                                     }, {
                                         "type": "field",
                                         "field": {
-                                            "name": "metadata.field.dateType",
+                                            "name": "metadata.field.report.specification.dateType",
                                             "multiplicity": 1,
-                                            "help": "metadata.field.dateType_help",
+                                            "help": "metadata.field.report.specification.dateType_help",
                                             "path": "metadata.dataQualityInfo.report.result.specification.date.dateType",
                                             "render": "CODELIST.readonly",
                                             "obligation": "M","completion" : "ELEMENTARY",
