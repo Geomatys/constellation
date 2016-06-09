@@ -31,6 +31,7 @@
     "metadata.field.rsIdentifier":"Identifiant unique de la donnée",
     "metadata.field.report.specification.title":"Spécification employée pour l'évaluation de la conformité",
     "metadata.field.report.specification.date":"Date de référence de la spécification",
+    "metadata.field.report.specification.dateType":"Type de date",
     "metadata.field.inspire_keyword":"Thème(s) INSPIRE",
     "metadata.field.inspire_thesaurusTitle":"Thésaurus",
     "metadata.field.inspire_thesaurusDate":"Date de référence du thésaurus",

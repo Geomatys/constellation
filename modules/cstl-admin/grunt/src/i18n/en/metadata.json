@@ -31,6 +31,7 @@
     "metadata.field.rsIdentifier":"Identifier code for data",
     "metadata.field.report.specification.title":"Specification used for assessing conformity",
     "metadata.field.report.specification.date":"Reference date of the specification",
+    "metadata.field.report.specification.dateType":"Date type",
     "metadata.field.inspire_keyword":"INSPIRE theme",
     "metadata.field.inspire_thesaurusTitle":"Thesaurus",
     "metadata.field.inspire_thesaurusDate":"Date",
