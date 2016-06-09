@@ -272,6 +272,7 @@ public class WPSRest {
                             newFactory.getInclude().add(pid);
                         }
                     }
+                    context.getProcessFactories().add(newFactory);
                 }
             }
         } else {
