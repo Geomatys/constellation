@@ -188,14 +188,7 @@ function previewMapConfig(previewMapOptionsProvider) {
             ],
             layers: [
                 new ol.layer.Tile({
-                    source: new ol.source.OSM({
-                        url: 'http://otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
-                        attributions: [
-                            new ol.Attribution({
-                                html: 'Tiles courtesy of <a href="http://www.mapquest.com" target="_blank">MapQuest</a>'
-                            })
-                        ]
-                    })
+                    source: new ol.source.OSM()
                 })
             ],
             logo: false,

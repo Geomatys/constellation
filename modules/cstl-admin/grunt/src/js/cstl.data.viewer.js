@@ -71,11 +71,7 @@ window.buildDataViewer = function () {
 
             if(this.addBackground) {
                 //adding background layer by default OSM
-                var osmOpts = {url:'//otile1.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
-                    attributions:[new ol.Attribution({
-                        html: 'Tiles courtesy of ' +
-                            '<a href="http://www.mapquest.com" target="_blank">MapQuest</a>'
-                    })]};
+                var osmOpts = {};
                 if(!this.enableAttributions) {
                     osmOpts.attributions = null;
                 }
