@@ -68,9 +68,9 @@
                               title="{{item.title}}">{{item.title ? item.title : '&nbsp;'}}</span>
                         <div class="pull-right cell-state">
                             <span><i class="fa"
-                                     ng-class="{'fa-check icon-state-success':item.isValidated,'fa-close icon-state-fail':!item.isValidated}"></i>Validée</span>
+                                     ng-class="{'fa-check icon-state-success':item.isValidated,'fa-close icon-state-fail':!item.isValidated}"></i>{{'label.mdfilter.validity.true' | translate}}</span>
                             <span><i class="fa"
-                                     ng-class="{'fa-check icon-state-success':item.isPublished,'fa-close icon-state-fail':!item.isPublished}"></i>Publiée</span>
+                                     ng-class="{'fa-check icon-state-success':item.isPublished,'fa-close icon-state-fail':!item.isPublished}"></i>{{'label.mdfilter.published.true' | translate}}</span>
                         </div>
                     </div>
                     <div class="bottom">
