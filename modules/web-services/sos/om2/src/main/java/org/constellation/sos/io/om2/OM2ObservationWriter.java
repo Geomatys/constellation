@@ -263,7 +263,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
             return observationName;
         } catch (SQLException ex) {
-            throw new DataStoreException("Error while inserting observation.", ex);
+            throw new DataStoreException("Error while inserting observation:" + ex.getMessage(), ex);
         }
     }
 
@@ -369,11 +369,19 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (phenomenonP.getHref() != null) {
             return phenomenonP.getHref();
         }
-
-        if (phenomenonP.getPhenomenon() != null && phenomenonP.getPhenomenon().getName() != null) {
-            return phenomenonP.getPhenomenon().getName().getCode();
+        if (phenomenonP.getPhenomenon() != null) {
+            org.geotoolkit.swe.xml.Phenomenon phen = phenomenonP.getPhenomenon();
+            // TODO remove when the interface Phenomenon will have a getId() method
+            if (phen instanceof  org.geotoolkit.swe.xml.v101.PhenomenonType) {
+                String id = ((org.geotoolkit.swe.xml.v101.PhenomenonType)phen).getId();
+                if (id != null) {
+                    return id;
+                }
+            }
+            if (phen.getName() != null) {
+                return phen.getName().getCode();
+            }
         }
-
         return null;
     }
     
@@ -1036,7 +1044,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         final AbstractBoolean q = (AbstractBoolean)field.getValue();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Boolean", field.getName(), desc, null));
-                        if (!isPostgres) {
+                        if (isPostgres) {
                             sb.append("boolean,");
                         } else {
                             sb.append("integer,");
@@ -1075,7 +1083,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         final AbstractBoolean q = (AbstractBoolean)field.getValue();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Boolean", field.getName(), desc, null));
-                        if (!isPostgres) {
+                        if (isPostgres) {
                             sb.append("boolean,");
                         } else {
                             sb.append("integer,");
@@ -1166,6 +1174,10 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             StringBuilder sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
             while (tokenizer.hasMoreTokens()) {
                 String block = tokenizer.nextToken();
+                block = block.trim();
+                if (block.isEmpty()) {
+                    continue;
+                }
 
                 sql.append('(').append(oid).append(',').append(n).append(',');
                 for (int i = 0; i < fields.size(); i++) {
@@ -1175,13 +1187,18 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         value = block;
                     } else {
                         int separator = block.indexOf(encoding.getTokenSeparator());
-                        value = block.substring(0, separator);
-                        block = block.substring(separator + 1);
+                        if (separator != -1) {
+                            value = block.substring(0, separator);
+                            block = block.substring(separator + 1);
+                        } else {
+                            throw new SQLException("Bad encoding for datablock, unable to find the token separator:" + encoding.getTokenSeparator() + "in the block.");
+                        }
                     }
 
                     //format time
                     if (field.fieldType.equals("Time") && value != null && !value.isEmpty()) {
                         try {
+                            value = value.trim();
                             final long millis = new ISODateParser().parseToMillis(value);
                             value = "'" + new Timestamp(millis).toString() + "'";
                         } catch (IllegalArgumentException ex) {
