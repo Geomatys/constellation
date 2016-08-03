@@ -6,7 +6,7 @@
   more details. */ -->
 <configuration scan="true">
 
-    <property name="cstl.log.dir" value="${cslt.dir:-${user.home}/.constellation}/logs/cstl" />
+    <property name="cstl.log.dir" value="${cstl.home:-${user.home}/.constellation}/logs/cstl" />
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
