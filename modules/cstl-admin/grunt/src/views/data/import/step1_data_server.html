@@ -37,7 +37,7 @@
             <ul class="unstyled">
                 <li ng-repeat="item in columns | filter:search">
                     <i class="fa"
-                       ng-class="{'fa-folder-close-alt':item.folder && !startWith(item.path),'fa-folder-open-alt':item.folder && startWith(item.path),'fa-file':!item.folder}"></i>
+                       ng-class="{'fa-folder':item.folder && !startWith(item.path),'fa-folder-open':item.folder && startWith(item.path),'fa-file':!item.folder}"></i>
                     <a ng-class="{'link-sel':startWith(item.path)}"
                        title="{{item.name}}"
                        type="button"
