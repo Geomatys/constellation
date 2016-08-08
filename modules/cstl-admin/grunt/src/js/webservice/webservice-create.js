@@ -52,7 +52,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
                 return [{ 'id': '1.0.0', 'checked': true}];
             }
             if ($scope.type === 'csw') {
-                return [{ 'id': '2.0.0'}, { 'id': '2.0.2', 'checked': true}];
+                return [{ 'id': '2.0.2', 'checked': true}];
             }
             if ($scope.type === 'sos') {
                 return [{ 'id': '1.0.0'}, { 'id': '2.0.0', 'checked': true}];
