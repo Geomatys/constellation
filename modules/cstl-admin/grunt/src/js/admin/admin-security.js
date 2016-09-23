@@ -77,6 +77,9 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 templateUrl: 'views/admin/user/edit.html',
                 controller: 'UserDetailsController',
                 resolve: {
+                    'currentAccount' : function(Permission) {
+                        return Permission.getAccount();
+                    },
                     'user': function(UserResource){
                         return UserResource.getWithRole({id: id}).$promise;
                     },
@@ -94,6 +97,9 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
                 templateUrl: 'views/admin/user/add.html',
                 controller: 'UserDetailsController',
                 resolve: {
+                    'currentAccount' : function(Permission) {
+                        return Permission.getAccount();
+                    },
                     'user': function(){
                         return {roles: [""]};
                     },
@@ -116,9 +122,12 @@ angular.module('cstl-admin-security', ['cstl-restapi', 'cstl-services', 'pascalp
         $scope.loadPage(1);
     })
 
-    .controller('UserDetailsController', function($rootScope, $scope, $modalInstance, $cookieStore, Growl, UserResource, cfpLoadingBar, user, roles) {
+    .controller('UserDetailsController', function($rootScope, $scope, $modalInstance, $cookieStore, Growl, UserResource,
+                                                  cfpLoadingBar, currentAccount, user, roles) {
         $scope.user = user;
         $scope.roles = roles;
+
+        $scope.disableEditLogin = (currentAccount.login === user.login);
 
         $scope.password = "";
         $scope.password2 = "";

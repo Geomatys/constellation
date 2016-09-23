@@ -154,6 +154,7 @@ angular.module('cstl-main', ['cstl-restapi', 'cstl-services', 'pascalprecht.tran
 
     .controller('UserAccountController', function($scope, $rootScope, $location, $cookieStore, $translate, Growl, cfpLoadingBar, user, roles) {
         $scope.user = user;
+        $scope.disableEditLogin = true;
         $scope.roles = roles;
 
         $scope.password = "";
