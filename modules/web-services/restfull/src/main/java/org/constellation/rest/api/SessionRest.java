@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import org.constellation.token.TokenUtils;
 
 /**
  * RestFull user configuration service
@@ -72,20 +73,29 @@ public class SessionRest {
     @GET
     @Path("/account")
     public Response account(@Context HttpServletRequest req) {
-        Principal userPrincipal = req.getUserPrincipal();
-        if(userPrincipal==null){
-            LOGGER.warn("No principal in request");
+        String token = TokenUtils.extractAccessToken(req);
+        
+        String username = null;
+        if (token != null) {
+            username = TokenUtils.getUserNameFromToken(token);
+        } 
+        
+        if (username == null || username.isEmpty()) {
+            Principal userPrincipal = req.getUserPrincipal();
 
-            StringBuilder builder = new StringBuilder();
-            for (Enumeration<String> headerNames = req.getHeaderNames();headerNames.hasMoreElements(); /* NO-OPS */) {
-                String header = headerNames.nextElement();
-                builder.append(header).append(':').append(req.getHeader(header));
+            if (userPrincipal == null) {
+                LOGGER.warn("No token in request");
+
+                StringBuilder builder = new StringBuilder();
+                for (Enumeration<String> headerNames = req.getHeaderNames(); headerNames.hasMoreElements(); /* NO-OPS */) {
+                    String header = headerNames.nextElement();
+                    builder.append(header).append(':').append(req.getHeader(header));
+                }
+                LOGGER.warn(builder.toString());
+                return Response.status(401).build();
             }
-
-            LOGGER.warn(builder.toString());
-            return Response.status(401).build();
         }
-        return userRepository.findOneWithRole(userPrincipal.getName())
+        return userRepository.findOneWithRole(username)
                 .transform(new Function<UserWithRole, Response>() {
                     @Override
                     public Response apply(UserWithRole domainUser) {

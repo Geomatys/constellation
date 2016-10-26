@@ -20,7 +20,7 @@ import org.springframework.web.filter.GenericFilterBean;
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationTokenProcessingFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationTokenProcessingFilter.class);
 
     private UnauthorizedHandler unauthorizedHandler = new UnauthorizedHandler() {
 
@@ -61,7 +61,8 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         UserDetails userDetails = userDetailsExtractor.userDetails(httpRequest);
 
         if (userDetails == null) {
-            if( ! unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
+            if(!unauthorizedHandler.onUnauthorized(httpRequest, getAsHttpResponse(response))) {
+                LOGGER.warn("ATPF: unauthorized for URI:" + httpRequest.getRequestURI());
                 getAsHttpResponse(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -79,7 +80,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
         } finally {
-            SecurityContextHolder.getContext().setAuthentication(null);
+            SecurityContextHolder.clearContext();
         }
 
     }

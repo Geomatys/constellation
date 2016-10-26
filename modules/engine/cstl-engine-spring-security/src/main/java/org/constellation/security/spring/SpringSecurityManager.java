@@ -32,12 +32,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  * @author Olivier NOUGUIER (Geomatys)
  */
 public class SpringSecurityManager implements SecurityManager {
 
+    @Override
     public String getCurrentUserLogin() throws NoSecurityManagerException {
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
@@ -47,60 +48,66 @@ public class SpringSecurityManager implements SecurityManager {
         return authentication.getName();
     }
 
+    @Override
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        if(authentication==null)
-        	return false;
-        if(!authentication.isAuthenticated())
-        	return false;
+        if (authentication == null) {
+            return false;
+        }
+        if (!authentication.isAuthenticated()) {
+            return false;
+        }
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-			if(!grantedAuthority.getAuthority().equals("ROLE_ANONYMOUS"))
-				return true;
-		}
+            if (!grantedAuthority.getAuthority().equals("ROLE_ANONYMOUS")) {
+                return true;
+            }
+        }
         return false;
     }
 
+    @Override
     public boolean isAllowed(final String action) {
         throw new RuntimeException("Not implemented yet");
     }
 
+    @Override
     public boolean hasRole(final String role) {
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if(grantedAuthority.getAuthority().equals(role)) 
+            if (grantedAuthority.getAuthority().equals(role)) {
                 return true;
+            }
         }
         return false;
     }
 
+    @Override
     public void login(final String login, final String pass)
             throws UnknownAccountException, IncorrectCredentialsException {
-        
-        
-        
-        
+
     }
 
+    @Override
     public void runAs(String login) {
-    	//FIXME add role from DB.
-    	Collection<SimpleGrantedAuthority> auths = new ArrayList<SimpleGrantedAuthority>();
-    	auths.add(new SimpleGrantedAuthority("cstl-admin"));
-    	Authentication authentication = new UsernamePasswordAuthenticationToken("admin", "admin", auths );
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-    
-    
-    public void logout() {
-        
+        //FIXME add role from DB.
+        Collection<SimpleGrantedAuthority> auths = new ArrayList<>();
+        auths.add(new SimpleGrantedAuthority("cstl-admin"));
+        Authentication authentication = new UsernamePasswordAuthenticationToken("admin", "admin", auths);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-	@Override
-	public void reset() {
-		SecurityContextHolder.getContext().setAuthentication(null);
-		
-	}
+    @Override
+    public void logout() {
+
+    }
+
+    @Override
+    public void reset() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+
+    }
 }
