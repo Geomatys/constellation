@@ -19,13 +19,21 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label" translate="settings.form.login" autofocus>Login</label>
-                                    <div class="col-sm-8">
+                                    <div class="col-sm-8" ng-if="disableEditLogin">
+                                        <input class="form-control"
+                                               ng-class="{error: userForm.login.$invalid}"
+                                               name="loginDisabled"
+                                               type="text"
+                                               ng-model="user.login"
+                                               ng-disabled="true"/>
+                                        <input name="login" type="text" ng-model="user.login" style="display: none"/>
+                                    </div>
+                                    <div class="col-sm-8" ng-if="!disableEditLogin">
                                         <input class="form-control"
                                                ng-class="{error: userForm.login.$invalid}"
                                                name="login"
                                                type="text"
                                                ng-model="user.login"
-                                               ng-disabled="disableEditLogin"
                                                required />
                                     </div>
                                 </div>
