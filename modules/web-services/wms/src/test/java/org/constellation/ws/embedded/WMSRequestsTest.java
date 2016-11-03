@@ -178,6 +178,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                                                     + "ReQuEsT=GetFeatureInfo&InFo_fOrMaT=text/plain&BbOx=-2,2,2,6"
                                                     + "&HeIgHt=100&J=50&VeRsIoN=1.3.0&FoRmAt=image/gif";
 
+    private static final String WMS_GETFEATUREINFO4 ="QuErY_LaYeRs=cite:Lakes&BbOx=0,-0.0020,0.0040,0&"
+                                                    + "FoRmAt=image/gif&ReQuEsT=GetFeatureInfo&"
+                                                    + "VeRsIoN=1.1.1&InFo_fOrMaT=application/vnd.ogc.gml&"
+                                                    + "X=60&StYlEs=&LaYeRs=cite:Lakes&"
+                                                    + "SrS=EPSG:4326&WiDtH=200&HeIgHt=100&Y=60";
+
     private static final String WMS_GETLEGENDGRAPHIC = "request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
 
@@ -988,6 +994,43 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertTrue   (value.startsWith("28.5"));
     }
 
+    @Test
+    @Ignore
+    @Order(order=16)
+    public void testWMSGetFeatureInfo4() throws Exception {
+
+        // Creates a valid GetFeatureInfo url.
+        final URL gfi;
+        try {
+            gfi = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETFEATUREINFO4);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        String value = null;
+        final InputStream inGfi = gfi.openStream();
+        final InputStreamReader isr = new InputStreamReader(inGfi);
+        final BufferedReader reader = new BufferedReader(isr);
+        String fullResponse = "";
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Verify that the line starts with a number, only the one with the value
+            // should begin like this.
+            if (line.matches("[0-9]+.*")) {
+                // keep the line with the value
+                value = line;
+            }
+            fullResponse = fullResponse + line + '\n';
+        }
+        System.out.println("FULLRESPONSE: " + fullResponse);
+        reader.close();
+
+        // Tests on the returned value
+        assertNotNull(fullResponse, value);
+        assertTrue   (value.startsWith("28.5"));
+    }
+
     /**
      * Ensures that a valid GetLegendGraphic request returns indeed a {@link BufferedImage}.
      *
@@ -1021,7 +1064,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
-    @Order(order=17)
+    @Order(order=18)
     public void testWMSDescribeLayer() throws JAXBException, Exception {
         waitForStart();
         // Creates a valid DescribeLayer url.
@@ -1050,7 +1093,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
 
     @Test
-    @Order(order=18)
+    @Order(order=19)
     public void testWMSGetMapLakePostKvp() throws Exception {
         waitForStart();
         // Creates a valid GetMap url.
