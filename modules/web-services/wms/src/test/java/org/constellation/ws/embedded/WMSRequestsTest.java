@@ -190,6 +190,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     private static final String WMS_GETMAP_BMP =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/bmp&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
+    private static final String WMS_GETMAP_JPEG =
+    "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/jpeg&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
+
     private static final String WMS_GETMAP_BMP_111 =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/bmp&ReQuEsT=GetMap&StYlEs=&SrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.1.1&WiDtH=100";
 
@@ -582,6 +585,33 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      */
     @Test
     @Order(order=7)
+    public void testWMSGetMapLakeJpeg() throws Exception {
+
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_JPEG);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/jpeg");
+
+        // Test on the returned image.
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(100, image.getWidth());
+        assertEquals(100,  image.getHeight());
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
+    }
+
+
+    /**
+     * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    @Order(order=7)
     public void testWMSGetMapLakePpm() throws Exception {
         waitForStart();
         // Creates a valid GetMap url.
@@ -630,7 +660,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
             final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
             Assert.fail("Service should have raised an error");
         }catch(Exception ex){
-            System.out.println(ex);
+            //ok
         }
 
     }
