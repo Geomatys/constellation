@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.Utilities;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
@@ -1257,40 +1258,38 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     if (featureObject instanceof JAXBElement) {
                         featureObject = ((JAXBElement)featureObject).getValue();
                     }
+
+                    FeatureType ft = null;
                     try {
                         if (featureObject instanceof Node) {
-
-                                featureObject = featureReader.read(featureObject);
-
+                            featureObject = featureReader.read(featureObject);
                         } else if (featureObject instanceof FeatureCollectionType) {
                             final FeatureCollectionType xmlCollection = (FeatureCollectionType) featureObject;
                             final String id = xmlCollection.getId();
                             final List<Feature> features = new ArrayList<>();
-                            FeatureType ft = null;
                             for (FeaturePropertyType fprop : xmlCollection.getFeatureMember()) {
                                 Feature feat = (Feature)featureReader.read(fprop.getUnknowFeature());
                                 ft = feat.getType();
                                 features.add(feat);
                             }
-                            final FeatureCollection collection = FeatureStoreUtilities.collection(id, ft);
-                            collection.addAll(features);
-                            featureObject = collection;
+                            featureObject = features;
                         }
                     } catch (IllegalArgumentException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, INVALID_VALUE);
                     } catch (IOException | XMLStreamException ex) {
                         throw new CstlServiceException(ex);
                     }
-                    final GenericName typeName;
-                    FeatureCollection featureCollection;
+                    Collection<Feature> featureCollection;
 
                     if (featureObject instanceof Feature) {
                         final Feature feature = (Feature) featureObject;
-                        typeName = feature.getType().getName();
-                        featureCollection = FeatureStoreUtilities.collection(feature);
+                        ft = feature.getType();
+                        featureCollection = Arrays.asList(feature);
+                    } else if (featureObject instanceof List) {
+                        featureCollection = (List) featureObject;
                     } else if (featureObject instanceof FeatureCollection) {
-                        featureCollection = (FeatureCollection) featureObject;
-                        typeName = ((FeatureCollection)featureCollection).getFeatureType().getName();
+                        featureCollection = (Collection) featureObject;
+                        ft = ((FeatureCollection)featureCollection).getFeatureType();
                     } else {
                         final String featureType;
                         if (featureObject == null) {
@@ -1304,6 +1303,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         }
                         throw new CstlServiceException("Unexpected Object to insert:" + featureType);
                     }
+                    GenericName typeName = ft.getName();
 
                     if (layersContainsKey(userLogin, typeName) == null) {
                         throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
@@ -1311,8 +1311,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     final FeatureData layer = (FeatureData) getLayerReference(userLogin, typeName);
                     try {
                         final CoordinateReferenceSystem trueCrs = layer.getStore().getFeatureType(typeName).getCoordinateReferenceSystem();
-                        if(trueCrs != null && !CRS.equalsIgnoreMetadata(trueCrs, featureCollection.getFeatureType().getCoordinateReferenceSystem())){
-                            featureCollection = GenericReprojectFeatureIterator.wrap(featureCollection, trueCrs);
+                        if(trueCrs != null && !Utilities.equalsIgnoreMetadata(trueCrs, ft.getCoordinateReferenceSystem())){
+                            final FeatureCollection collection = FeatureStoreUtilities.collection(ft,featureCollection);
+                            featureCollection = GenericReprojectFeatureIterator.wrap(collection, trueCrs);
                         }
 
                         final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);

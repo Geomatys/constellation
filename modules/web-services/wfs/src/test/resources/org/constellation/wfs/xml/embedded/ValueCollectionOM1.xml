@@ -7,8 +7,8 @@
     <wfs:member>urn:-sandre:object:bdrhf:123X</wfs:member>
     <wfs:member>urn:blablabla:4</wfs:member>
     <wfs:member>urn:blablabla:5</wfs:member>
-    <wfs:member>urn:-sandre:object:bdrhf:560X</wfs:member>
     <wfs:member>urn:-sandre:object:bdrhf:48X</wfs:member>
-    <wfs:member>urn:-sandre:object:bdrhf:666X</wfs:member>
+    <wfs:member>urn:-sandre:object:bdrhf:560X</wfs:member>
     <wfs:member>urn:-sandre:object:bdrhf:999X</wfs:member>
+    <wfs:member>urn:-sandre:object:bdrhf:666X</wfs:member>
 </wfs:ValueCollection>

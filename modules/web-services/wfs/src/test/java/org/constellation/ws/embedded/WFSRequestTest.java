@@ -749,8 +749,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         sum              = new TransactionSummaryType(2, 0, 0);
         insertedFeatures = new ArrayList<>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-010"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-009"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-010"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
         ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 
@@ -792,8 +792,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
         sum              = new TransactionSummaryType(2, 0, 0);
         insertedFeatures = new ArrayList<>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-012"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-011"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-012"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
         ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 

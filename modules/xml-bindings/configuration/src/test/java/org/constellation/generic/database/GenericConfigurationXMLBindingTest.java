@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -83,7 +84,7 @@ public class GenericConfigurationXMLBindingTest {
 
         BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
 
-        HashMap<String, String> parameters = new HashMap<>();
+        HashMap<String, String> parameters = new LinkedHashMap<>();//ensure order for test
         parameters.put("staticVar01", "something");
         parameters.put("staticVar02", "blavl, bloub");
 

@@ -48,22 +48,22 @@
     </wfs:member>
     <wfs:member>
         <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">23400.0 2001368.0</gml:pos>
-        </gml:Point>
-    </wfs:member>
-    <wfs:member>
-        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
             <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">21400.0 2001368.0</gml:pos>
         </gml:Point>
     </wfs:member>
     <wfs:member>
         <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">87400.0 2001654.0</gml:pos>
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">23400.0 2001368.0</gml:pos>
         </gml:Point>
     </wfs:member>
     <wfs:member>
         <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
             <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">45900.0 2001214.0</gml:pos>
+        </gml:Point>
+    </wfs:member>
+    <wfs:member>
+        <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+            <gml:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">87400.0 2001654.0</gml:pos>
         </gml:Point>
     </wfs:member>
 </wfs:ValueCollection>

@@ -481,6 +481,11 @@ public abstract class AbstractGrizzlyServer {
     }
 
     private static Object unmarshallStream(final InputStream is) throws IOException, JAXBException {
+
+        //JDK-8 : ensure xml reader are allowed to access external DTD files when needed
+        System.setProperty("javax.xml.accessExternalSchema", "all");
+        System.setProperty("javax.xml.accessExternalDTD", "all");
+        
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         StringWriter writer = new StringWriter();
         IOUtils.copy(is, writer, "UTF-8");

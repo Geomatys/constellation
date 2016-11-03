@@ -170,7 +170,7 @@ public class WMSService extends GridWebService<WMSWorker> {
     @Override
     public Response treatIncomingRequest(final Object objectRequest, final WMSWorker worker) {
         final QueryContext queryContext = new QueryContext();
-
+        
         ServiceDef version = null;
         try {
 
