@@ -202,6 +202,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     private static final String WMS_GETMAP_GIF =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
+    private static final String WMS_GETMAP_GIF_UNVALID_LAYER =
+    "TrAnSpArEnT=False&HeIgHt=100&LaYeRs=unknownlayer&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&srS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.1.1&WiDtH=100&EXCEPTIONS=application/vnd.ogc.se_inimage";
+
     private static final String WMS_GETMAP_GIF_TRANSPARENT =
     "TrAnSpArEnT=TRUE&CrS=CRS:84&FoRmAt=image%2Fgif&VeRsIoN=1.3.0&HeIgHt=100&WiDtH=200&StYlEs=&LaYeRs=cite%3ALakes&ReQuEsT=GetMap&BbOx=0,-0.0020,0.0040,0";
 
@@ -606,12 +609,11 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
-
     /**
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
-    @Order(order=7)
+    @Order(order=8)
     public void testWMSGetMapLakePpm() throws Exception {
         waitForStart();
         // Creates a valid GetMap url.
@@ -637,7 +639,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * Ensures that an exception is returned when requesting too many layers.
      */
     @Test
-    @Order(order=8)
+    @Order(order=9)
     public void testWMSGetMapLayerLimit() throws Exception {
 
         // Creates a valid GetMap url.
@@ -665,13 +667,41 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     }
 
+    /**
+     * Ensures that an error is returned in image as gif and
+     * is not all black.
+     */
+    @Test
+    @Order(order=10)
+    public void testWMSGetMapErrorInImageGif() throws Exception {
+
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_GIF_UNVALID_LAYER);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/gif");
+
+        // Test on the returned image.
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(100, image.getWidth());
+        assertEquals(100,  image.getHeight());
+        assertTrue  (ImageTesting.getNumColors(image) == 2);
+        assertFalse (ImageTesting.hasTransparency(image));
+
+    }
 
     /**
      * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
      * document representing the server capabilities in the WMS version 1.1.1/ 1.3.0 standard.
      */
     @Test
-    @Order(order=9)
+    @Order(order=11)
     public void testWMSGetCapabilities() throws JAXBException, Exception {
         waitForStart();
         // Creates a valid GetCapabilities url.
@@ -774,7 +804,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     }
 
     @Test
-    @Order(order=10)
+    @Order(order=12)
     public void testWMSGetCapabilitiesLanguage() throws JAXBException, Exception {
         waitForStart();
          // Creates a valid GetMap url.
@@ -845,7 +875,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * @throws java.io.Exception
      */
     @Test
-    @Order(order=11)
+    @Order(order=13)
     public void testWMSGetFeatureInfo() throws Exception {
         waitForStart();
         // Creates a valid GetFeatureInfo url.
@@ -886,7 +916,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      */
     @Test
     @Ignore
-    @Order(order=12)
+    @Order(order=14)
     public void testWMSGetFeatureInfo2() throws Exception {
         waitForStart();
         // Creates a valid GetFeatureInfo url.
@@ -923,7 +953,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     @Test
     @Ignore
-    @Order(order=13)
+    @Order(order=15)
     public void testWMSGetFeatureInfo3() throws Exception {
         waitForStart();
         // Creates a valid GetFeatureInfo url.
@@ -991,7 +1021,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
-    @Order(order=15)
+    @Order(order=17)
     public void testWMSDescribeLayer() throws JAXBException, Exception {
         waitForStart();
         // Creates a valid DescribeLayer url.
@@ -1020,7 +1050,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
 
     @Test
-    @Order(order=16)
+    @Order(order=18)
     public void testWMSGetMapLakePostKvp() throws Exception {
         waitForStart();
         // Creates a valid GetMap url.

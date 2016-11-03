@@ -46,6 +46,7 @@ import org.constellation.dto.Details;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
+import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
@@ -184,12 +185,6 @@ import org.opengis.util.GenericName;
 import org.apache.sis.util.logging.Logging;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
-
-//Geoapi dependencies
-
-//Constellation dependencies
-//Geotoolkit dependencies
-//Geoapi dependencies
 
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
@@ -1470,7 +1465,20 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                                                Exception ex, OWSExceptionCode expCode, String locator) throws CstlServiceException {
         if (errorInImage) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
+            BufferedImage img = CstlPortrayalService.getInstance().writeInImage(ex, getMap.getSize());
+            Boolean trs = getMap.getTransparent();
+            if (Boolean.FALSE.equals(trs)) {
+                //force background
+                final BufferedImage buffer = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                final Color exColor = getMap.getBackground() != null ? getMap.getBackground() : Color.WHITE;
+                final Graphics2D g = buffer.createGraphics();
+                g.setColor(exColor);
+                g.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
+                g.drawImage(img, 0, 0, null);
+                img = buffer;
+            }
+            return new PortrayalResponse(img);
+
         } else if (errorBlank) {
             Color exColor = getMap.getBackground() != null ? getMap.getBackground() : Color.WHITE;
             if (getMap.getTransparent()) {

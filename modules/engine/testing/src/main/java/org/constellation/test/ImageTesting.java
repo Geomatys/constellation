@@ -88,6 +88,25 @@ public final class ImageTesting {
         return colors.size();
     }
 
+
+    /**
+     * Returns true if the image any pixel not opaque.
+     *
+     * @param image The input image.
+     * @return true if image contain transparency
+     */
+    public static boolean hasTransparency(final BufferedImage image) {
+        for (int x=0, nw=image.getWidth(); x<nw; x++) {
+            for (int y=0, nh=image.getHeight(); y<nh; y++) {
+                int argb = image.getRGB(x, y) >>> 24;
+                if (argb != 0xFF) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Flip a {@link RenderedImage}. The given image should not be {@code null}.
      *
