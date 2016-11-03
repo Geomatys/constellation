@@ -1270,6 +1270,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 1. SCENE
         //       -- get the List of layer references
         final List<GenericName> layerNames = getMap.getLayers();
+
+        //check layer limit
+        final Details skeleton = getStaticCapabilitiesObject("wms", "eng");
+        if (skeleton.getServiceConstraints()!=null) {
+            final int layerLimit = skeleton.getServiceConstraints().getLayerLimit();
+            if(layerLimit>0 && layerLimit<layerNames.size()) {
+                throw new CstlServiceException("Too many layers requested, limit is "+layerLimit);
+            }
+        }
         final List<Data> layerRefs;
         final List<Layer> layerConfig;
         try{

@@ -93,8 +93,7 @@ import org.junit.BeforeClass;
 import org.opengis.util.GenericName;
 import org.apache.sis.util.logging.Logging;
 import org.springframework.test.context.ActiveProfiles;
-
-// JUnit dependencies
+import org.junit.Assert;
 
 
 /**
@@ -153,6 +152,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
+
+
+    private static final String WMS_GETMAP_LAYER_LIMIT ="request=GetMap&service=WMS&version=1.1.1&" +
+                                      "format=image/png&width=1024&height=512&" +
+                                      "srs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                      "styles=&layers=";
 
     private static final String WMS_GETFEATUREINFO ="request=GetFeatureInfo&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
@@ -281,6 +286,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 config.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
                 serviceBusiness.create("wms", "default", config, null);
+                final Details details = serviceBusiness.getInstanceDetails("wms", "default", "eng");
+                details.getServiceConstraints().setLayerLimit(100);
+                serviceBusiness.setInstanceDetails("wms", "default", details, "eng", true);
+
                 layerBusiness.add("SSTMDE200305",                     null,           "coverageTestSrc",        null, "default", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
@@ -595,11 +604,44 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     }
 
     /**
+     * Ensures that an exception is returned when requesting too many layers.
+     */
+    @Test
+    @Order(order=8)
+    public void testWMSGetMapLayerLimit() throws Exception {
+
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("http://localhost:").append(grizzly.getCurrentPort()).append("/wms/default?" + WMS_GETMAP_LAYER_LIMIT);
+            sb.append(LAYER_TEST);
+            for (int i=0;i<120;i++) {
+                sb.append(',').append(LAYER_TEST);
+            }
+            getMapUrl = new URL(sb.toString());
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        try{
+            final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
+            Assert.fail("Service should have raised an error");
+        }catch(Exception ex){
+            System.out.println(ex);
+        }
+
+    }
+
+
+    /**
      * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
      * document representing the server capabilities in the WMS version 1.1.1/ 1.3.0 standard.
      */
     @Test
-    @Order(order=8)
+    @Order(order=9)
     public void testWMSGetCapabilities() throws JAXBException, Exception {
         waitForStart();
         // Creates a valid GetCapabilities url.
@@ -702,7 +744,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     }
 
     @Test
-    @Order(order=9)
+    @Order(order=10)
     public void testWMSGetCapabilitiesLanguage() throws JAXBException, Exception {
         waitForStart();
          // Creates a valid GetMap url.
@@ -773,7 +815,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * @throws java.io.Exception
      */
     @Test
-    @Order(order=10)
+    @Order(order=11)
     public void testWMSGetFeatureInfo() throws Exception {
         waitForStart();
         // Creates a valid GetFeatureInfo url.
@@ -814,7 +856,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      */
     @Test
     @Ignore
-    @Order(order=11)
+    @Order(order=12)
     public void testWMSGetFeatureInfo2() throws Exception {
         waitForStart();
         // Creates a valid GetFeatureInfo url.
@@ -851,7 +893,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     @Test
     @Ignore
-    @Order(order=12)
+    @Order(order=13)
     public void testWMSGetFeatureInfo3() throws Exception {
         waitForStart();
         // Creates a valid GetFeatureInfo url.
@@ -919,7 +961,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
-    @Order(order=14)
+    @Order(order=15)
     public void testWMSDescribeLayer() throws JAXBException, Exception {
         waitForStart();
         // Creates a valid DescribeLayer url.
@@ -948,7 +990,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
 
     @Test
-    @Order(order=15)
+    @Order(order=16)
     public void testWMSGetMapLakePostKvp() throws Exception {
         waitForStart();
         // Creates a valid GetMap url.
