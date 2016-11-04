@@ -634,18 +634,18 @@ angular.module('cstl-directives', ['pascalprecht.translate'])
                     '</div>' +
                     '<div class="picklist-body">' +
                         '<div class="picklist-left">' +
-                            '<select multiple="multiple" class="form-control" ng-model="leftSelect" ng-options="item as item[labelField] for item in leftModel"/>' +
+                            '<select multiple="multiple" class="form-control" ng-model="leftSelect" ng-options="item as (labelField? item[labelField] : item) for item in leftModel"/>' +
                         '</div>' +
                         '<div class="picklist-actions">' +
                             '<div class="centered">' +
-                                '<button type="button" class="btn btn-default" ng-click="toLeft(rightModel)" ng-disabled="!rightModel.length"><i class="fa fa-angle-double-left"></i></button>' +
-                                '<button type="button" class="btn btn-default" ng-click="toLeft(rightSelect)" ng-disabled="!rightSelect.length"><i class="fa fa-angle-left"></i></button>' +
                                 '<button type="button" class="btn btn-default" ng-click="toRight(leftSelect)" ng-disabled="!leftSelect.length"><i class="fa fa-angle-right"></i></button>' +
                                 '<button type="button" class="btn btn-default" ng-click="toRight(leftModel)" ng-disabled="!leftModel.length"><i class="fa fa-angle-double-right"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="toLeft(rightModel)" ng-disabled="!rightModel.length"><i class="fa fa-angle-double-left"></i></button>' +
+                                '<button type="button" class="btn btn-default" ng-click="toLeft(rightSelect)" ng-disabled="!rightSelect.length"><i class="fa fa-angle-left"></i></button>' +
                             '</div>' +
                         '</div>' +
                         '<div class="picklist-right">' +
-                            '<select multiple="multiple" class="form-control" ng-model="rightSelect" ng-options="item as item[labelField] for item in rightModel"/>' +
+                            '<select multiple="multiple" class="form-control" ng-model="rightSelect" ng-options="item as (labelField? item[labelField] : item) for item in rightModel"/>' +
                         '</div>' +
                     '</div>' +
                 '</div>'
