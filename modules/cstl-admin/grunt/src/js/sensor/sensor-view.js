@@ -237,7 +237,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
             var line;
             if (measures.length === 1) {
                 line = d3.svg.line()
-                    .x(function (d) { return x(d.Time); })
+                    .x(function (d) { return x(d.time); })
                     .y(function (d) { return y(d[measures[0]]); });
             } else {
                 line = d3.svg.line()
@@ -261,7 +261,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
             data.forEach(function(d) {
                 if (measures.length === 1) {
-                    d.Time = parseDate(d.Time);
+                    d.time = parseDate(d.time);
                     d[measures[0]] = +d[measures[0]];
                 } else {
                     d[measures[0]] = +d[measures[0]];
@@ -271,7 +271,7 @@ angular.module('cstl-sensor-view', ['cstl-restapi', 'cstl-services', 'ui.bootstr
 
             if (measures.length === 1) {
                 x.domain(d3.extent(data, function (d) {
-                    return d.Time;
+                    return d.time;
                 }));
                 y.domain(d3.extent(data, function (d) {
                     return d[measures[0]];
