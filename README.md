@@ -36,6 +36,8 @@ To run Constellation-SDI, you'll need :
 * **JDK7u45+** from Oracle. Can be downloaded [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html) for your platform.
 * **PostgreSQL 9.x** (found [here](http://www.postgresql.org/download/)) with a database named `constellation` owned by role:password `cstl:admin`
 * **Apache Tomcat 7.0.47+** with support of websockets found [here](http://tomcat.apache.org/download-70.cgi)
+or
+* **Apache Tomcat 8.0.39+** with support of websockets found [here](http://tomcat.apache.org/download-80.cgi)
 
 For building :
 * **Maven 3.3.x** found [here](https://maven.apache.org/download.cgi)
@@ -61,6 +63,11 @@ CATALINA_OPTS="$CATALINA_OPTS -Dfile.encoding=UTF8 -Xmx1024m -XX:MaxPermSize=128
 JAVA_HOME=<PATH_TO_JDK>
 JRE_HOME=<PATH_TO_JDK>/jre
  ```
+On tomcat 8 add the following property
+```
+CATALINA_OPTS="$CATALINA_OPTS -Dorg.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH=true"
+```
+
 Tomcat startup :
  ```
 <PATH_TO_TOMCAT>/bin/startup.sh
