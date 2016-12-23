@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.sos.factory.OMFactory;
+import org.geotoolkit.geometry.jts.SRIDGenerator;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -148,7 +149,7 @@ public class OM2BaseReader {
                 }
                 final CoordinateReferenceSystem crs;
                 if (srid != 0) {
-                    crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
+                    crs = CRS.decode(SRIDGenerator.toSRS(srid, SRIDGenerator.Version.V1));
                 } else {
                     crs = defaultCRS;
                 }

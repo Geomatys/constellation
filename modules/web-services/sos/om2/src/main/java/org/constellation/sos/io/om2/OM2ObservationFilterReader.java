@@ -42,6 +42,7 @@ import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
 import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
 import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
 import static org.constellation.sos.ws.SOSUtils.getTimeValue;
+import org.geotoolkit.geometry.jts.SRIDGenerator;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.observation.ObservationFilterReader;
@@ -777,7 +778,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final byte[] b = rs.getBytes("shape");
                     final CoordinateReferenceSystem crs;
                     if (srid != 0) {
-                        crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
+                        crs = CRS.decode(SRIDGenerator.toSRS(srid, SRIDGenerator.Version.V1));
                     } else {
                         crs = defaultCRS;
                     }

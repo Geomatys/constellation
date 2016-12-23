@@ -160,7 +160,13 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public void initFilterGetFeatureOfInterest() {
         firstFilter = false;
-        sqlRequest = new StringBuilder("SELECT distinct sf.* FROM \"om\".\"observations\" o, \"om\".\"sampling_features\" sf "
+        String geomColum;
+        if (isPostgres) {
+            geomColum = "st_asBinary(\"shape\") as shape";
+        } else {
+            geomColum = "\"shape\"";
+        }
+         sqlRequest = new StringBuilder("SELECT distinct sf.id, sf.name, sf.description, sf.sampledfeature, sf.crs, ").append(geomColum).append(" FROM \"om\".\"observations\" o, \"om\".\"sampling_features\" sf "
                                      + "WHERE o.\"foi\" = sf.\"id\"");
         getFOI = true;
     }
