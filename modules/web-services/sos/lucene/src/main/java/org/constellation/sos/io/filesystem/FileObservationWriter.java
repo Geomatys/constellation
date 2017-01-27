@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.observation.xml.AbstractObservation;
 
 
 /**
@@ -76,6 +77,8 @@ public class FileObservationWriter implements ObservationWriter {
     private LuceneObservationIndexer indexer;
 
     private final String observationTemplateIdBase;
+    
+    private final String observationIdBase;
 
     private static final String FILE_EXTENSION = ".xml";
 
@@ -84,6 +87,7 @@ public class FileObservationWriter implements ObservationWriter {
     public FileObservationWriter(final Automatic configuration,  final Map<String, Object> properties) throws DataStoreException {
         super();
         this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
+        this.observationIdBase         = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
@@ -138,6 +142,19 @@ public class FileObservationWriter implements ObservationWriter {
             throw new DataStoreException("Exception while marshalling the observation file.", ex);
         }
     }
+    
+    private String getNewObservationId() throws DataStoreException {
+        String obsID = null;
+        boolean exist = true;
+        int i = observationDirectory.list().length;
+        while (exist) {
+            obsID = observationIdBase + i;
+            final File newFile = new File(observationDirectory, obsID);
+            exist = newFile.exists();
+            i++;
+        }
+        return obsID;
+    }
 
     /**
      * {@inheritDoc}
@@ -146,6 +163,9 @@ public class FileObservationWriter implements ObservationWriter {
     public String writeObservation(final Observation observation) throws DataStoreException {
         try {
             final File observationFile;
+            if (observation instanceof AbstractObservation && (observation.getName() == null || observation.getName().getCode() == null)) {
+                ((AbstractObservation)observation).setName(getNewObservationId());
+            }
             if (observation.getName().getCode().startsWith(observationTemplateIdBase)) {
                 observationFile = new File(observationTemplateDirectory, observation.getName().getCode() + FILE_EXTENSION);
             } else {

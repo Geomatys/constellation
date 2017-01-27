@@ -48,9 +48,13 @@ import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.referencing.CRS;
 
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.AbstractBoolean;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
+import org.geotoolkit.swe.xml.AbstractText;
+import org.geotoolkit.swe.xml.AbstractTime;
 
 import org.geotoolkit.swe.xml.AnyScalar;
+import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.UomProperty;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -354,6 +358,56 @@ public class OM2BaseReader {
                 throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
             }
             return buildAnyScalar(version, null, fieldName, compo);
+        }
+        
+        public Field(final String fieldName, final AbstractDataComponent value) throws SQLException {
+            this.fieldName = fieldName;
+            if (value instanceof Quantity) {
+                final Quantity q = (Quantity) value;
+                if (q.getUom() != null) {
+                    this.fieldUom = q.getUom().getCode();
+                }
+                this.fieldDesc = q.getDefinition();
+                this.fieldType = "Quantity";
+            } else if (value instanceof AbstractText) {
+                final AbstractText q = (AbstractText) value;
+                this.fieldDesc = q.getDefinition();
+                this.fieldType = "Text";
+            } else if (value instanceof AbstractBoolean) {
+                final AbstractBoolean q = (AbstractBoolean) value;
+                this.fieldDesc =  q.getDefinition();
+                this.fieldType = "Boolean";
+            } else if (value instanceof AbstractTime) {
+                final AbstractTime q = (AbstractTime) value;
+                this.fieldDesc =  q.getDefinition();
+                this.fieldType = "Time";
+            } else {
+                throw new SQLException("Only Quantity, Text AND Time is supported for now");
+            }
+            
+        }
+        
+        
+        public String getSQLType(boolean isPostgres) throws SQLException {
+            if (fieldType.equals("Quantity")) {
+                if (!isPostgres) {
+                    return "double";
+                } else {
+                    return "double precision";
+                }
+            } else if (fieldType.equals("Text")) {
+                return "character varying(1000)";
+            } else if (fieldType.equals("Boolean")) {
+                if (isPostgres) {
+                    return "boolean";
+                } else {
+                    return "integer";
+                }
+            } else if (fieldType.equals("Time")) {
+                return "timestamp";
+            } else {
+                throw new SQLException("Only Quantity, Text AND Time is supported for now");
+            }
         }
 
         @Override

@@ -25,7 +25,6 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.util.ReflectionUtilities;
 import org.geotoolkit.geometry.jts.JTS;
-import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.BoundingShape;
@@ -582,6 +581,15 @@ public final class SOSUtils {
             }
         } else {
             final List<Geometry> geometries = new ArrayList<>();
+            
+            // add the root geometry if there is one
+            final AbstractGeometry geom = reader.getSensorLocation(sensor.getId(), "2.0.0");
+            if (geom != null) {
+                Geometry jtsGeometry = GeometrytoJTS.toJTS(geom);
+                // reproject to CRS:84
+                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(true), WGS84);
+                geometries.add(JTS.transform(jtsGeometry, mt));
+            }
             for (SensorMLTree child : sensor.getChildren()) {
                 geometries.addAll(getJTSGeometryFromSensor(child, reader));
             }
@@ -596,6 +604,9 @@ public final class SOSUtils {
             
         } else {
             final Set<String> phenomenons = new HashSet<>();
+            
+            // add the root phenomenon if there is one
+            phenomenons.addAll(reader.getPhenomenonsForProcedure(sensor.getId()));
             for (SensorMLTree child : sensor.getChildren()) {
                 phenomenons.addAll(getPhenomenonFromSensor(child, reader));
             }

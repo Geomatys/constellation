@@ -46,6 +46,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.geotoolkit.sos.xml.v200.InsertObservationResponseType;
+import org.geotoolkit.sos.xml.v200.ObjectFactory;
 
 /**
  *
@@ -115,6 +117,9 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
             final Object obj;
             if (t instanceof SOSResponseWrapper) {
                 obj = ((SOSResponseWrapper)t).getCollection();
+            } else if (t instanceof InsertObservationResponseType) {
+                final ObjectFactory factory = new ObjectFactory();
+                obj = factory.createInsertObservationResponse((InsertObservationResponseType)t);
             } else {
                 obj = t;
             }

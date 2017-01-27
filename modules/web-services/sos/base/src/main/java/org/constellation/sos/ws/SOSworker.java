@@ -115,6 +115,7 @@ import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.ObservationComparator;
 import org.geotoolkit.observation.xml.Process;
+import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AbstractOperation;
@@ -1922,7 +1923,7 @@ public class SOSworker extends AbstractWorker {
                                                encoding, 
                                                values);
         try {
-            obs.setName(omReader.getNewObservationId());
+            obs.setName(null);//omReader.getNewObservationId());
             obs.setResult(array);
             obs.setSamplingTimePeriod(extractTimeBounds(currentVersion, values, encoding));
             omWriter.writeObservation(obs);
@@ -2243,7 +2244,7 @@ public class SOSworker extends AbstractWorker {
                 final AbstractObservation obs = (AbstractObservation) observation;
                 if (obs != null) {
                     obs.setProcedure(sensorId);
-                    obs.setName(omReader.getNewObservationId());
+                    obs.setName(null);//omReader.getNewObservationId());
                     LOGGER.log(Level.FINER, "samplingTime received: {0}", obs.getSamplingTime());
                     LOGGER.log(Level.FINER, "template received:\n{0}", obs.toString());
                 } else {

@@ -601,7 +601,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                             }
                             for (String f : currentFields) {
                                 final Field field = getFieldForPhenomenon(currentProcedure, f, c);
-                                if (!fields.contains(field)) {
+                                if (field != null && !fields.contains(field)) {
                                     fields.add(field);
                                 }
                             }
@@ -612,7 +612,12 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                             encoding = getCsvTextEncoding("2.0.0");
                             // Add the header
                             for (Field pheno : fields) {
-                                values.append(pheno.fieldName).append(',');
+                                // hack for the current graph in cstl you only work when the main field is named "time"
+                                if ("Time".equals(pheno.fieldType)) {
+                                    values.append("time").append(',');
+                                } else {
+                                    values.append(pheno.fieldName).append(',');
+                                }
                             }
                             values.setCharAt(values.length() - 1, '\n');
                         } else {

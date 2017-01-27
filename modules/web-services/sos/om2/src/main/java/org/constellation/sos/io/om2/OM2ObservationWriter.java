@@ -18,6 +18,7 @@
  */
 package org.constellation.sos.io.om2;
 
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBWriter;
 import org.apache.sis.storage.DataStoreException;
@@ -25,7 +26,7 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.om2.OM2BaseReader.Field;
-import org.geotoolkit.gml.GeometrytoJTS;
+import org.constellation.sos.ws.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
@@ -33,9 +34,6 @@ import org.geotoolkit.observation.xml.v200.OMObservationType.InternalPhenomenon;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
-import org.geotoolkit.swe.xml.AbstractBoolean;
-import org.geotoolkit.swe.xml.AbstractText;
-import org.geotoolkit.swe.xml.AbstractTime;
 import org.geotoolkit.swe.xml.AnyScalar;
 import org.geotoolkit.swe.xml.CompositePhenomenon;
 import org.geotoolkit.swe.xml.DataArray;
@@ -43,7 +41,6 @@ import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
 import org.geotoolkit.swe.xml.DataRecord;
 import org.geotoolkit.swe.xml.PhenomenonProperty;
-import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
@@ -65,11 +62,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import org.geotoolkit.geometry.jts.transform.AbstractGeometryTransformer;
+import org.geotoolkit.geometry.jts.transform.GeometryCSTransformer;
+import org.geotoolkit.swe.xml.AbstractDataComponent;
+import org.geotoolkit.swe.xml.AbstractDataRecord;
+import org.opengis.referencing.operation.TransformException;
 
 
 
@@ -82,6 +86,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
     protected final DataSource source;
     
+    private boolean allowSensorStructureUpdate = true;
+    
     /**
      * Build a new Observation writer for postgrid dataSource.
      *
@@ -90,6 +96,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      *
      * @throws org.apache.sis.storage.DataStoreException
      */
+    @Deprecated
     public OM2ObservationWriter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         super(properties);
         if (configuration == null) {
@@ -130,7 +137,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
+    public synchronized String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
         if (template.getObservation() != null) {
             return writeObservation(template.getObservation());
         } else  {
@@ -150,9 +157,9 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final Observation observation) throws DataStoreException {
+    public synchronized String writeObservation(final Observation observation) throws DataStoreException {
         try(final Connection c = source.getConnection()) {
-            final int generatedID   = getNewObservationId();
+            final int generatedID   = getNewObservationId(c);
             final String oid        = writeObservation(observation, c, generatedID);
             return oid;
         } catch (SQLException ex) {
@@ -164,10 +171,10 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public List<String> writeObservations(final List<Observation> observations) throws DataStoreException {
+    public synchronized List<String> writeObservations(final List<Observation> observations) throws DataStoreException {
         final List<String> results = new ArrayList<>();
         try(final Connection c = source.getConnection()) {
-            int generatedID = getNewObservationId();
+            int generatedID = getNewObservationId(c);
             for (Observation observation : observations) {
                 final String oid = writeObservation(observation, c, generatedID);
                 results.add(oid);
@@ -179,14 +186,11 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         return results;
     }
     
-    
-    
-    
     private String writeObservation(final Observation observation, final Connection c, final int generatedID) throws DataStoreException {
         try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)")) {
             final String observationName;
             int oid;
-            if (observation.getName() == null) {
+            if (observation.getName() == null || observation.getName().getCode() == null) {
                 oid = generatedID;
                 observationName = observationIdBase + oid;
             } else {
@@ -296,7 +300,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     }
 
     @Override
-    public void writePhenomenons(final List<Phenomenon> phenomenons) throws DataStoreException {
+    public synchronized void writePhenomenons(final List<Phenomenon> phenomenons) throws DataStoreException {
         try(final Connection c = source.getConnection()) {
             for (Phenomenon phenomenon : phenomenons) {
                 if (phenomenon instanceof InternalPhenomenon) {
@@ -344,8 +348,9 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     }
                 }
             } else if (exist && isPartial) {
-                try(final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET \"partial\" = ?")) {
+                try(final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET \"partial\" = ? WHERE \"id\"= ?")) {
                     stmtUpdate.setBoolean(1, false);
+                    stmtUpdate.setString(2, phenomenonId);
                     stmtUpdate.executeUpdate();
                 }
                 if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
@@ -432,7 +437,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                                 final int SRID = geom.getSRID();
                                 stmtInsert.setBytes(5, writer.write(geom));
                                 stmtInsert.setInt(6, SRID);
-                            } catch (FactoryException ex) {
+                            } catch (FactoryException | IllegalArgumentException ex) {
                                 LOGGER.log(Level.WARNING, "unable to transform the geometry to JTS", ex);
                                 stmtInsert.setNull(5, java.sql.Types.VARBINARY);
                                 stmtInsert.setNull(6, java.sql.Types.INTEGER);
@@ -449,13 +454,19 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     }
     
     private void writeResult(final int oid, final int pid, final String procedureID, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, DataStoreException {
-        if (result instanceof Measure) {
-            buildMeasureTable(procedureID, pid, c);
+        if (result instanceof Measure || result instanceof org.apache.sis.internal.jaxb.gml.Measure) {
+            Field singleField = new Field("Quantity", "value", null, null);
+            buildMeasureTable(procedureID, pid, Arrays.asList(singleField), c);
             try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"mesures\".\"mesure" + pid + "\" VALUES(?,?,?)")) {
-                final Measure measure = (Measure) result;
+                double value;
+                if (result instanceof org.apache.sis.internal.jaxb.gml.Measure) {
+                    value = ((org.apache.sis.internal.jaxb.gml.Measure)result).value;
+                } else {
+                    value = ((Measure) result).getValue();
+                }
                 stmt.setInt(1, oid);
                 stmt.setInt(2, 1);
-                stmt.setDouble(3, measure.getValue());
+                stmt.setDouble(3, value);
                 stmt.executeUpdate();
             }
         } else if (result instanceof DataArrayProperty) {
@@ -469,71 +480,10 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 !(array.getPropertyElementType().getAbstractRecord() instanceof SimpleDataRecord)) {
                 throw new DataStoreException("Only DataRecord/SimpleDataRecord is supported");
             }
-            buildMeasureTable(procedureID, pid, array, c);
-            final List<Field> fields2 = new ArrayList<>();
-            if (array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) {
-                final DataRecord record = (DataRecord)array.getPropertyElementType().getAbstractRecord();
-                for (DataComponentProperty field : record.getField()) {
-
-                    if (field.getValue() instanceof AbstractTime) {
-                        final AbstractTime q = (AbstractTime) field.getValue();
-                        final String desc    = q.getDefinition();
-                        fields2.add(new Field("Time", field.getName(), desc, null));
-
-                    } else if (field.getValue() instanceof Quantity) {
-                        final Quantity q = (Quantity)field.getValue();
-                        final String uom;
-                        if (q.getUom() != null) {
-                            uom = q.getUom().getCode();
-                        } else {
-                            uom = null;
-                        }
-                        final String desc = q.getDefinition();
-                        fields2.add(new Field("Quantity", field.getName(), desc, uom));
-                    } else if (field.getValue() instanceof AbstractText) {
-                        final AbstractText q = (AbstractText)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields2.add(new Field("Text", field.getName(), desc, null));
-                    } else {
-                        throw new DataStoreException("Only Quantity, Time and Text are supported for now");
-                    }
-
-                }
-            } else {
-                final SimpleDataRecord record = (SimpleDataRecord)array.getPropertyElementType().getAbstractRecord();
-                for (AnyScalar field : record.getField()) {
-
-                    if (field.getValue() instanceof AbstractTime) {
-                        final AbstractTime q = (AbstractTime) field.getValue();
-                        final String desc    = q.getDefinition();
-                        fields2.add(new Field("Time", field.getName(), desc, null));
-
-                    } else if (field.getValue() instanceof Quantity) {
-                        final Quantity q = (Quantity)field.getValue();
-                        final String uom;
-                        if (q.getUom() != null) {
-                            uom = q.getUom().getCode();
-                        } else {
-                            uom = null;
-                        }
-                        final String desc = q.getDefinition();
-                        fields2.add(new Field("Quantity", field.getName(), desc, uom));
-                    } else if (field.getValue() instanceof AbstractText) {
-                        final AbstractText q = (AbstractText)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields2.add(new Field("Text", field.getName(), desc, null));
-                    } else if (field.getValue() instanceof AbstractBoolean) {
-                        final AbstractBoolean q = (AbstractBoolean)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields2.add(new Field("Boolean", field.getName(), desc, null));
-                    } else {
-                        throw new DataStoreException("Only Quantity, Time, Text and Boolean are supported for now");
-                    }
-
-                }
-            }
-            final String values = array.getValues();
-            fillMesureTable(c, oid, pid, fields2, values, encoding);
+            final List<Field> fields = getFieldList(array.getPropertyElementType().getAbstractRecord());
+            buildMeasureTable(procedureID, pid, fields, c);
+            final String values       = array.getValues();
+            fillMesureTable(c, oid, pid, fields, values, encoding);
             
             /*if (lastDate != null) {
                 final PreparedStatement stmt2 = c.prepareStatement("UPDATE \"om\".\"observations\" SET \"time_end\"=? WHERE \"id\"=?");
@@ -548,17 +498,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final String foiID, final Connection c) throws SQLException {
         final String offeringID;
-        if (procedureID.startsWith(sensorIdBase)) {
-            offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
-        } else {
-            offeringID  = "offering-" + procedureID;
-        }
-       
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"identifier\"=?")) {
-            stmtExist.setString(1, offeringID);
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"procedure\"=?")) {
+            stmtExist.setString(1, procedureID);
             try(final ResultSet rs = stmtExist.executeQuery()) {
                 // INSERT
                 if (!rs.next()) {
+                    if (procedureID.startsWith(sensorIdBase)) {
+                        offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
+                    } else {
+                        offeringID  = "offering-" + procedureID;
+                    }
                     try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
                         stmtInsert.setString(1, offeringID);
                         stmtInsert.setString(2, "Offering for procedure:" + procedureID);
@@ -612,6 +561,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
                     // UPDATE
                 } else {
+                    offeringID = rs.getString(1);
                     /*
                      * update time bound
                      */
@@ -717,7 +667,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public String writeOffering(final ObservationOffering offering) throws DataStoreException {
+    public synchronized String writeOffering(final ObservationOffering offering) throws DataStoreException {
         try(final Connection c           = source.getConnection();
              final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
             stmt.setString(1, offering.getId());
@@ -780,7 +730,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws DataStoreException {
+    public synchronized void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws DataStoreException {
         try(final Connection c = source.getConnection()) {
             if (offProc != null) {
                 // single pricedure in v2.0.0
@@ -818,21 +768,37 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws DataStoreException {
+    public synchronized void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws DataStoreException {
         if (position != null) {
             try(final Connection c     = source.getConnection();
                 PreparedStatement ps   = c.prepareStatement("UPDATE \"om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?")) {
                 final WKBWriter writer = new WKBWriter();
                 ps.setString(3, physicalID);
-                final Geometry pt = GeometrytoJTS.toJTS(position);
-                ps.setBytes(1, writer.write(pt));
+                Geometry pt = org.geotoolkit.gml.GeometrytoJTS.toJTS(position, false);
+                GeometryCSTransformer ts = new GeometryCSTransformer(new AbstractGeometryTransformer() {
+                    @Override
+                    public CoordinateSequence transform(CoordinateSequence cs, int i) throws TransformException {
+                        for (int j = 0; j < cs.size(); j++) {
+                            double x = cs.getX(j);
+                            double y = cs.getY(j);
+                            cs.setOrdinate(j, 0, y);
+                            cs.setOrdinate(j, 1, x);
+                        }
+                        return cs;
+                    }
+                });
+
                 int srid = pt.getSRID();
                 if (srid == 0) {
                     srid = 4326;
+                }                
+                if (srid == 4326) {
+                    pt = ts.transform(pt);
                 }
+                ps.setBytes(1, writer.write(pt));
                 ps.setInt(2, srid);
                 ps.execute();
-            } catch (SQLException | FactoryException e) {
+            } catch (SQLException | FactoryException | TransformException e) {
                 throw new DataStoreException(e.getMessage(), e);
             }
         }
@@ -841,9 +807,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     /**
      * {@inheritDoc}
      */
-    private int getNewObservationId() throws DataStoreException {
-        try(final Connection c         = source.getConnection();
-            final Statement stmt       = c.createStatement();
+    private int getNewObservationId(Connection c) throws DataStoreException {
+        try(final Statement stmt       = c.createStatement();
             final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"")) {
             int resultNum;
             if (rs.next()) {
@@ -861,18 +826,30 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public void removeObservationForProcedure(final String procedureID) throws DataStoreException {
+    public synchronized void removeObservationForProcedure(final String procedureID) throws DataStoreException {
         try(final Connection c = source.getConnection()) {
             final int pid = getPIDFromProcedure(procedureID, c);
             if (pid == -1) {
                 LOGGER.log(Level.FINE, "Unable to find a procedure:{0}", procedureID);
                 return;
             }
+            
+            boolean mesureTableExist = true;
+            try(final PreparedStatement stmtExist  = c.prepareStatement("SELECT COUNT(id) FROM \"mesures\".\"mesure" + pid + "\"")) {
+                stmtExist.executeQuery();
+            } catch (SQLException ex) {
+                LOGGER.warning("no measure table mesure" + pid + " exist.");
+                mesureTableExist = false;
+            }
+            
             //NEW
             try(final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
                 final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?")) {
-                stmtMes.setString(1, procedureID);
-                stmtMes.executeUpdate();
+                
+                if (mesureTableExist) {
+                    stmtMes.setString(1, procedureID);
+                    stmtMes.executeUpdate();
+                }
 
                 stmtObs.setString(1, procedureID);
                 stmtObs.executeUpdate();
@@ -886,7 +863,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public void removeProcedure(final String procedureID) throws DataStoreException {
+    public synchronized void removeProcedure(final String procedureID) throws DataStoreException {
         try {
             removeObservationForProcedure(procedureID);
             try(final Connection c = source.getConnection()) {
@@ -924,6 +901,9 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
                 try (final Statement stmtDrop = c.createStatement()) {
                     stmtDrop.executeUpdate("DROP TABLE \"mesures\".\"mesure" + pid + "\"");
+                }  catch (SQLException ex) {
+                    // it happen that the table does not exist
+                    LOGGER.log(Level.WARNING, "Unable to remove measure table." +  ex.getMessage());
                 }
 
                 //look for unused observed properties (execute the statement 2 times for remaining components)
@@ -974,7 +954,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * {@inheritDoc}
      */
     @Override
-    public void removeObservation(final String observationID) throws DataStoreException {
+    public synchronized void removeObservation(final String observationID) throws DataStoreException {
         try(final Connection c              = source.getConnection()) {
             final int pid                   = getPIDFromObservation(observationID, c);
             try(final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
@@ -1005,98 +985,20 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         return exist;
     }
     
-    private void buildMeasureTable(final String procedureID, final int pid, final DataArray array, final Connection c) throws SQLException {
+    private void buildMeasureTable(final String procedureID, final int pid, final List<Field> fields, final Connection c) throws SQLException {
+        
+        
         final String tableName = "mesure" + pid;
         //look for existence
         final boolean exist = measureTableExist(pid);
-        
         if (!exist) {
+
+            // Build measure table
             final StringBuilder sb = new StringBuilder("CREATE TABLE \"mesures\".\"" + tableName + "\"("
                                                      + "\"id_observation\" integer NOT NULL,"
                                                      + "\"id\"             integer NOT NULL,");
-            
-            final List<Field> fields = new ArrayList<>();
-            if (array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) {
-                final DataRecord record = (DataRecord)array.getPropertyElementType().getAbstractRecord();
-                for (DataComponentProperty field : record.getField()) {
-                    sb.append('"').append(field.getName()).append("\" ");
-                    if (field.getValue() instanceof Quantity) {
-                        final Quantity q = (Quantity)field.getValue();
-                        final String uom;
-                        if (q.getUom() != null) {
-                            uom = q.getUom().getCode();
-                        } else {
-                            uom = null;
-                        }
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Quantity", field.getName(), desc, uom));
-                        if (!isPostgres) {
-                            sb.append("double,");
-                        } else {
-                            sb.append("double precision,");
-                        }
-                    } else if (field.getValue() instanceof AbstractText) {
-                        final AbstractText q = (AbstractText)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Text", field.getName(), desc, null));
-                        sb.append("character varying(1000),");
-                    } else if (field.getValue() instanceof AbstractBoolean) {
-                        final AbstractBoolean q = (AbstractBoolean)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Boolean", field.getName(), desc, null));
-                        if (isPostgres) {
-                            sb.append("boolean,");
-                        } else {
-                            sb.append("integer,");
-                        }
-                    } else if (field.getValue() instanceof AbstractTime) {
-                        final AbstractTime q = (AbstractTime)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Time", field.getName(), desc, null));
-                        sb.append("timestamp,");
-                    } else {
-                        throw new SQLException("Only Quantity, Text AND Time is supported for now");
-                    }
-                }
-                 
-            } else {
-                final SimpleDataRecord record = (SimpleDataRecord)array.getPropertyElementType().getAbstractRecord();
-                for (AnyScalar field : record.getField()) {
-                    sb.append('"').append(field.getName()).append("\" ");
-                    
-                    if (field.getValue() instanceof Quantity) {
-                        final Quantity q = (Quantity)field.getValue();
-                        final String uom  = q.getUom().getCode();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Quantity", field.getName(), desc, uom));
-                        if (!isPostgres) {
-                            sb.append("double,");
-                        } else {
-                            sb.append("double precision,");
-                        }
-                    } else if (field.getValue() instanceof AbstractText) {
-                        final AbstractText q = (AbstractText)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Text", field.getName(), desc, null));
-                        sb.append("character varying(1000),"); 
-                    } else if (field.getValue() instanceof AbstractBoolean) {
-                        final AbstractBoolean q = (AbstractBoolean)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Boolean", field.getName(), desc, null));
-                        if (isPostgres) {
-                            sb.append("boolean,");
-                        } else {
-                            sb.append("integer,");
-                        }
-                    } else if (field.getValue() instanceof AbstractTime) {
-                        final AbstractTime q = (AbstractTime)field.getValue();
-                        final String desc = q.getDefinition();
-                        fields.add(new Field("Text", field.getName(), desc, null));
-                        sb.append("timestamp,");
-                    } else {
-                        throw new SQLException("Only Quantity is supported for now");
-                    }
-                }
+            for (Field field : fields) {
+                sb.append('"').append(field.fieldName).append("\" ").append(field.getSQLType(isPostgres)).append(",");
             }
             sb.setCharAt(sb.length() - 1, ' ');
             sb.append(");");
@@ -1107,62 +1009,80 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             }
 
             //fill procedure_descriptions table
-            try(final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
-                int order = 1;
-                for (Field field : fields) {
-                    insertFieldStmt.setString(1, procedureID);
-                    insertFieldStmt.setInt(2, order);
-                    insertFieldStmt.setString(3, field.fieldName);
-                    insertFieldStmt.setString(4, field.fieldType);
-                    if (field.fieldDesc != null) {
-                        insertFieldStmt.setString(5, field.fieldDesc);
-                    } else {
-                        insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
-                    }
-                    if (field.fieldUom != null) {
-                        insertFieldStmt.setString(6, field.fieldUom);
-                    } else {
-                        insertFieldStmt.setNull(6, java.sql.Types.VARCHAR);
-                    }
-                    insertFieldStmt.executeUpdate();
-                    order++;
+            insertField(procedureID, fields, 1, c);
+            
+        } else if (allowSensorStructureUpdate) {
+            final List<Field> oldfields = readFields(procedureID, c);
+            final List<Field> newfields = new ArrayList<>();
+            for (Field field : fields) {
+                if (!oldfields.contains(field)) {
+                    newfields.add(field);
                 }
+            }
+            // Update measure table
+            try (Statement addColumnStmt = c.createStatement()) {
+                for (Field newField : newfields) {
+                    StringBuilder sb = new StringBuilder("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD \"" + newField.fieldName + "\" ");
+                    sb.append(newField.getSQLType(isPostgres)).append(';');
+                    addColumnStmt.execute(sb.toString());
+                }
+            }
+            
+            //fill procedure_descriptions table
+            insertField(procedureID, newfields, oldfields.size() + 1, c);
+        }
+    }
+    
+    private void insertField(String procedureID, List<Field> fields, int offset, final Connection c) throws SQLException {
+        
+        try (final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
+            for (Field field : fields) {
+                insertFieldStmt.setString(1, procedureID);
+                insertFieldStmt.setInt(2, offset);
+                insertFieldStmt.setString(3, field.fieldName);
+                insertFieldStmt.setString(4, field.fieldType);
+                if (field.fieldDesc != null) {
+                    insertFieldStmt.setString(5, field.fieldDesc);
+                } else {
+                    insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
+                }
+                if (field.fieldUom != null) {
+                    insertFieldStmt.setString(6, field.fieldUom);
+                } else {
+                    insertFieldStmt.setNull(6, java.sql.Types.VARCHAR);
+                }
+                insertFieldStmt.executeUpdate();
+                offset++;
             }
         }
     }
     
-    private void buildMeasureTable(final String procedureID, final int pid, final Connection c) throws SQLException {
-        final String tableName = "mesure" + pid;
-        //look for existence
-        final boolean exist = measureTableExist(pid);
-        
-        if (!exist) {
-            final StringBuilder sb = new StringBuilder("CREATE TABLE \"mesures\".\"" + tableName + "\"("
-                                                     + "\"id_observation\" integer NOT NULL,"
-                                                     + "\"id\"             integer NOT NULL,");
-            if (!isPostgres) {
-                sb.append("\"value\" double);");
-            } else {
-                sb.append("\"value\" double precision);");
-            }
-            
-            try(final Statement stmt = c.createStatement()) {
-                stmt.executeUpdate(sb.toString());
-                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
-                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
-            }
-
-            //fill procedure_descriptions table
-            try(final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
-                insertFieldStmt.setString(1, procedureID);
-                insertFieldStmt.setInt(2, 1);
-                insertFieldStmt.setString(3, "value");
-                insertFieldStmt.setString(4, "Quantity");
-                insertFieldStmt.setNull(5, java.sql.Types.VARCHAR);
-                insertFieldStmt.setNull(6, java.sql.Types.VARCHAR); // TODO
-                insertFieldStmt.executeUpdate();
-            }
+    private List<Field> getFieldList(AbstractDataRecord abstractRecord) throws SQLException {
+        final List<Field> fields = new ArrayList<>();
+        final Collection recordField;
+        if (abstractRecord instanceof DataRecord) {
+            final DataRecord record = (DataRecord) abstractRecord;
+            recordField =  record.getField();
+        } else {
+            final SimpleDataRecord record = (SimpleDataRecord) abstractRecord;
+            recordField =  record.getField();
         }
+        
+        for (Object field : recordField) {
+            String name;
+            AbstractDataComponent value;
+            if (field instanceof AnyScalar) {
+                name  = ((AnyScalar)field).getName();
+                value = ((AnyScalar)field).getValue();
+            } else if (field instanceof DataComponentProperty) {
+                name  = ((DataComponentProperty)field).getName();
+                value = ((DataComponentProperty)field).getValue();
+            } else {
+                throw new SQLException("Unexpected field type:" + field.getClass());
+            }
+            fields.add(new Field(name, value));
+        }
+        return fields;
     }
     
     private void fillMesureTable(final Connection c, final int oid, final int pid, final List<Field> fields, final String values, final TextBlock encoding ) throws SQLException {
@@ -1171,7 +1091,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         int n = 1;
         int sqlCpt = 0;
         try(final Statement stmtSQL = c.createStatement()) {
-            StringBuilder sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
+            StringBuilder sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" (\"id_observation\", \"id\", ");
+            for (Field field : fields) {
+                sql.append('"').append(field.fieldName).append("\",");
+            }
+            sql.setCharAt(sql.length() - 1, ' ');
+            sql.append(") VALUES ");
             while (tokenizer.hasMoreTokens()) {
                 String block = tokenizer.nextToken();
                 block = block.trim();
@@ -1228,7 +1153,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
                     stmtSQL.addBatch(sql.toString());
                     sqlCpt = 0;
-                    sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" VALUES ");
+                    sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" (\"id_observation\", \"id\", ");
+                    for (Field field : fields) {
+                        sql.append('"').append(field.fieldName).append("\",");
+                    }
+                    sql.setCharAt(sql.length() - 1, ' ');
+                    sql.append(") VALUES ");
                 }
             }
             if (sqlCpt > 0) {

@@ -64,6 +64,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -358,19 +359,24 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             try(final PreparedStatement stmtC = c.prepareStatement("SELECT \"component\" "
                                                              + "FROM \"om\".\"components\""
                                                              + "WHERE \"phenomenon\"=?")) {
-                for (String pheno : results) {
+                final Set<String> toAdd    = new HashSet<>();
+                final Set<String> toRemove = new HashSet<>();
+                for (Iterator<String> it = results.iterator(); it.hasNext();) {
+                    String pheno = it.next();
                     stmtC.setString(1, pheno);
                     try(final ResultSet rsC = stmtC.executeQuery()) {
                         boolean composite = false;
                         while (rsC.next()) {
                             composite = true;
-                            results.add(rsC.getString(1));
+                            toAdd.add(rsC.getString(1));
                         }
                         if (composite) {
-                            results.remove(pheno);
+                            toRemove.add(pheno);
                         }
                     }
                 }
+                results.addAll(toAdd);
+                results.removeAll(toRemove);
             }
 
             return results;
