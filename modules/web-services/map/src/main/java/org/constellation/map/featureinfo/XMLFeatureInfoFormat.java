@@ -325,9 +325,11 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                 continue;
             }
             String pLocal = propName.tip().toString();
+            if (pLocal.startsWith("@")) {
+                pLocal = pLocal.substring(1);
+            }
 
             if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
-                GeometryAttribute geomProp = (GeometryAttribute) prop;
                 builder.append(margin).append('<').append(pLocal).append(">\n");
                 Geometry geom = (Geometry) prop.getValue();
                 builder.append(encodeXML(geom.toText()));
@@ -344,12 +346,17 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                     margin = margin.substring(1);
                     builder.append(margin).append("</").append(pLocal).append(">\n");
                 } else {
+                    
                     //simple
                     final Object value = prop.getValue();
-                    final String strValue = encodeXML(value.toString());
-                    builder.append(margin).append('<').append(pLocal).append(">")
-                            .append(strValue)
-                            .append("</").append(pLocal).append(">\n");
+                    if (value != null) {
+                        final String strValue = encodeXML(value.toString());
+                        builder.append(margin).append('<').append(pLocal).append(">")
+                                .append(strValue)
+                                .append("</").append(pLocal).append(">\n");
+                    } else {
+                        builder.append(margin).append('<').append(pLocal).append("/>\n");
+                    }
                 }
             }
         }

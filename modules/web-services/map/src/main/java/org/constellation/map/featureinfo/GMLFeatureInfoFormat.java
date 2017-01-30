@@ -418,9 +418,13 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                 } else {
                     //simple
                     final Object value = prop.getValue();
-                    builder.append(margin).append('<').append(pPrefix).append(pLocal).append('>')
-                            .append(value)
-                            .append("</").append(pPrefix).append(pLocal).append(">\n");
+                    if (value != null) {
+                        builder.append(margin).append('<').append(pPrefix).append(pLocal).append('>')
+                                .append(value)
+                                .append("</").append(pPrefix).append(pLocal).append(">\n");
+                    } else {
+                        builder.append(margin).append('<').append(pPrefix).append(pLocal).append("\\>\n");
+                    }
                 }
             }
         }
