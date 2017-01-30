@@ -178,6 +178,7 @@ import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
 import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureWriter;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
+import org.geotoolkit.data.om.NetCDFFeatureStore;
 import org.geotoolkit.data.session.Session;
 import org.geotoolkit.feature.type.ComplexType;
 import org.geotoolkit.util.NamesExt;
@@ -515,9 +516,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 try {
                     FeatureData fLayer = (FeatureData)layer;
-                    ExtendedFeatureStore store = (ExtendedFeatureStore) fLayer.getStore();
-                    if (store.getWrapped() instanceof XSDFeatureStore) {
-                        final Map params = (Map)((XSDFeatureStore)store.getWrapped()).getSchema(layer.getName());
+                    FeatureStore store = fLayer.getStore();
+                    if (store instanceof ExtendedFeatureStore) store = ((ExtendedFeatureStore)store).getWrapped();
+                    if (store instanceof XSDFeatureStore) {
+                        final Map params = (Map)((XSDFeatureStore)store).getSchema(layer.getName());
                         if(params.size()==1 && params.get(params.keySet().iterator().next()) instanceof Schema){
                             final FeatureType ft = getFeatureTypeFromLayer(fLayer);
                             declaredSchema.put(ft, (Schema) params.get(params.keySet().iterator().next()));

@@ -240,7 +240,11 @@ public class WFSService extends GridWebService<WFSWorker> {
                            requestOutputFormat.equals("application/gml+xml; version=3.2")) {
                     outputFormat = GML_3_2_1;
                 } else {
-                    outputFormat = MediaType.valueOf(requestOutputFormat);
+                    try {
+                        outputFormat = MediaType.valueOf(requestOutputFormat);
+                    } catch (IllegalArgumentException ex) {
+                        throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "outputFormat");
+                    }
                 }
                 LOGGER.log(Level.INFO, "outputFormat asked:{0}", requestOutputFormat);
 
