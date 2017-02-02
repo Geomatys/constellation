@@ -77,6 +77,7 @@ public final class SOSConstants {
 
     private SOSConstants() {}
 
+    public static final String SHEMA_PREFIX = "schemaPrefix";
     public static final String SOS = "SOS";
     public static final String ALL = "All";
     public static final String OFFERING = "offering";

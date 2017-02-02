@@ -82,8 +82,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     }
 
     
-    public OM2ObservationFilterReader(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-        super(configuration, properties);
+    public OM2ObservationFilterReader(final Automatic configuration, final String schemaPrefix, final Map<String, Object> properties) throws DataStoreException {
+        super(configuration, schemaPrefix, properties);
     }
     
     /**
@@ -322,11 +322,11 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         final Field timeField = getTimeField(procedure);
                         final String sqlRequest;
                         if (timeField != null) {
-                            sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                            sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m "
                                     + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString().replace("$time", timeField.fieldName)
                                     + "ORDER BY m.\"id\"";
                         } else {
-                            sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
+                            sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
                         }
 
                         try(final PreparedStatement stmt = c.prepareStatement(sqlRequest)) {
@@ -364,11 +364,11 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         final Field timeField = getTimeField(procedure);
                         final String sqlRequest;
                         if (timeField != null) {
-                            sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                            sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m "
                                     + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString().replace("$time", timeField.fieldName)
                                     + "ORDER BY m.\"id\"";
                         } else {
-                            sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
+                            sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
                         }
 
                         try(final PreparedStatement stmt = c.prepareStatement(sqlRequest)) {
@@ -470,11 +470,11 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final Field timeField = getTimeField(procedure);
                     final String sqlRequest;
                     if (timeField != null) {
-                        sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                        sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m "
                                 + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString().replace("$time", timeField.fieldName)
                                 + "ORDER BY m.\"id\"";
                     } else {
-                        sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
+                        sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
                     }
 
                     try(final PreparedStatement stmt = c.prepareStatement(sqlRequest)) {

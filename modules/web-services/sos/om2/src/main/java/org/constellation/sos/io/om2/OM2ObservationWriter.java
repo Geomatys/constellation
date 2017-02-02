@@ -97,8 +97,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      * @throws org.apache.sis.storage.DataStoreException
      */
     @Deprecated
-    public OM2ObservationWriter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-        super(properties);
+    public OM2ObservationWriter(final Automatic configuration, final String schemaPrefix, final Map<String, Object> properties) throws DataStoreException {
+        super(properties, schemaPrefix);
         if (configuration == null) {
             throw new DataStoreException("The configuration object is null");
         }
@@ -124,8 +124,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      *
      * @throws org.apache.sis.storage.DataStoreException
      */
-    public OM2ObservationWriter(final DataSource source, final boolean isPostgres, final Map<String, Object> properties) throws DataStoreException {
-        super(properties);
+    public OM2ObservationWriter(final DataSource source, final boolean isPostgres, final String schemaPrefix, final Map<String, Object> properties) throws DataStoreException {
+        super(properties, schemaPrefix);
         if (source == null) {
             throw new DataStoreException("The source object is null");
         }
@@ -187,7 +187,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     }
     
     private String writeObservation(final Observation observation, final Connection c, final int generatedID) throws DataStoreException {
-        try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)")) {
+        try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"observations\" VALUES(?,?,?,?,?,?,?)")) {
             final String observationName;
             int oid;
             if (observation.getName() == null || observation.getName().getCode() == null) {
@@ -319,7 +319,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         final String phenomenonId = getPhenomenonId(phenomenonP);
         if (phenomenonId == null) return null;
         
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\", \"partial\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?")) {
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\", \"partial\" FROM  \"" + schemaPrefix + "om\".\"observed_properties\" WHERE \"id\"=?")) {
             stmtExist.setString(1, phenomenonId);
             boolean exist = false;
             boolean isPartial = false;
@@ -330,14 +330,14 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
             }
             if (!exist) {
-                try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"observed_properties\" VALUES(?,?)")) {
+                try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"observed_properties\" VALUES(?,?)")) {
                     stmtInsert.setString(1, phenomenonId);
                     stmtInsert.setBoolean(2, partial);
                     stmtInsert.executeUpdate();
                 }    
                 if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
                     final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
-                    try(final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)")) {
+                    try(final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"components\" VALUES(?,?)")) {
                         for (PhenomenonProperty child : composite.getRealComponent()) {
                             final String childID = getPhenomenonId(child);
                             writePhenomenon(child, c, false);
@@ -348,14 +348,14 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     }
                 }
             } else if (exist && isPartial) {
-                try(final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"om\".\"observed_properties\" SET \"partial\" = ? WHERE \"id\"= ?")) {
+                try(final PreparedStatement stmtUpdate = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"observed_properties\" SET \"partial\" = ? WHERE \"id\"= ?")) {
                     stmtUpdate.setBoolean(1, false);
                     stmtUpdate.setString(2, phenomenonId);
                     stmtUpdate.executeUpdate();
                 }
                 if (phenomenonP.getPhenomenon() instanceof CompositePhenomenon) {
                     final CompositePhenomenon composite = (CompositePhenomenon) phenomenonP.getPhenomenon();
-                    try(final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"om\".\"components\" VALUES(?,?)")) {
+                    try(final PreparedStatement stmtInsertCompo = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"components\" VALUES(?,?)")) {
                         for (PhenomenonProperty child : composite.getRealComponent()) {
                             final String childID = getPhenomenonId(child);
                             writePhenomenon(child, c, false);
@@ -392,19 +392,19 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private int writeProcedure(final String procedureID, final Connection c) throws SQLException {
         int pid;
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"procedures\" WHERE \"id\"=?")) {
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"pid\" FROM \"" + schemaPrefix + "om\".\"procedures\" WHERE \"id\"=?")) {
             stmtExist.setString(1, procedureID);
             try(final ResultSet rs = stmtExist.executeQuery()) {
                 if (!rs.next()) {
                     try(final Statement stmt = c.createStatement();
-                        final ResultSet rs2 = stmt.executeQuery("SELECT max(\"pid\") FROM \"om\".\"procedures\"")) {
+                        final ResultSet rs2 = stmt.executeQuery("SELECT max(\"pid\") FROM \"" + schemaPrefix + "om\".\"procedures\"")) {
                         pid = 0;
                         if (rs2.next()) {
                             pid = rs2.getInt(1) + 1;
                         }
                     }
 
-                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES(?,?,?,?)")) {
+                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"procedures\" VALUES(?,?,?,?)")) {
                         stmtInsert.setString(1, procedureID);
                         stmtInsert.setNull(2, java.sql.Types.BINARY);
                         stmtInsert.setNull(3, java.sql.Types.INTEGER);
@@ -420,11 +420,11 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     }
     
     private void writeFeatureOfInterest(final SamplingFeature foi, final Connection c) throws SQLException {
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"sampling_features\" WHERE \"id\"=?")) {
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"" + schemaPrefix + "om\".\"sampling_features\" WHERE \"id\"=?")) {
             stmtExist.setString(1, foi.getId());
             try(final ResultSet rs = stmtExist.executeQuery()) {
                 if (!rs.next()) {
-                    try (final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"sampling_features\" VALUES(?,?,?,?,?,?)")) {
+                    try (final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"sampling_features\" VALUES(?,?,?,?,?,?)")) {
                         stmtInsert.setString(1, foi.getId());
                         stmtInsert.setString(2, (foi.getName() != null) ? foi.getName().getCode() : null);
                         stmtInsert.setString(3, foi.getDescription());
@@ -457,7 +457,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (result instanceof Measure || result instanceof org.apache.sis.internal.jaxb.gml.Measure) {
             Field singleField = new Field("Quantity", "value", null, null);
             buildMeasureTable(procedureID, pid, Arrays.asList(singleField), c);
-            try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"mesures\".\"mesure" + pid + "\" VALUES(?,?,?)")) {
+            try(final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" VALUES(?,?,?)")) {
                 double value;
                 if (result instanceof org.apache.sis.internal.jaxb.gml.Measure) {
                     value = ((org.apache.sis.internal.jaxb.gml.Measure)result).value;
@@ -498,7 +498,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final String foiID, final Connection c) throws SQLException {
         final String offeringID;
-        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"offerings\" WHERE \"procedure\"=?")) {
+        try(final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"" + schemaPrefix + "om\".\"offerings\" WHERE \"procedure\"=?")) {
             stmtExist.setString(1, procedureID);
             try(final ResultSet rs = stmtExist.executeQuery()) {
                 // INSERT
@@ -508,7 +508,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     } else {
                         offeringID  = "offering-" + procedureID;
                     }
-                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
+                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
                         stmtInsert.setString(1, offeringID);
                         stmtInsert.setString(2, "Offering for procedure:" + procedureID);
                         stmtInsert.setString(3, offeringID);
@@ -544,7 +544,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     }
 
                     if (phenoID != null) {
-                        try(final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                        try(final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_observed_properties\" VALUES(?,?)")) {
                             stmtInsertOP.setString(1, offeringID);
                             stmtInsertOP.setString(2, phenoID);
                             stmtInsertOP.executeUpdate();
@@ -552,7 +552,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     }
 
                     if (foiID != null) {
-                        try(final PreparedStatement stmtInsertFOI = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                        try(final PreparedStatement stmtInsertFOI = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_foi\" VALUES(?,?)")) {
                             stmtInsertFOI.setString(1, offeringID);
                             stmtInsertFOI.setString(2, foiID);
                             stmtInsertFOI.executeUpdate();
@@ -587,7 +587,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         if (beginDate != null) {
                             final long obsBeginTime = beginDate.getTime();
                             if (obsBeginTime < offBegin) {
-                                try(final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?")) {
+                                try(final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"offerings\" SET \"time_begin\"=?")) {
                                     beginStmt.setTimestamp(1, new Timestamp(obsBeginTime));
                                     beginStmt.executeUpdate();
                                 }
@@ -596,7 +596,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         if (endDate != null) {
                             final long obsEndTime = endDate.getTime();
                             if (obsEndTime > offEnd) {
-                                try(final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?")) {
+                                try(final PreparedStatement endStmt = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"offerings\" SET \"time_end\"=?")) {
                                     endStmt.setTimestamp(1, new Timestamp(obsEndTime));
                                     endStmt.executeUpdate();
                                 }
@@ -608,13 +608,13 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         if (date != null) {
                             final long obsTime = date.getTime();
                             if (obsTime < offBegin) {
-                                try(final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_begin\"=?")) {
+                                try(final PreparedStatement beginStmt = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"offerings\" SET \"time_begin\"=?")) {
                                     beginStmt.setTimestamp(1, new Timestamp(obsTime));
                                     beginStmt.executeUpdate();
                                 }
                             }
                             if (obsTime > offEnd) {
-                                try(final PreparedStatement endStmt = c.prepareStatement("UPDATE \"om\".\"offerings\" SET \"time_end\"=?")) {
+                                try(final PreparedStatement endStmt = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"offerings\" SET \"time_end\"=?")) {
                                     endStmt.setTimestamp(1, new Timestamp(obsTime));
                                     endStmt.executeUpdate();
                                 }
@@ -626,12 +626,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                      * Phenomenon
                      */
                     if (phenoID != null) {
-                        try(final PreparedStatement phenoStmt = c.prepareStatement("SELECT \"phenomenon\" FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?")) {
+                        try(final PreparedStatement phenoStmt = c.prepareStatement("SELECT \"phenomenon\" FROM  \"" + schemaPrefix + "om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?")) {
                             phenoStmt.setString(1, offeringID);
                             phenoStmt.setString(2, phenoID);
                             try(final ResultSet rsp = phenoStmt.executeQuery()) {
                                 if (!rsp.next()) {
-                                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_observed_properties\" VALUES(?,?)")) {
                                         stmtInsert.setString(1, offeringID);
                                         stmtInsert.setString(2, phenoID);
                                         stmtInsert.executeUpdate();
@@ -645,12 +645,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                  * Feature Of interest
                  */
                 if (foiID != null) {
-                    try(final PreparedStatement foiStmt = c.prepareStatement("SELECT \"foi\" FROM  \"om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?")) {
+                    try(final PreparedStatement foiStmt = c.prepareStatement("SELECT \"foi\" FROM  \"" + schemaPrefix + "om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?")) {
                         foiStmt.setString(1, offeringID);
                         foiStmt.setString(2, foiID);
                         try(final ResultSet rsf = foiStmt.executeQuery()) {
                             if (!rsf.next()) {
-                                try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                                try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_foi\" VALUES(?,?)")) {
                                     stmtInsert.setString(1, offeringID);
                                     stmtInsert.setString(2, foiID);
                                     stmtInsert.executeUpdate();
@@ -669,7 +669,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     @Override
     public synchronized String writeOffering(final ObservationOffering offering) throws DataStoreException {
         try(final Connection c           = source.getConnection();
-             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
+             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offerings\" VALUES(?,?,?,?,?,?)")) {
             stmt.setString(1, offering.getId());
             stmt.setString(2, offering.getDescription());
             stmt.setString(3, (offering.getName() != null) ? offering.getName().getCode() : null);
@@ -700,7 +700,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmt.setString(6, offering.getProcedures().get(0));
             stmt.executeUpdate();
 
-            try(final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+            try(final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_observed_properties\" VALUES(?,?)")) {
                 for (String op : offering.getObservedProperties()) {
                     if (op != null) {
                         opstmt.setString(1, offering.getId());
@@ -710,7 +710,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
             }
 
-            try(final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+            try(final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_foi\" VALUES(?,?)")) {
                 for (String foi : offering.getFeatureOfInterestIds()) {
                     if (foi != null) {
                         foistmt.setString(1, offering.getId());
@@ -736,7 +736,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 // single pricedure in v2.0.0
             }
             if (offPheno != null) {
-                try(final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)")) {
+                try(final PreparedStatement opstmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_observed_properties\" VALUES(?,?)")) {
                     for (String op : offPheno) {
                         opstmt.setString(1, offeringID);
                         opstmt.setString(2, op);
@@ -745,7 +745,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 }
             }
             if (offSF != null) {
-                try(final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)")) {
+                try(final PreparedStatement foistmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"offering_foi\" VALUES(?,?)")) {
                     foistmt.setString(1, offeringID);
                     foistmt.setString(2, offSF);
                     foistmt.executeUpdate();
@@ -771,7 +771,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     public synchronized void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws DataStoreException {
         if (position != null) {
             try(final Connection c     = source.getConnection();
-                PreparedStatement ps   = c.prepareStatement("UPDATE \"om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?")) {
+                PreparedStatement ps   = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?")) {
                 final WKBWriter writer = new WKBWriter();
                 ps.setString(3, physicalID);
                 Geometry pt = org.geotoolkit.gml.GeometrytoJTS.toJTS(position, false);
@@ -809,7 +809,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
      */
     private int getNewObservationId(Connection c) throws DataStoreException {
         try(final Statement stmt       = c.createStatement();
-            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"om\".\"observations\"")) {
+            final ResultSet rs         = stmt.executeQuery("SELECT max(\"id\") FROM \"" + schemaPrefix + "om\".\"observations\"")) {
             int resultNum;
             if (rs.next()) {
                 resultNum = rs.getInt(1) + 1;
@@ -835,7 +835,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             }
             
             boolean mesureTableExist = true;
-            try(final PreparedStatement stmtExist  = c.prepareStatement("SELECT COUNT(id) FROM \"mesures\".\"mesure" + pid + "\"")) {
+            try(final PreparedStatement stmtExist  = c.prepareStatement("SELECT COUNT(id) FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\"")) {
                 stmtExist.executeQuery();
             } catch (SQLException ex) {
                 LOGGER.warning("no measure table mesure" + pid + " exist.");
@@ -843,8 +843,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             }
             
             //NEW
-            try(final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
-                final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?")) {
+            try(final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"" + schemaPrefix + "om\".\"observations\" WHERE \"procedure\"=?)");
+                final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"observations\" WHERE \"procedure\"=?")) {
                 
                 if (mesureTableExist) {
                     stmtMes.setString(1, procedureID);
@@ -869,13 +869,13 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             try(final Connection c = source.getConnection()) {
                 final int pid = getPIDFromProcedure(procedureID, c);
 
-                try (final PreparedStatement stmtObsP = c.prepareStatement("DELETE FROM \"om\".\"offering_observed_properties\" "
-                        + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
-                     final PreparedStatement stmtFoi = c.prepareStatement("DELETE FROM \"om\".\"offering_foi\" "
-                             + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
-                     final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"offerings\" WHERE \"procedure\"=?");
-                     final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"procedures\" WHERE \"id\"=?");
-                     final PreparedStatement stmtProcDesc = c.prepareStatement("DELETE FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=?")) {
+                try (final PreparedStatement stmtObsP = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"offering_observed_properties\" "
+                        + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"" + schemaPrefix + "om\".\"offerings\" WHERE \"procedure\"=?)");
+                     final PreparedStatement stmtFoi = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"offering_foi\" "
+                             + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"" + schemaPrefix + "om\".\"offerings\" WHERE \"procedure\"=?)");
+                     final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"offerings\" WHERE \"procedure\"=?");
+                     final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"procedures\" WHERE \"id\"=?");
+                     final PreparedStatement stmtProcDesc = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"procedure_descriptions\" WHERE \"procedure\"=?")) {
 
                     stmtObsP.setString(1, procedureID);
                     stmtObsP.executeUpdate();
@@ -909,14 +909,14 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 //look for unused observed properties (execute the statement 2 times for remaining components)
                 try (final Statement stmtOP = c.createStatement()) {
                     for (int i = 0; i < 2; i++) {
-                        try (final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"om\".\"observed_properties\""
-                                + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"om\".\"observations\") "
-                                + " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")"
-                                + " AND    \"id\" NOT IN (SELECT DISTINCT \"component\"         FROM \"om\".\"components\")")) {
+                        try (final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"" + schemaPrefix + "om\".\"observed_properties\""
+                                + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"" + schemaPrefix + "om\".\"observations\") "
+                                + " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"" + schemaPrefix + "om\".\"offering_observed_properties\")"
+                                + " AND    \"id\" NOT IN (SELECT DISTINCT \"component\"         FROM \"" + schemaPrefix + "om\".\"components\")")) {
                             while (rs.next()) {
                                 final String key = encodeQuote(rs.getString(1));
-                                stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + key + "';");
-                                stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + key + "';");
+                                stmtOP.addBatch("DELETE FROM \"" + schemaPrefix + "om\".\"components\" WHERE \"phenomenon\"='" + key + "';");
+                                stmtOP.addBatch("DELETE FROM \"" + schemaPrefix + "om\".\"observed_properties\" WHERE \"id\"='" + key + "';");
                             }
                         }
                         stmtOP.executeBatch();
@@ -924,12 +924,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
                     //look for unused foi
                     try(final Statement stmtFOI = c.createStatement();
-                    final ResultSet rs2 = stmtFOI.executeQuery(" SELECT \"id\" FROM \"om\".\"sampling_features\""
-                            + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"observations\") " +
-                            " AND    \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"offering_foi\")")) {
+                    final ResultSet rs2 = stmtFOI.executeQuery(" SELECT \"id\" FROM \"" + schemaPrefix + "om\".\"sampling_features\""
+                            + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"" + schemaPrefix + "om\".\"observations\") " +
+                            " AND    \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"" + schemaPrefix + "om\".\"offering_foi\")")) {
 
                         while (rs2.next()) {
-                            stmtFOI.addBatch("DELETE FROM \"om\".\"sampling_features\" WHERE \"id\"='" + encodeQuote(rs2.getString(1)) + "';");
+                            stmtFOI.addBatch("DELETE FROM \"" + schemaPrefix + "om\".\"sampling_features\" WHERE \"id\"='" + encodeQuote(rs2.getString(1)) + "';");
                         }
                         stmtFOI.executeBatch();
                     }
@@ -957,8 +957,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     public synchronized void removeObservation(final String observationID) throws DataStoreException {
         try(final Connection c              = source.getConnection()) {
             final int pid                   = getPIDFromObservation(observationID, c);
-            try(final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
-            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE identifier=?")) {
+            try(final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" WHERE id_observation IN (SELECT \"id\" FROM \"" + schemaPrefix + "om\".\"observations\" WHERE identifier=?)");
+            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"observations\" WHERE identifier=?")) {
                 stmtMes.setString(1, observationID);
                 stmtMes.executeUpdate();
 
@@ -975,7 +975,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         boolean exist = false;
         try(final Connection c = source.getConnection()) {
             try(final Statement stmt = c.createStatement()) {
-                try(final ResultSet rs = stmt.executeQuery("SELECT \"id\" FROM \"mesures\".\"" + tableName + "\"")) {
+                try(final ResultSet rs = stmt.executeQuery("SELECT \"id\" FROM \"" + schemaPrefix + "mesures\".\"" + tableName + "\"")) {
                     exist = true;
                 }
             } catch (SQLException ex) {
@@ -994,7 +994,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (!exist) {
 
             // Build measure table
-            final StringBuilder sb = new StringBuilder("CREATE TABLE \"mesures\".\"" + tableName + "\"("
+            final StringBuilder sb = new StringBuilder("CREATE TABLE \"" + schemaPrefix + "mesures\".\"" + tableName + "\"("
                                                      + "\"id_observation\" integer NOT NULL,"
                                                      + "\"id\"             integer NOT NULL,");
             for (Field field : fields) {
@@ -1004,8 +1004,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             sb.append(");");
             try(final Statement stmt = c.createStatement()) {
                 stmt.executeUpdate(sb.toString());
-                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
-                stmt.executeUpdate("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"om\".\"observations\"(\"id\")");
+                stmt.executeUpdate("ALTER TABLE \"" + schemaPrefix + "mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_pk PRIMARY KEY (\"id_observation\", \"id\")");
+                stmt.executeUpdate("ALTER TABLE \"" + schemaPrefix + "mesures\".\"" + tableName + "\" ADD CONSTRAINT " + tableName + "_obs_fk FOREIGN KEY (\"id_observation\") REFERENCES \"" + schemaPrefix + "om\".\"observations\"(\"id\")");
             }
 
             //fill procedure_descriptions table
@@ -1022,7 +1022,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             // Update measure table
             try (Statement addColumnStmt = c.createStatement()) {
                 for (Field newField : newfields) {
-                    StringBuilder sb = new StringBuilder("ALTER TABLE \"mesures\".\"" + tableName + "\" ADD \"" + newField.fieldName + "\" ");
+                    StringBuilder sb = new StringBuilder("ALTER TABLE \"" + schemaPrefix + "mesures\".\"" + tableName + "\" ADD \"" + newField.fieldName + "\" ");
                     sb.append(newField.getSQLType(isPostgres)).append(';');
                     addColumnStmt.execute(sb.toString());
                 }
@@ -1035,7 +1035,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
     
     private void insertField(String procedureID, List<Field> fields, int offset, final Connection c) throws SQLException {
         
-        try (final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
+        try (final PreparedStatement insertFieldStmt = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"procedure_descriptions\" VALUES (?,?,?,?,?,?)")) {
             for (Field field : fields) {
                 insertFieldStmt.setString(1, procedureID);
                 insertFieldStmt.setInt(2, offset);
@@ -1091,7 +1091,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         int n = 1;
         int sqlCpt = 0;
         try(final Statement stmtSQL = c.createStatement()) {
-            StringBuilder sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" (\"id_observation\", \"id\", ");
+            StringBuilder sql = new StringBuilder("INSERT INTO \"" + schemaPrefix + "mesures\".\"" + tableName + "\" (\"id_observation\", \"id\", ");
             for (Field field : fields) {
                 sql.append('"').append(field.fieldName).append("\",");
             }
@@ -1153,7 +1153,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
                     stmtSQL.addBatch(sql.toString());
                     sqlCpt = 0;
-                    sql = new StringBuilder("INSERT INTO \"mesures\".\"" + tableName + "\" (\"id_observation\", \"id\", ");
+                    sql = new StringBuilder("INSERT INTO \"" + schemaPrefix + "mesures\".\"" + tableName + "\" (\"id_observation\", \"id\", ");
                     for (Field field : fields) {
                         sql.append('"').append(field.fieldName).append("\",");
                     }

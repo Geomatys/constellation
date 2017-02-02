@@ -93,6 +93,8 @@ public class Automatic extends AbstractConfigurationObject {
      * The profile of the service (Discovery or transactional).
      */
     private String profile;
+    
+    private String schemaPrefix;
 
     /**
      * In the case of a fileSystem implementation,
@@ -795,6 +797,20 @@ public class Automatic extends AbstractConfigurationObject {
         hash = 37 * hash + (this.harvester != null ? this.harvester.hashCode() : 0);
         hash = 37 * hash + (this.filterQueries != null ? this.filterQueries.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * @return the schemaPrefix
+     */
+    public String getSchemaPrefix() {
+        return schemaPrefix;
+    }
+
+    /**
+     * @param schemaPrefix the schemaPrefix to set
+     */
+    public void setSchemaPrefix(String schemaPrefix) {
+        this.schemaPrefix = schemaPrefix;
     }
 
 }

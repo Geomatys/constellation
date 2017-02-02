@@ -67,6 +67,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import static org.constellation.data.om2.OM2FeatureStoreFactory.SCHEMA_PREFIX;
 import static org.constellation.data.om2.OM2FeatureStoreFactory.SGBDTYPE;
 import org.geotoolkit.util.NamesExt;
 import org.opengis.util.GenericName;
@@ -92,21 +93,24 @@ public class OM2FeatureStore extends AbstractFeatureStore {
 
     private final ManageableDataSource source;
 
-    private static final String SQL_ALL_PROCEDURE = "SELECT * FROM \"om\".\"procedures\"";
-    private static final String SQL_ALL_PROCEDURE_PG = "SELECT  \"id\", \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\"";
-    private static final String SQL_ALL_ID = "SELECT \"id\" FROM \"om\".\"procedures\" ORDER BY \"id\" ASC";
-    private static final String SQL_WRITE_PROCEDURE = "INSERT INTO \"om\".\"procedures\" VALUES(?,?,?)";
-    private static final String SQL_DELETE_PROCEDURE = "DELETE FROM \"om\".\"procedures\" WHERE \"id\" = ?";
-
     private final String sensorIdBase = "urn:ogc:object:sensor:GEOM:"; // TODO
 
     private final boolean isPostgres;
+    
+    protected final String schemaPrefix;
 
     public OM2FeatureStore(final ParameterValueGroup params, final ManageableDataSource source) {
         super(params);
         this.source = source;
         Object sgbdtype = Parameters.value(SGBDTYPE, params);
         isPostgres = !("derby".equals(sgbdtype));
+        
+        String sc = Parameters.value(SCHEMA_PREFIX, params);
+        if (sc != null) {
+            schemaPrefix = sc;
+        } else {
+            schemaPrefix = "";
+        }
         initTypes();
     }
 
@@ -214,7 +218,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
         PreparedStatement stmtWrite = null;
         try {
             cnx = getConnection();
-            stmtWrite = cnx.prepareStatement(SQL_WRITE_PROCEDURE);
+            stmtWrite = cnx.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"procedures\" VALUES(?,?,?)");
 
             for(final Feature feature : newFeatures) {
                 FeatureId identifier = feature.getIdentifier();
@@ -241,7 +245,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                 result.add(identifier);
             }
         } catch (SQLException ex) {
-            getLogger().log(Level.WARNING, SQL_WRITE_PROCEDURE, ex);
+            getLogger().log(Level.WARNING, "Error while writing procedure feature", ex);
         }finally{
             if(stmtWrite != null){
                 try {
@@ -268,7 +272,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
         PreparedStatement stmtLastId = null;
         try {
             cnx = getConnection();
-            stmtLastId = cnx.prepareStatement(SQL_ALL_ID);
+            stmtLastId = cnx.prepareStatement("SELECT \"id\" FROM \"" + schemaPrefix + "om\".\"procedures\" ORDER BY \"id\" ASC");
             final ResultSet result = stmtLastId.executeQuery();
             // keep the last
             String id = null;
@@ -371,9 +375,9 @@ public class OM2FeatureStore extends AbstractFeatureStore {
             cnx = getConnection();
             final PreparedStatement stmtAll;
             if (isPostgres) {
-                stmtAll = cnx.prepareStatement(SQL_ALL_PROCEDURE_PG);
+                stmtAll = cnx.prepareStatement("SELECT  \"id\", \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"" + schemaPrefix + "om\".\"procedures\"");
             } else {
-                stmtAll = cnx.prepareStatement(SQL_ALL_PROCEDURE);
+                stmtAll = cnx.prepareStatement("SELECT * FROM \"" + schemaPrefix + "om\".\"procedures\"");
             }
             result = stmtAll.executeQuery();
         }
@@ -496,12 +500,12 @@ public class OM2FeatureStore extends AbstractFeatureStore {
 
             PreparedStatement stmtDelete = null;
             try {
-                stmtDelete = cnx.prepareStatement(SQL_DELETE_PROCEDURE);
+                stmtDelete = cnx.prepareStatement("DELETE FROM \"" + schemaPrefix + "om\".\"procedures\" WHERE \"id\" = ?");
                 stmtDelete.setString(1, candidate.getIdentifier().getID());
                 stmtDelete.executeUpdate();
 
             } catch (SQLException ex) {
-                getLogger().log(Level.WARNING, SQL_WRITE_PROCEDURE, ex);
+                getLogger().log(Level.WARNING, "Error while deleting procedure features", ex);
             } finally {
                 if (stmtDelete != null) {
                     try {

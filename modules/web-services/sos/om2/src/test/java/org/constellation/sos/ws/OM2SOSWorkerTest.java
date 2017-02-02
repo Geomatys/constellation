@@ -47,6 +47,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  *
@@ -71,7 +72,9 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
         sr.setEncoding("UTF-8");
-        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+        String sql = FileUtilities.getStringFromStream(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+        sql = sql.replace("$SCHEMA", "");
+        sr.run(sql);
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
 
 

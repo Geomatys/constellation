@@ -40,6 +40,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,7 +71,9 @@ public class OM2SOSConfigurerTest extends SOSConfigurerTest {
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
         sr.setEncoding("UTF-8");
-        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+        String sql = FileUtilities.getStringFromStream(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+        sql = sql.replace("$SCHEMA", "");
+        sr.run(sql);
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
 
 

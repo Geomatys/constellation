@@ -138,9 +138,12 @@ public class OM2FeatureStoreFactory extends AbstractFeatureStoreFactory {
             .setRemarks("Password")
             .setRequired(false)
             .create(String.class, null);
+    
+     public static final ParameterDescriptor<String> SCHEMA_PREFIX =
+             BUILDER.addName("schema-prefix").setRemarks("schema-prefix").setRequired(false).create(String.class, null);
 
     public static final ParameterDescriptorGroup PARAMETERS_DESCRIPTOR = BUILDER.addName("OM2Parameters").setRequired(true)
-            .createGroup(IDENTIFIER,DBTYPE,HOST,PORT,DATABASE,USER,PASSWD,NAMESPACE, SGBDTYPE, DERBYURL);
+            .createGroup(IDENTIFIER,DBTYPE,HOST,PORT,DATABASE,USER,PASSWD,NAMESPACE, SGBDTYPE, DERBYURL, SCHEMA_PREFIX);
 
     @Override
     public Identification getIdentification() {

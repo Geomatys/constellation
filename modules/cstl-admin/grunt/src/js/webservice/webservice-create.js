@@ -178,6 +178,7 @@ angular.module('cstl-webservice-create', ['cstl-restapi', 'cstl-services', 'pasc
                     'constellation-config.SMLType': 'filesystem',
                     'constellation-config.OMConfiguration': {
                         '@format': 'OM2',
+                        'schemaPrefix': '',
                         'bdd': {}
                     }
                 }

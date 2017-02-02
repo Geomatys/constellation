@@ -70,6 +70,7 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import org.geotoolkit.util.FileUtilities;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.utility.parameter.ParametersExt.getOrCreateValue;
 import static org.junit.Assert.assertEquals;
@@ -206,7 +207,9 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                 Connection con = ds.getConnection();
                 DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                String sql = FileUtilities.getStringFromStream(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                sql = sql.replace("$SCHEMA", "");
+                sr.run(sql);
                 sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
                 con.close();
                 ds.shutdown();

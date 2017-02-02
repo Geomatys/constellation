@@ -1,1 +1,1 @@
-ALTER TABLE "om"."observed_properties" ADD "partial" BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE "$SCHEMAom"."observed_properties" ADD "partial" BOOLEAN NOT NULL DEFAULT FALSE;

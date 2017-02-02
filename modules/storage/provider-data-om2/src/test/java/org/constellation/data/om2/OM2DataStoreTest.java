@@ -55,6 +55,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.sis.internal.storage.IOUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.NamesExt;
 import org.opengis.util.GenericName;
 
@@ -78,7 +80,9 @@ public class OM2DataStoreTest extends AbstractReadingTests{
             Connection con = ds.getConnection();
 
             final ScriptRunner exec = new ScriptRunner(con);
-            exec.run(getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+            String sql = FileUtilities.getStringFromStream(getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+            sql = sql.replace("$SCHEMA", "");
+            exec.run(sql);
             exec.run(getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
 
             final Map params = new HashMap<>();

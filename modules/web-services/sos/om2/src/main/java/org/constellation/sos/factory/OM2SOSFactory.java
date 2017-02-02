@@ -64,7 +64,7 @@ public class OM2SOSFactory implements OMFactory {
      */
     @Override
     public ObservationFilter getObservationFilter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-       return new OM2ObservationFilterReader(configuration, properties);
+       return new OM2ObservationFilterReader(configuration, configuration.getSchemaPrefix(), properties);
     }
 
     /**
@@ -80,7 +80,7 @@ public class OM2SOSFactory implements OMFactory {
      */
     @Override
     public ObservationReader getObservationReader(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-        return new OM2ObservationReader(configuration, properties);
+        return new OM2ObservationReader(configuration, configuration.getSchemaPrefix(), properties);
     }
 
     /**
@@ -88,16 +88,17 @@ public class OM2SOSFactory implements OMFactory {
      */
     @Override
     public ObservationWriter getObservationWriter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-        return new OM2ObservationWriter(configuration, properties);
+        return new OM2ObservationWriter(configuration, configuration.getSchemaPrefix(), properties);
     }
 
     @Override
     public boolean buildDatasource(Automatic configuration, Map<String, Object> parameters) throws DataStoreException {
         try {
+            String schemaPrefix = configuration.getSchemaPrefix();
             final DataSource source = configuration.getBdd().getDataSource();
             if (OM2DatabaseCreator.validConnection(source)) {
-                if (!OM2DatabaseCreator.structurePresent(source)) {
-                    OM2DatabaseCreator.createObservationDatabase(source, true, null);
+                if (!OM2DatabaseCreator.structurePresent(source, schemaPrefix)) {
+                    OM2DatabaseCreator.createObservationDatabase(source, true, null, schemaPrefix);
                     return true;
                 } else {
                     LOGGER.info("OM2 structure already present");

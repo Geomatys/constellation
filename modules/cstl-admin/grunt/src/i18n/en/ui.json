@@ -738,6 +738,7 @@
     "service.config.source.database.description": "Database of kind MDWeb, which contains georeferenced metadata records",
     "service.config.source.database.name": "Database name",
     "service.config.source.database.password": "Password",
+    "service.config.source.database.schema": "Schema prefix",
     "service.config.source.database.port": "Database port",
     "service.config.source.database.shared": "Shared connection",
     "service.config.source.database.title": "Database (SGBDR)",

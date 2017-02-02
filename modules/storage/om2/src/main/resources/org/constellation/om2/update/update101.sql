@@ -1,8 +1,8 @@
-ALTER TABLE "om"."procedures" ADD "pid" INTEGER;
+ALTER TABLE "$SCHEMAom"."procedures" ADD "pid" INTEGER;
 
 CREATE SCHEMA "mesures";
 
-CREATE TABLE "om"."procedure_descriptions" (
+CREATE TABLE "$SCHEMAom"."procedure_descriptions" (
     "procedure"         character varying(100) NOT NULL,
     "order"             integer NOT NULL,
     "field_name"        character varying(30) NOT NULL,
@@ -11,6 +11,6 @@ CREATE TABLE "om"."procedure_descriptions" (
     "uom"               character varying(20)
 );
 
-ALTER TABLE "om"."procedure_descriptions" ADD CONSTRAINT procedure_descriptions_pk PRIMARY KEY ("procedure", "field_name");
+ALTER TABLE "$SCHEMAom"."procedure_descriptions" ADD CONSTRAINT procedure_descriptions_pk PRIMARY KEY ("procedure", "field_name");
 
-ALTER TABLE "om"."procedure_descriptions" ADD CONSTRAINT procedure_desc_fk FOREIGN KEY ("procedure") REFERENCES "om"."procedures"("id");
+ALTER TABLE "$SCHEMAom"."procedure_descriptions" ADD CONSTRAINT procedure_desc_fk FOREIGN KEY ("procedure") REFERENCES "$SCHEMAom"."procedures"("id");

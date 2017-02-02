@@ -92,9 +92,9 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         
     }
 
-    
-    public OM2ObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-        super(properties);
+    @Deprecated
+    public OM2ObservationFilter(final Automatic configuration, final String schemaPrefix, final Map<String, Object> properties) throws DataStoreException {
+        super(properties, schemaPrefix);
 
         if (configuration == null) {
             throw new DataStoreException("The configuration object is null");
@@ -116,7 +116,6 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         }
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -125,11 +124,11 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         firstFilter = true;
         if (ResponseModeType.RESULT_TEMPLATE.equals(requestMode)) {
              sqlRequest = new StringBuilder("SELECT distinct \"observed_property\", \"procedure\", \"foi\" "
-                                          + "FROM \"om\".\"observations\" o WHERE");
+                                          + "FROM \"" + schemaPrefix + "om\".\"observations\" o WHERE");
             template = true;
         } else {
             sqlRequest = new StringBuilder("SELECT o.\"id\", o.\"identifier\", \"observed_property\", \"procedure\", \"foi\", \"time_begin\", \"time_end\" "
-                                         + "FROM \"om\".\"observations\" o WHERE \"identifier\" NOT LIKE '"+ observationTemplateIdBase +"%' AND ");
+                                         + "FROM \"" + schemaPrefix + "om\".\"observations\" o WHERE \"identifier\" NOT LIKE '"+ observationTemplateIdBase +"%' AND ");
         }
         this.resultModel = resultModel;
     }
@@ -144,7 +143,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         try(final Connection c = source.getConnection()) {
             final int pid = getPIDFromProcedure(procedure, c);
             sqlRequest = new StringBuilder("SELECT m.* "
-                                         + "FROM \"om\".\"observations\" o, \"mesures\".\"mesure" + pid + "\" m "
+                                         + "FROM \"" + schemaPrefix + "om\".\"observations\" o, \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m "
                                          + "WHERE o.\"id\" = m.\"id_observation\"");
 
             //we add to the request the property of the template
@@ -166,7 +165,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         } else {
             geomColum = "\"shape\"";
         }
-        sqlRequest = new StringBuilder("SELECT distinct sf.\"id\", sf.\"name\", sf.\"description\", sf.\"sampledfeature\", sf.\"crs\", ").append(geomColum).append(" FROM \"om\".\"observations\" o, \"om\".\"sampling_features\" sf "
+        sqlRequest = new StringBuilder("SELECT distinct sf.\"id\", sf.\"name\", sf.\"description\", sf.\"sampledfeature\", sf.\"crs\", ").append(geomColum).append(" FROM \"" + schemaPrefix + "om\".\"observations\" o, \"" + schemaPrefix + "om\".\"sampling_features\" sf "
                                      + "WHERE o.\"foi\" = sf.\"id\"");
         getFOI = true;
     }
@@ -216,7 +215,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     public void setObservedProperties(final List<String> phenomenon) {
         if (!phenomenon.isEmpty()) {
             final StringBuilder sbPheno = new StringBuilder();
-            final StringBuilder sbCompo = new StringBuilder(" OR \"observed_property\" IN (SELECT \"phenomenon\" FROM \"om\".\"components\" WHERE ");
+            final StringBuilder sbCompo = new StringBuilder(" OR \"observed_property\" IN (SELECT \"phenomenon\" FROM \"" + schemaPrefix + "om\".\"components\" WHERE ");
             final Set<String> fields    = new HashSet<>();
             for (String p : phenomenon) {
                 sbPheno.append(" \"observed_property\"='").append(p).append("' OR ");

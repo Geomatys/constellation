@@ -286,6 +286,15 @@
                                 <input type="password" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password">
                             </div>
                         </div>
+                        <div class="form-group row">
+                            <label class="col-sm-12 control-label new-service-form-label"
+                                   translate="service.config.source.database.schema">Schema prefix</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control"
+                                       name="dbSchema" required
+                                       ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].schemaPrefix"/>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="checkbox inline">
                                 <input type="checkbox" ng-model="transactional.choice"><span translate="service.config.source.transactional">Transactional</span>

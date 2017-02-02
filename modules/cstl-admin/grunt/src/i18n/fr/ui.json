@@ -852,6 +852,7 @@
     "service.config.source.database.description": "Base de données de type MDWeb, contenant des métadonnées géoréférencées",
     "service.config.source.database.name": "Nom de la base de données",
     "service.config.source.database.password": "Mot de passe",
+    "service.config.source.database.schema": "Schema",
     "service.config.source.database.port": "Port de la base de données",
     "service.config.source.database.shared": "Connexion partagée",
     "service.config.source.database.title": "Base de données (SGBDR)",

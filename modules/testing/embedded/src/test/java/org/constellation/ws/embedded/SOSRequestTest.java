@@ -70,6 +70,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.geotoolkit.util.FileUtilities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -133,7 +134,9 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
                 Connection con = ds.getConnection();
 
                 final ScriptRunner exec = new ScriptRunner(con);
-                exec.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                String sql = FileUtilities.getStringFromStream(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                sql = sql.replace("$SCHEMA", "");
+                exec.run(sql);
                 exec.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
                 con.close();
 

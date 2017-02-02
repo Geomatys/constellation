@@ -53,7 +53,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.sis.internal.storage.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import static org.junit.Assume.assumeNoException;
@@ -119,7 +121,9 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
                 DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
                 sr.setEncoding("UTF-8");
-                sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                String sql = FileUtilities.getStringFromStream(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                sql = sql.replace("$SCHEMA", "");
+                sr.run(sql);
                 sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
         
                 final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
