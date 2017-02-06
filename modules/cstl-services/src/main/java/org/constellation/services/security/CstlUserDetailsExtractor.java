@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.util.StringUtils;
 
@@ -54,7 +55,12 @@ public class CstlUserDetailsExtractor implements UserDetailsExtractor{
         String userName = basicAuth(httpRequest);
         if (userName == null)
             return null;
-        return userDetailsService.loadUserByUsername(userName);
+        try {
+            return userDetailsService.loadUserByUsername(userName);
+        } catch (UsernameNotFoundException ex) {
+            LOGGER.debug("Unable to find the user "+userName, ex);
+            return null;
+        }
 
     }
 
