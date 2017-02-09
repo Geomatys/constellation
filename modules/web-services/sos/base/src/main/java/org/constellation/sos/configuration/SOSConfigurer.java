@@ -60,8 +60,8 @@ import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.v321.TimeInstantType;
 import org.geotoolkit.gml.xml.v321.TimePeriodType;
 import org.geotoolkit.observation.ObservationFilterReader;
-import org.geotoolkit.observation.ObservationReader;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import static org.geotoolkit.sml.xml.SensorMLUtilities.getSensorMLType;
@@ -350,6 +350,16 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getPhenomenonNames();
+        } catch (DataStoreException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public AcknowlegementType writeProcedure(final String id, final String sensorID, final AbstractGeometry location, final String parent, final String type) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            writer.writeProcedure(sensorID, location, parent, type);
+            return new AcknowlegementType("Success", "The sensor have been recorded in the SOS");
         } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }

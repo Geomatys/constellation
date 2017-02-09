@@ -23,8 +23,8 @@ import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.geotoolkit.observation.ObservationFilter;
-import org.geotoolkit.observation.ObservationReader;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationWriter;
 
 import java.util.Map;
 
@@ -44,6 +44,8 @@ public interface OMFactory {
     public static final String PHENOMENON_ID_BASE = "phenomenonIdBase";
 
     public static final String ALWAYS_FEATURE_COLLECTION = "alwaysFeatureCollection";
+    
+    public static final String SENSOR_TYPE_FILTER = "sensorTypeFilter";
 
     /**
      * Return true if the factory can return an implementation for the specified type.

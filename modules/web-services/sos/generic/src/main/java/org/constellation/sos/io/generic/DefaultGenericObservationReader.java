@@ -33,7 +33,7 @@ import org.geotoolkit.gml.xml.GMLXmlFactory;
 import org.geotoolkit.gml.xml.LineString;
 import org.geotoolkit.gml.xml.Point;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
-import org.geotoolkit.observation.ObservationReader;
+import org.constellation.sos.io.ObservationReader;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.v100.MeasureType;
 import org.geotoolkit.sos.xml.ObservationOffering;
@@ -792,5 +792,20 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public Observation getTemplateForProcedure(String procedure, String version) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+
+    @Override
+    public Collection<String> getOfferingNames(String version, String sensorType) throws DataStoreException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<ObservationOffering> getObservationOfferings(String version, String sensorType) throws DataStoreException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Collection<String> getProcedureNames(String sensorType) throws DataStoreException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

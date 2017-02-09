@@ -52,7 +52,9 @@ CREATE TABLE "$SCHEMAom"."procedures" (
     "id"     character varying(200) NOT NULL,
     "shape"  varchar (200) for bit data,
     "crs"    integer,
-    "pid"    integer NOT NULL
+    "pid"    integer NOT NULL,
+    "parent" character varying(200),
+    "type"   character varying(200)
 );
 
 CREATE TABLE "$SCHEMAom"."procedure_descriptions" (

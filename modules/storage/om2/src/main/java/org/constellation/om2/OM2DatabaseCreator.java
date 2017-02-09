@@ -74,9 +74,9 @@ public class OM2DatabaseCreator {
             }
             if (!versionTablePresent(con, schemaPrefix)) {
                 try (Statement stmt = con.createStatement()) {
-                    stmt.executeUpdate("CREATE TABLE \"public\".\"version\" (\"number\"   character varying(10) NOT NULL\");");
-                    stmt.executeUpdate("INSERT INTO \"public\".\"version\" VALUES ('1.0.2');");
-                    stmt.executeUpdate("\"ALTER TABLE \"version\" ADD CONSTRAINT version_pk PRIMARY KEY (\"number\");");
+                    stmt.executeUpdate("CREATE TABLE \"public\".\"version\" (\"number\"   character varying(10) NOT NULL);");
+                    stmt.executeUpdate("INSERT INTO \"public\".\"version\" VALUES ('1.0.3');");
+                    stmt.executeUpdate("ALTER TABLE \"version\" ADD CONSTRAINT version_pk PRIMARY KEY (\"number\");");
                 }
             }
 

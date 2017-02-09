@@ -51,6 +51,15 @@ public interface SensorReader {
      * @throws org.constellation.ws.CstlServiceException
      */
     Collection<String> getSensorNames() throws CstlServiceException;
+    
+    /**
+     * Return all sensor ID's.
+     *
+     * @param sensorTypeFilter
+     * @return All sensor ID's.
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    Collection<String> getSensorNames(String sensorTypeFilter) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

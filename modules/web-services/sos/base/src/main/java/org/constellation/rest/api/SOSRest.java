@@ -262,14 +262,11 @@ public class SOSRest {
         }
     }
     
-    private void updateProcedureLocation(final String id, final ProcedureTree process, final ExtractionResult result, final SOSConfigurer configurer) throws ConfigurationException {
-        for (ProcedureTree child : process.children) {
-            updateProcedureLocation(id, child, result, configurer);
-        }
-        
+    private void writeProcedures(final String id, final ProcedureTree process, final String parent, final SOSConfigurer configurer) throws ConfigurationException {
         final AbstractGeometryType geom = (AbstractGeometryType) process.spatialBound.getGeometry("2.0.0");
-        if (geom != null) {
-            configurer.updateSensorLocation(id, process.id, geom);
+        configurer.writeProcedure(id, process.id, geom, parent, process.type);
+        for (ProcedureTree child : process.children) {
+            writeProcedures(id, child, process.id, configurer);
         }
     }
     
@@ -320,13 +317,14 @@ public class SOSRest {
             } else {
                 return ok(new AcknowlegementType("Failure", "Available only on Observation provider (and netCDF coverage) for now"));
             }
-            // import in O&M database
-            configurer.importObservations(id, result.observations, result.phenomenons);
             
             // update sensor location
             for (ProcedureTree process : result.procedures) {
-                updateProcedureLocation(id, process, result, configurer);
+                writeProcedures(id, process, null, configurer);
             }
+            
+            // import in O&M database
+            configurer.importObservations(id, result.observations, result.phenomenons);
         }
         
         

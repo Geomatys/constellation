@@ -26,7 +26,6 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.factory.OMFactory;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
@@ -47,6 +46,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.constellation.sos.io.ObservationReader;
 
 /**
  *
@@ -122,6 +122,12 @@ public class FileObservationReader implements ObservationReader {
             }
         }
         return offeringNames;
+    }
+    
+    @Override
+    public Collection<String> getOfferingNames(String version, String sensorType) throws DataStoreException {
+        // no filter yet
+        return getOfferingNames(version);
     }
 
     /**
@@ -202,6 +208,12 @@ public class FileObservationReader implements ObservationReader {
         }
         return offerings;
     }
+    
+    @Override
+    public List<ObservationOffering> getObservationOfferings(String version, String sensorType) throws DataStoreException {
+        // no filter yet
+        return getObservationOfferings(version);
+    }
 
     /**
      * {@inheritDoc}
@@ -217,6 +229,12 @@ public class FileObservationReader implements ObservationReader {
             }
         }
         return sensorNames;
+    }
+    
+    @Override
+    public Collection<String> getProcedureNames(String sensorType) throws DataStoreException {
+         // no filter yet
+        return getProcedureNames();
     }
 
     /**

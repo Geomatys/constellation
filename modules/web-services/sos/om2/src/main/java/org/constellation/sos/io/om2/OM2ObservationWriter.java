@@ -28,7 +28,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.om2.OM2BaseReader.Field;
 import org.constellation.sos.ws.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.v200.OMObservationType.InternalPhenomenon;
 import org.geotoolkit.sampling.xml.SamplingFeature;
@@ -142,12 +142,12 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             return writeObservation(template.getObservation());
         } else  {
             try(final Connection c = source.getConnection()) {
-                writeProcedure(template.getProcedure(), c);
+                writeProcedure(template.getProcedure(), null, null, null, c);
                 for (PhenomenonProperty phen : template.getFullObservedProperties()) {
                     writePhenomenon(phen, c, true);
                 }
                 return null;
-            } catch (SQLException ex) {
+            } catch (SQLException | FactoryException ex) {
                 throw new DataStoreException("Error while inserting observations.", ex);
             }
         }
@@ -227,10 +227,6 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             } else if (samplingTime instanceof Instant) {
                 final Instant instant = (Instant) samplingTime;
                 Date date = instant.getDate();
-//                if (instant.getPosition() != null) {
-//                    date  = instant.getPosition().getDate();
-//                }
-                
                 if (date != null) {
                     stmt.setTimestamp(3, new Timestamp(date.getTime()));
                 } else {
@@ -247,8 +243,8 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             
             final org.geotoolkit.observation.xml.Process procedure = (org.geotoolkit.observation.xml.Process)observation.getProcedure();
             final String procedureID = procedure.getHref();
-            final int pid = writeProcedure(procedureID, c);
-            stmt.setString(6, procedure.getHref());
+            final int pid = writeProcedure(procedureID, null, null, null, c);
+            stmt.setString(6, procedureID);
             final org.geotoolkit.sampling.xml.SamplingFeature foi = (org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest();
             final String foiID;
             if (foi != null) {
@@ -264,9 +260,14 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
 
             writeResult(oid, pid, procedureID, observation.getResult(), samplingTime, c);
             emitResultOnBus(procedureID, observation.getResult());
-            updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
+            String parent = getProcedureParent(procedureID, c);
+            if (parent != null) {        
+                updateOrCreateOffering(parent,samplingTime, phenRef, foiID, c);
+            }
+            updateOrCreateOffering(procedureID,samplingTime, phenRef, foiID, c);
+            
             return observationName;
-        } catch (SQLException ex) {
+        } catch (SQLException | FactoryException ex) {
             throw new DataStoreException("Error while inserting observation:" + ex.getMessage(), ex);
         }
     }
@@ -390,7 +391,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         return null;
     }
     
-    private int writeProcedure(final String procedureID, final Connection c) throws SQLException {
+    @Override
+    public void writeProcedure(final String procedureID, final AbstractGeometry position, final String parent, final String type) throws DataStoreException {
+        try(final Connection c = source.getConnection()) {
+            writeProcedure(procedureID, position, parent, type, c);
+        } catch (SQLException | FactoryException ex) {
+            throw new DataStoreException("Error while inserting procedure.", ex);
+        }
+    }
+    
+    private int writeProcedure(final String procedureID,  final AbstractGeometry position, final String parent, final String type, final Connection c) throws SQLException, FactoryException, DataStoreException {
         int pid;
         try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"pid\" FROM \"" + schemaPrefix + "om\".\"procedures\" WHERE \"id\"=?")) {
             stmtExist.setString(1, procedureID);
@@ -404,11 +414,31 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         }
                     }
 
-                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"procedures\" VALUES(?,?,?,?)")) {
+                    try(final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"" + schemaPrefix + "om\".\"procedures\" VALUES(?,?,?,?,?,?)")) {
                         stmtInsert.setString(1, procedureID);
-                        stmtInsert.setNull(2, java.sql.Types.BINARY);
-                        stmtInsert.setNull(3, java.sql.Types.INTEGER);
+                         if (position != null) {
+                            Geometry pt = GeometrytoJTS.toJTS(position, false);
+                            int srid = pt.getSRID();
+                            if (srid == 0) {
+                                srid = 4326;
+                            }
+                            stmtInsert.setBytes(2, getGeometryBytes(pt));
+                            stmtInsert.setInt(3, srid);
+                        } else {
+                            stmtInsert.setNull(2, java.sql.Types.BINARY);
+                            stmtInsert.setNull(3, java.sql.Types.INTEGER);
+                        }
                         stmtInsert.setInt(4, pid);
+                        if (parent != null) {
+                            stmtInsert.setString(5, parent);
+                        } else {
+                            stmtInsert.setNull(5, java.sql.Types.VARCHAR);
+                        }
+                        if (type != null) {
+                            stmtInsert.setString(6, type);
+                        } else {
+                            stmtInsert.setNull(6, java.sql.Types.VARCHAR);
+                        }
                         stmtInsert.executeUpdate();
                     }
                 } else {
@@ -418,6 +448,36 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         }
         return pid;
     }
+    
+    private byte[] getGeometryBytes(Geometry pt) throws DataStoreException {
+        try {
+            final WKBWriter writer = new WKBWriter();
+            GeometryCSTransformer ts = new GeometryCSTransformer(new AbstractGeometryTransformer() {
+                @Override
+                public CoordinateSequence transform(CoordinateSequence cs, int i) throws TransformException {
+                    for (int j = 0; j < cs.size(); j++) {
+                        double x = cs.getX(j);
+                        double y = cs.getY(j);
+                        cs.setOrdinate(j, 0, y);
+                        cs.setOrdinate(j, 1, x);
+                    }
+                    return cs;
+                }
+            });
+
+            int srid = pt.getSRID();
+            if (srid == 0) {
+                srid = 4326;
+            }                
+            if (srid == 4326) {
+                pt = ts.transform(pt);
+            }
+            return writer.write(pt);
+        } catch (TransformException ex) {
+            throw new DataStoreException(ex);
+        }
+    }
+    
     
     private void writeFeatureOfInterest(final SamplingFeature foi, final Connection c) throws SQLException {
         try(final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"" + schemaPrefix + "om\".\"sampling_features\" WHERE \"id\"=?")) {
@@ -772,33 +832,17 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
         if (position != null) {
             try(final Connection c     = source.getConnection();
                 PreparedStatement ps   = c.prepareStatement("UPDATE \"" + schemaPrefix + "om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?")) {
-                final WKBWriter writer = new WKBWriter();
                 ps.setString(3, physicalID);
-                Geometry pt = org.geotoolkit.gml.GeometrytoJTS.toJTS(position, false);
-                GeometryCSTransformer ts = new GeometryCSTransformer(new AbstractGeometryTransformer() {
-                    @Override
-                    public CoordinateSequence transform(CoordinateSequence cs, int i) throws TransformException {
-                        for (int j = 0; j < cs.size(); j++) {
-                            double x = cs.getX(j);
-                            double y = cs.getY(j);
-                            cs.setOrdinate(j, 0, y);
-                            cs.setOrdinate(j, 1, x);
-                        }
-                        return cs;
-                    }
-                });
+                Geometry pt = GeometrytoJTS.toJTS(position, false);
 
                 int srid = pt.getSRID();
                 if (srid == 0) {
                     srid = 4326;
                 }                
-                if (srid == 4326) {
-                    pt = ts.transform(pt);
-                }
-                ps.setBytes(1, writer.write(pt));
+                ps.setBytes(1, getGeometryBytes(pt));
                 ps.setInt(2, srid);
                 ps.execute();
-            } catch (SQLException | FactoryException | TransformException e) {
+            } catch (SQLException | FactoryException e) {
                 throw new DataStoreException(e.getMessage(), e);
             }
         }
@@ -838,7 +882,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             try(final PreparedStatement stmtExist  = c.prepareStatement("SELECT COUNT(id) FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\"")) {
                 stmtExist.executeQuery();
             } catch (SQLException ex) {
-                LOGGER.warning("no measure table mesure" + pid + " exist.");
+                LOGGER.log(Level.WARNING, "no measure table mesure{0} exist.", pid);
                 mesureTableExist = false;
             }
             
@@ -903,7 +947,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     stmtDrop.executeUpdate("DROP TABLE \"mesures\".\"mesure" + pid + "\"");
                 }  catch (SQLException ex) {
                     // it happen that the table does not exist
-                    LOGGER.log(Level.WARNING, "Unable to remove measure table." +  ex.getMessage());
+                    LOGGER.log(Level.WARNING, "Unable to remove measure table.{0}", ex.getMessage());
                 }
 
                 //look for unused observed properties (execute the statement 2 times for remaining components)

@@ -31,6 +31,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,5 +162,19 @@ public class InternalSensorReader implements SensorReader {
     @Override
     public int getSensorCount() throws CstlServiceException {
         return getSensorNames().size();
+    }
+
+    @Override
+    public Collection<String> getSensorNames(String sensorTypeFilter) throws CstlServiceException {
+        if (sensorTypeFilter == null || sensorTypeFilter.isEmpty()) {
+            return getSensorNames();
+        }
+        final List<String> result = new ArrayList<>();
+        for (Sensor sensor : sensorBusiness.getAll()) {
+            if (sensor.getType().equals(sensorTypeFilter)) {
+                result.add(sensor.getIdentifier());
+            }
+        }
+        return result;
     }
 }

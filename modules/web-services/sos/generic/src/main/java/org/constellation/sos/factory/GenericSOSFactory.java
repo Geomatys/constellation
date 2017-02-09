@@ -26,8 +26,8 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.generic.DefaultGenericObservationReader;
 import org.constellation.sos.io.generic.GenericObservationFilter;
 import org.geotoolkit.observation.ObservationFilter;
-import org.geotoolkit.observation.ObservationReader;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationWriter;
 
 import java.util.Map;
 

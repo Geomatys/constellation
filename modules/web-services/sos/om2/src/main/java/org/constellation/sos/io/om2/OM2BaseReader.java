@@ -268,6 +268,19 @@ public class OM2BaseReader {
             }
         }
     }
+    
+    protected String getProcedureParent(final String procedureId, final Connection c) throws SQLException {
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT \"parent\" FROM \"om\".\"procedures\" WHERE \"id\"=?")) {
+            stmt.setString(1, procedureId);
+            try(final ResultSet rs = stmt.executeQuery()) {
+                String parent = null;
+                if (rs.next()) {
+                    parent = rs.getString(1);
+                }
+                return parent;
+            }
+        }
+    }
 
     protected Field getTimeField(final String procedureID, final Connection c) throws SQLException {
         try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"" + schemaPrefix + "om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_type\"='Time' ORDER BY \"order\"")) {

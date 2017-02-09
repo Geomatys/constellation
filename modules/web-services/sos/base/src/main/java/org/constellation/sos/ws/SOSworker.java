@@ -107,15 +107,14 @@ import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationFilterReader;
-import org.geotoolkit.observation.ObservationReader;
+import org.constellation.sos.io.ObservationReader;
 import org.geotoolkit.observation.ObservationResult;
 import org.geotoolkit.observation.ObservationStoreException;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.ObservationComparator;
 import org.geotoolkit.observation.xml.Process;
-import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.AbstractOperation;
@@ -359,6 +358,8 @@ public class SOSworker extends AbstractWorker {
 
     private boolean alwaysFeatureCollection;
     
+    private String sensorTypeFilter;
+    
     private SOSConfiguration configuration;
 
     /**
@@ -435,7 +436,7 @@ public class SOSworker extends AbstractWorker {
             configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
 
             alwaysFeatureCollection   = configuration.getBooleanParameter(OMFactory.ALWAYS_FEATURE_COLLECTION);
-
+            sensorTypeFilter          = configuration.getParameter(OMFactory.SENSOR_TYPE_FILTER);
             applySupportedVersion();
 
             // we fill a map of properties to sent to the reader/writer/filter
@@ -743,9 +744,9 @@ public class SOSworker extends AbstractWorker {
                 final List<String> queryableResultProperties;
                 if (omReader != null) {
                     foiNames  = omReader.getFeatureOfInterestNames();
-                    procNames = omReader.getProcedureNames();
+                    procNames = omReader.getProcedureNames(sensorTypeFilter);
                     phenNames = omReader.getPhenomenonNames();
-                    offNames  = omReader.getOfferingNames(currentVersion);
+                    offNames  = omReader.getOfferingNames(currentVersion, sensorTypeFilter);
                     eventTime = omReader.getEventTime();
                 } else {
                     foiNames  = new ArrayList<>();
@@ -801,7 +802,7 @@ public class SOSworker extends AbstractWorker {
                  */
                 final AbstractOperation ds = om.getOperation("DescribeSensor");
                 if (smlReader != null) {
-                    final List<String> sensorNames = new ArrayList<>(smlReader.getSensorNames());
+                    final List<String> sensorNames = new ArrayList<>(smlReader.getSensorNames(sensorTypeFilter));
                     Collections.sort(sensorNames);
                     ds.updateParameter(PROCEDURE, sensorNames);
                 } else {
@@ -833,7 +834,7 @@ public class SOSworker extends AbstractWorker {
                 // we add the list of observation offerings
                 final List<ObservationOffering> offerings;
                 if (omReader != null) {
-                    offerings = omReader.getObservationOfferings(currentVersion);
+                    offerings = omReader.getObservationOfferings(currentVersion, sensorTypeFilter);
                 } else {
                     offerings = new ArrayList<>();
                 }

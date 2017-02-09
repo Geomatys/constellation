@@ -30,7 +30,7 @@ import org.constellation.generic.database.BDD;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.FeatureProperty;
-import org.geotoolkit.observation.ObservationReader;
+import org.constellation.sos.io.ObservationReader;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sos.xml.ObservationOffering;
@@ -168,6 +168,29 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             throw new DataStoreException("Error while retrieving offering names.", ex);
         }
     }
+    
+    @Override
+    public List<String> getOfferingNames(final String version, final String sensorType) throws DataStoreException {
+        try(final Connection c         = source.getConnection();
+            final Statement stmt       = c.createStatement()) {
+            final List<String> results = new ArrayList<>();
+            String query;
+            if (sensorType != null) {
+                query = "SELECT \"identifier\" FROM \"om\".\"offerings\" o, \"om\".\"procedures\" p WHERE  o.\"procedure\" = p.\"id\" AND p.\"type\" = '" + sensorType + "'"; 
+            } else {
+                query = "SELECT \"identifier\" FROM \"om\".\"offerings\"";
+            }
+            
+            try (final ResultSet rs = stmt.executeQuery(query)) {
+                while (rs.next()) {
+                    results.add(rs.getString(1));
+                }
+            }
+            return results;
+        } catch (SQLException ex) {
+            throw new DataStoreException("Error while retrieving offering names.", ex);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -277,6 +300,16 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         }
         return loo;
     }
+    
+    @Override
+    public List<ObservationOffering> getObservationOfferings(final String version, final String sensorType) throws DataStoreException {
+        final List<String> offeringNames    = getOfferingNames(version, sensorType);
+        final List<ObservationOffering> loo = new ArrayList<>();
+        for (String offeringName : offeringNames) {
+            loo.add(getObservationOffering(offeringName, version));
+        }
+        return loo;
+    }
 
     /**
      * {@inheritDoc}
@@ -286,6 +319,29 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         try(final Connection c   = source.getConnection();
             final Statement stmt = c.createStatement();
             final ResultSet rs   = stmt.executeQuery("SELECT \"id\" FROM \"" + schemaPrefix + "om\".\"procedures\"")) {
+
+            final List<String> results = new ArrayList<>();
+            while (rs.next()) {
+                results.add(rs.getString(1));
+            }
+            return results;
+        } catch (SQLException ex) {
+            throw new DataStoreException("Error while retrieving procedure names.", ex);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getProcedureNames(final String sensorType) throws DataStoreException {
+        String filter = "";
+        if (sensorType != null) {
+            filter = " WHERE \"type\"='" + sensorType + "'";
+        }
+        try(final Connection c   = source.getConnection();
+            final Statement stmt = c.createStatement();
+            final ResultSet rs   = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"procedures\"" + filter)) {
 
             final List<String> results = new ArrayList<>();
             while (rs.next()) {

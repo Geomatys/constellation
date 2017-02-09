@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,10 @@ import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V100;
 import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
 import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
 import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import org.constellation.sos.ws.SOSUtils;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import org.geotoolkit.sml.xml.SensorMLUtilities;
 
 // Constellation dependencies
 // Geotoolkit dependendies
@@ -174,6 +177,23 @@ public class FileSensorReader implements SensorReader {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Collection<String> getSensorNames(String sensorTypeFilter) throws CstlServiceException {
+        List<String> names = getSensorNames();
+        if (sensorTypeFilter == null || sensorTypeFilter.isEmpty()) {
+            return names;
+        }
+        List<String> results = new ArrayList<>();
+        for (String name : names) {
+            AbstractSensorML sml = getSensor(name);
+            String type = SensorMLUtilities.getSensorMLType(sml);
+            if (type.equals(sensorTypeFilter)) {
+                results.add(name);
+            }
+        }
+        return results;
     }
 
     @Override

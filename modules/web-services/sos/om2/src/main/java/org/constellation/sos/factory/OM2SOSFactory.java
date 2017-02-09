@@ -35,8 +35,8 @@ import org.constellation.sos.io.om2.OM2ObservationFilterReader;
 import org.constellation.sos.io.om2.OM2ObservationReader;
 import org.constellation.sos.io.om2.OM2ObservationWriter;
 import org.geotoolkit.observation.ObservationFilter;
-import org.geotoolkit.observation.ObservationReader;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationWriter;
 
 /**
   * A postgrid implementation of the SOS factory.

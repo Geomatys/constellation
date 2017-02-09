@@ -26,9 +26,8 @@ import org.constellation.sos.io.filesystem.FileObservationReader;
 import org.constellation.sos.io.filesystem.FileObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationFilter;
 import org.geotoolkit.observation.ObservationFilter;
-import org.geotoolkit.observation.ObservationReader;
-import org.geotoolkit.observation.ObservationWriter;
-
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationWriter;
 import java.util.Map;
 
 import static org.constellation.configuration.DataSourceType.FILESYSTEM;

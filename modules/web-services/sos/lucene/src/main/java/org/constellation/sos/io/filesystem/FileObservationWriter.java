@@ -29,7 +29,7 @@ import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.observation.ObservationWriter;
+import org.constellation.sos.io.ObservationWriter;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
@@ -339,6 +339,11 @@ public class FileObservationWriter implements ObservationWriter {
         // do nothing
     }
 
+    @Override
+    public void writeProcedure(final String procedureID, final AbstractGeometry position, final String parent, final String type) throws DataStoreException {
+         // do nothing
+    }
+    
     /**
      * {@inheritDoc}
      */
