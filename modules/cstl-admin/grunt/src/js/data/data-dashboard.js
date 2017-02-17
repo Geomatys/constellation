@@ -76,6 +76,14 @@ angular.module('cstl-data-dashboard', [
 
         // Observe the 'reloadDatasets' event to re-launch the search.
         $scope.$on('reloadDatasets', self.search);
+
+        self.deleteData = function() {
+            $scope.dc.deleteData(function(){self.setPage(1);});
+        };
+
+        self.deleteDataset = function() {
+            $scope.dc.deleteDataset(function(){self.setPage(1);});
+        };
     })
 
     .controller('DatasetDashboardController', function($scope, $q, $routeParams, $http, $cookieStore, $modal, CstlConfig,
@@ -234,7 +242,7 @@ angular.module('cstl-data-dashboard', [
         };
 
         // Delete the selected dataset.
-        self.deleteDataset = function() {
+        self.deleteDataset = function(callback) {
             if (!selection.dataset) {
                 return;
             }
@@ -247,12 +255,15 @@ angular.module('cstl-data-dashboard', [
             }).result.then(function(confirmation) {
                 if (confirmation) {
                     Dataset.delete({ id: selection.dataset.id }, onDatasetDeleteSuccess, onDatasetDeleteError);
+                    if (angular.isFunction(callback)) {
+                        callback();
+                    }
                 }
             });
         };
 
         // Delete the selected data.
-        self.deleteData = function() {
+        self.deleteData = function(callback) {
             if (!selection.data) {
                 return;
             }
@@ -265,6 +276,9 @@ angular.module('cstl-data-dashboard', [
             }).result.then(function(confirmation){
                 if (confirmation) {
                     Data.delete({ dataId: selection.data.id }, onDataDeleteSuccess, onDataDeleteError);
+                    if (angular.isFunction(callback)) {
+                        callback();
+                    }
                 }
             });
         };
