@@ -78,6 +78,10 @@ public class GeometrytoJTS {
     private GeometrytoJTS(){}
 
     private static CoordinateReferenceSystem toCRS(String name, boolean longitudeFirst) throws FactoryException{
+        // HACK. Already corrected in SIS/geotk
+        if (name.startsWith("http://www.opengis.net/def/crs/EPSG/")) {
+            name = "EPSG:" + name.substring(name.lastIndexOf('/') + 1);
+        }
         CoordinateReferenceSystem crs = CRS.decode(name);
         if (longitudeFirst) {
             crs = AbstractCRS.castOrCopy(crs).forConvention(AxesConvention.RIGHT_HANDED);
