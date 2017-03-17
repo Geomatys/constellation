@@ -65,6 +65,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +74,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@Component
+@Component("cstlLayerBusiness")
+@Primary
 public class LayerBusiness implements ILayerBusiness {
     
     @Inject
