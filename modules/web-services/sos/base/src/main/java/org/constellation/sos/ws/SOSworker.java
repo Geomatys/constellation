@@ -266,11 +266,6 @@ public class SOSworker extends AbstractWorker {
     private String observationTemplateIdBase;
 
     /**
-     * The base for offering id.
-     */
-    private static final String OFFERING_ID_BASE = "offering-";
-
-    /**
      * The base for phenomenon id.
      */
     private String phenomenonIdBase;
@@ -2612,8 +2607,8 @@ public class SOSworker extends AbstractWorker {
         }
         // we create a the new Offering
         omWriter.writeOffering(buildOffering(version, 
-                                            OFFERING_ID_BASE + offeringName,
-                                            OFFERING_ID_BASE + offeringName,
+                                            offeringName,
+                                            offeringName,
                                             description,
                                             srsName,
                                             time,
