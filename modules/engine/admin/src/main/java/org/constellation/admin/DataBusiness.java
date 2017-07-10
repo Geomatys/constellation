@@ -941,8 +941,11 @@ public class DataBusiness implements IDataBusiness {
                         if ("xml".equalsIgnoreCase(extension)) {
                             listBean.add(bean);
                         }
-                    }else {
+                     }else {
                         if (extensions.contains(extension.toLowerCase())) {
+                            listBean.add(bean);
+                          // allow zip files
+                        } else if ("zip".equals(extension)) {
                             listBean.add(bean);
                         }
                     }

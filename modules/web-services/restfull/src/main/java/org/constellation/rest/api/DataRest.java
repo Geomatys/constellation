@@ -454,6 +454,24 @@ public class DataRest {
             }
 
             if (fsServer != null && fsServer.equalsIgnoreCase("true")) {
+
+                // if the server file is a zip we unzip it, in the integrated folder
+                if (filePath.toLowerCase().endsWith(".zip")) {
+
+                     //init provider directory
+                    final java.nio.file.Path intDirPath = dataIntegratedDirectory.toPath();
+                    final File providerDir = intDirPath.resolve(Paths.get(dataName, dataName)).toFile();
+                    if (providerDir.exists()) {
+                        FileUtilities.deleteDirectory(providerDir);
+                    }
+                    providerDir.mkdirs();
+
+                    // unzip
+                    final File zipFile = new File(filePath);
+                    FileUtilities.unzip(zipFile, providerDir, new CRC32());
+                    filePath = providerDir.getAbsolutePath();
+                }
+
                 importedDataReport.setDataFile(filePath);
             } else {
                 if (filePath != null) {
