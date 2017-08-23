@@ -391,7 +391,7 @@ angular.module('cstl-data-metadata', ['cstl-restapi', 'pascalprecht.translate', 
          * @returns {number} the result incremented number.
          */
         function getMaxNumeroForBlock(superBlockObj,prefix){
-            var max = 1;
+            var max = 0;
             for(var i=0;i<superBlockObj.superblock.children.length;i++){
                 var childObj = superBlockObj.superblock.children[i];
                 var childPath = childObj.block.path;
