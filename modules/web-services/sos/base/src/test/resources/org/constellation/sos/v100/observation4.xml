@@ -50,7 +50,7 @@
             <swe:encoding>
                 <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
-            <swe:values>2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@</swe:values>
+            <swe:values>2007-05-01T17:59:00.0,6.56@@2007-05-01T18:59:00.0,6.55@@2007-05-01T19:59:00.0,6.55@@2007-05-01T20:59:00.0,6.55@@2007-05-01T21:59:00.0,6.55@@</swe:values>
         </swe:DataArray>
     </om:result>
 </om:Observation>

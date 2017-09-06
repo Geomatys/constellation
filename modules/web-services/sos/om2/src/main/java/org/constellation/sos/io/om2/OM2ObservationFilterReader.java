@@ -294,9 +294,25 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final int oid = rs.getInt("id");
                     Observation observation = observations.get(procedure + '-' + featureID);
                     final int pid = getPIDFromProcedure(procedure, c);
+                    final Field timeField = getTimeField(procedure);
+
                     List<Field> fields = fieldMap.get(procedure);
                     if (fields == null) {
-                        fields = readFields(procedure, c);
+                        if (!currentFields.isEmpty()) {
+                            fields = new ArrayList<>();
+                            // we add the main field TODO profiles???
+                            if (timeField != null) {
+                                fields.add(timeField);
+                            }
+                            for (String f : currentFields) {
+                                final Field field = getFieldForPhenomenon(procedure, f, c);
+                                if (field != null && !fields.contains(field)) {
+                                    fields.add(field);
+                                }
+                            }
+                        } else {
+                            fields = readFields(procedure, c);
+                        }
                         fieldMap.put(procedure, fields);
                     }
 
@@ -319,7 +335,6 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         /*
                          *  BUILD RESULT
                          */
-                        final Field timeField = getTimeField(procedure);
                         final String sqlRequest;
                         if (timeField != null) {
                             sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m "
@@ -334,17 +349,20 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                             try(final ResultSet rs2 = stmt.executeQuery()) {
                                 while (rs2.next()) {
                                     for (int i = 0; i < fields.size(); i++) {
-                                        String value = rs2.getString(i + 3);
                                         Field field = fields.get(i);
-                                        // for time TODO remove when field will be typed
+                                        String value;
                                         if (field.fieldType.equals("Time")) {
-                                            value = value.replace(' ', 'T');
+                                            Timestamp t = rs2.getTimestamp(i + 3);
+                                            synchronized(format2) {
+                                                value = format2.format(t);
+                                            }
                                             if (first) {
                                                 firstTime = value;
                                                 first = false;
                                             }
                                             lastTime = value;
-                                            value = value.substring(0, value.length() - 2);
+                                        } else {
+                                            value = rs2.getString(i + 3);
                                         }
                                         values.append(value).append(encoding.getTokenSeparator());
                                     }
@@ -361,7 +379,6 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         observations.put(procedure + '-' + featureID, observation);
                     } else {
                         String lastTime = null;
-                        final Field timeField = getTimeField(procedure);
                         final String sqlRequest;
                         if (timeField != null) {
                             sqlRequest = "SELECT * FROM \"" + schemaPrefix + "mesures\".\"mesure" + pid + "\" m "
@@ -376,13 +393,16 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                             try(final ResultSet rs2 = stmt.executeQuery()) {
                                 while (rs2.next()) {
                                     for (int i = 0; i < fields.size(); i++) {
-                                        String value = rs2.getString(i + 3);
                                         Field field = fields.get(i);
-                                        // for time TODO remove when field will be typed
+                                        String value;
                                         if (field.fieldType.equals("Time")) {
-                                            value = value.replace(' ', 'T');
-                                            value = value.substring(0, value.length() - 2);
+                                            Timestamp t = rs2.getTimestamp(i + 3);
+                                            synchronized(format2) {
+                                                value = format2.format(t);
+                                            }
                                             lastTime = value;
+                                        } else {
+                                            value = rs2.getString(i + 3);
                                         }
                                         values.append(value).append(encoding.getTokenSeparator());
                                     }
@@ -535,7 +555,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         }
                         for (String f : currentFields) {
                             final Field field = getFieldForPhenomenon(currentProcedure, f, c);
-                            if (!fields.contains(field)) {
+                            if (field != null && !fields.contains(field)) {
                                 fields.add(field);
                             }
                         }
@@ -547,7 +567,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         encoding = getCsvTextEncoding("2.0.0");
                         // Add the header
                         for (Field pheno : fields) {
-                            values.append(pheno.fieldName).append(',');
+                            values.append(pheno.fieldDesc).append(',');
                         }
                         values.setCharAt(values.length() - 1, '\n');
                     } else {
@@ -557,12 +577,16 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     while (rs.next()) {
                         for (int i = 0; i < fields.size(); i++) {
                             Field field = fields.get(i);
-                            String value = rs.getString(field.fieldName);
-                            // for time TODO remove when field will be typed
-                            if (value != null && field.fieldType.equals("Time")) {
-                                value = value.replace(' ', 'T');
-                                value = value.substring(0, value.length() - 2);
-                            } else if (value == null) {
+                            String value; ;
+                            if (field.fieldType.equals("Time")) {
+                                Timestamp t = rs.getTimestamp(field.fieldName);
+                                synchronized(format2) {
+                                    value = format2.format(t);
+                                }
+                            } else {
+                                value = rs.getString(field.fieldName);
+                            }
+                            if (value == null) {
                                 value = "";
                             }
                             values.append(value).append(encoding.getTokenSeparator());
@@ -616,7 +640,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                                 if ("Time".equals(pheno.fieldType)) {
                                     values.append("time").append(',');
                                 } else {
-                                    values.append(pheno.fieldName).append(',');
+                                    values.append(pheno.fieldDesc).append(',');
                                 }
                             }
                             values.setCharAt(values.length() - 1, '\n');

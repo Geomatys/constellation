@@ -227,9 +227,6 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             sbCompo.append(')');
             if (!getFOI) {
                 for (String field : fields) {
-                    if (field.startsWith(phenomenonIdBase)) {
-                        field = field.substring(phenomenonIdBase.length());
-                    }
                     currentFields.add(field);
                 }
             }

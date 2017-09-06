@@ -298,7 +298,7 @@ public class OM2BaseReader {
     }
     
     protected Field getFieldForPhenomenon(final String procedureID, final String phenomenon, final Connection c) throws SQLException {
-        try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"" + schemaPrefix + "om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_name\"= ?")) {
+        try(final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"" + schemaPrefix + "om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND (\"field_definition\"= ?)")) {
             stmt.setString(1, procedureID);
             stmt.setString(2, phenomenon);
             try(final ResultSet rs = stmt.executeQuery()) {

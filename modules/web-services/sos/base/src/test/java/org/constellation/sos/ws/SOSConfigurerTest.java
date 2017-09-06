@@ -47,7 +47,7 @@ public abstract class SOSConfigurerTest  implements ApplicationContextAware {
     public void getObservationsCsvTest() throws Exception {
         
         String result = configurer.getDecimatedObservationsCsv("default", "urn:ogc:object:sensor:GEOM:3", Arrays.asList("urn:ogc:def:phenomenon:GEOM:depth"), null, null, 10);
-        String expResult = "time,depth\n" +
+        String expResult = "time,urn:ogc:def:phenomenon:GEOM:depth\n" +
                                  "2007-05-01T02:59:00,6.56\n" +
                                  "2007-05-01T04:53:00,6.56\n" +
                                  "2007-05-01T04:59:00,6.56\n" +
@@ -65,7 +65,7 @@ public abstract class SOSConfigurerTest  implements ApplicationContextAware {
         Assert.assertEquals(expResult, result);
         
         result = configurer.getDecimatedObservationsCsv("default", "urn:ogc:object:sensor:GEOM:8", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null, null, 10);
-        expResult = "time,depth,temperature\n" +
+        expResult = "time,urn:ogc:def:phenomenon:GEOM:depth,urn:ogc:def:phenomenon:GEOM:temperature\n" +
                     "2007-05-01T12:59:00,6.56,12.0\n" +
                     "2007-05-01T13:23:00,6.56,13.0\n" +
                     "2007-05-01T13:59:00,6.56,14.0\n" +
@@ -80,7 +80,7 @@ public abstract class SOSConfigurerTest  implements ApplicationContextAware {
     
     public void getObservationsCsvProfileTest() throws Exception {
         String result = configurer.getDecimatedObservationsCsv("default", "urn:ogc:object:sensor:GEOM:2", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null, null, 10);
-        String expResult = "depth,temperature\n" +
+        String expResult = "urn:ogc:def:phenomenon:GEOM:depth,urn:ogc:def:phenomenon:GEOM:temperature\n" +
                            "12,18.5\n" +
                            "87,23.9\n" +
                            "96,26.2\n" +

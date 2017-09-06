@@ -1542,9 +1542,9 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         GetResultType request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, null, null, null);
         GetResultResponseType result = (GetResultResponseType) worker.getResult(request);
 
-        String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + 
-                       "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + 
-                       "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
+        String value = "2007-05-01T02:59:00.0,6.56@@2007-05-01T03:59:00.0,6.56@@2007-05-01T04:59:00.0,6.56@@2007-05-01T05:59:00.0,6.56@@2007-05-01T06:59:00.0,6.56@@" +
+                       "2007-05-01T07:59:00.0,6.56@@2007-05-01T08:59:00.0,6.56@@2007-05-01T09:59:00.0,6.56@@2007-05-01T10:59:00.0,6.56@@2007-05-01T11:59:00.0,6.56@@" +
+                       "2007-05-01T17:59:00.0,6.56@@2007-05-01T18:59:00.0,6.55@@2007-05-01T19:59:00.0,6.55@@2007-05-01T20:59:00.0,6.55@@2007-05-01T21:59:00.0,6.55@@";
         GetResultResponseType expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1563,7 +1563,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@";
+        value = "2007-05-01T02:59:00.0,6.56@@2007-05-01T03:59:00.0,6.56@@2007-05-01T04:59:00.0,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1577,7 +1577,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         request.addTemporalFilter(afilter);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@";
+        value = "2007-05-01T03:59:00.0,6.56@@2007-05-01T04:59:00.0,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1594,7 +1594,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@";
+        value = "2007-05-01T02:59:00.0,6.56@@2007-05-01T03:59:00.0,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1612,7 +1612,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T03:59:00,6.56@@";
+        value = "2007-05-01T03:59:00.0,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1630,7 +1630,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         request = new GetResultType("2.0.0", "SOS", offeringId, observedProperty, filters, null, null);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T03:59:00,6.56@@";
+        value = "2007-05-01T03:59:00.0,6.56@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1647,7 +1647,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
                 
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
+        value = "2007-05-01T19:59:00.0,6.55@@2007-05-01T20:59:00.0,6.55@@2007-05-01T21:59:00.0,6.55@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1662,7 +1662,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         request.addTemporalFilter(templatefilter);
         result = (GetResultResponseType) worker.getResult(request);
 
-        value = "2007-05-01T20:59:00,6.55@@";
+        value = "2007-05-01T20:59:00.0,6.55@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1685,9 +1685,9 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         GetResultType GRrequest = new GetResultType("2.0.0", "SOS", "offering-3", observedProperty, null, null, null);
         GetResultResponseType result = (GetResultResponseType) worker.getResult(GRrequest);
 
-        String value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" + 
-                       "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" + 
-                       "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@";
+        String value = "2007-05-01T02:59:00.0,6.56@@2007-05-01T03:59:00.0,6.56@@2007-05-01T04:59:00.0,6.56@@2007-05-01T05:59:00.0,6.56@@2007-05-01T06:59:00.0,6.56@@" +
+                       "2007-05-01T07:59:00.0,6.56@@2007-05-01T08:59:00.0,6.56@@2007-05-01T09:59:00.0,6.56@@2007-05-01T10:59:00.0,6.56@@2007-05-01T11:59:00.0,6.56@@" +
+                       "2007-05-01T17:59:00.0,6.56@@2007-05-01T18:59:00.0,6.55@@2007-05-01T19:59:00.0,6.55@@2007-05-01T20:59:00.0,6.55@@2007-05-01T21:59:00.0,6.55@@";
         
         GetResultResponseType expResult = new GetResultResponseType(value);
 
@@ -1705,7 +1705,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         DataArrayPropertyType arrayP = (DataArrayPropertyType) template.getResult();
         DataArrayType array = arrayP.getDataArray();
         array.setElementCount(3);
-        array.setValues("2007-06-01T01:01:00,6.56@@2007-06-01T02:00:00,6.55@@2007-06-01T03:00:00,6.55@@");
+        array.setValues("2007-06-01T01:01:00.0,6.56@@2007-06-01T02:00:00.0,6.55@@2007-06-01T03:00:00.0,6.55@@");
 
         InsertObservationType request = new InsertObservationType("2.0.0", Arrays.asList("offering-3"), Arrays.asList(template));
         worker.insertObservation(request);
@@ -1713,10 +1713,10 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         GRrequest = new GetResultType("2.0.0", "SOS", "offering-3", observedProperty, null, null, null);
         result = (GetResultResponseType) worker.getResult(GRrequest);
 
-        value = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@" +
-                "2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@" +
-                "2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@" +
-                "2007-06-01T01:01:00,6.56@@2007-06-01T02:00:00,6.55@@2007-06-01T03:00:00,6.55@@";
+        value = "2007-05-01T02:59:00.0,6.56@@2007-05-01T03:59:00.0,6.56@@2007-05-01T04:59:00.0,6.56@@2007-05-01T05:59:00.0,6.56@@2007-05-01T06:59:00.0,6.56@@" +
+                "2007-05-01T07:59:00.0,6.56@@2007-05-01T08:59:00.0,6.56@@2007-05-01T09:59:00.0,6.56@@2007-05-01T10:59:00.0,6.56@@2007-05-01T11:59:00.0,6.56@@" +
+                "2007-05-01T17:59:00.0,6.56@@2007-05-01T18:59:00.0,6.55@@2007-05-01T19:59:00.0,6.55@@2007-05-01T20:59:00.0,6.55@@2007-05-01T21:59:00.0,6.55@@" +
+                "2007-06-01T01:01:00.0,6.56@@2007-06-01T02:00:00.0,6.55@@2007-06-01T03:00:00.0,6.55@@";
         expResult = new GetResultResponseType(value);
 
         assertEquals(expResult.getResultValues(), result.getResultValues());
@@ -1751,7 +1751,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         final String templateID = result.getAcceptedTemplate();
         assertTrue(templateID.startsWith("urn:ogc:object:observation:template:GEOM:"));
         
-        String value = "2012-01-01T00:01:00,12.1@@2012-01-01T00:02:00,13.1@@";
+        String value = "2012-01-01T00:01:00.0,12.1@@2012-01-01T00:02:00.0,13.1@@";
         InsertResultType requestIR = new InsertResultType("2.0.0", templateID, value);
         final InsertResultResponse response = worker.insertResult(requestIR);
         assertNotNull(response);
@@ -1824,7 +1824,10 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
         
         
-        String v = "2007-05-01T02:59:00,6.56@@2007-05-01T03:59:00,6.56@@2007-05-01T04:59:00,6.56@@2007-05-01T05:59:00,6.56@@2007-05-01T06:59:00,6.56@@2007-05-01T07:59:00,6.56@@2007-05-01T08:59:00,6.56@@2007-05-01T09:59:00,6.56@@2007-05-01T10:59:00,6.56@@2007-05-01T11:59:00,6.56@@2007-05-01T17:59:00,6.56@@2007-05-01T18:59:00,6.55@@2007-05-01T19:59:00,6.55@@2007-05-01T20:59:00,6.55@@2007-05-01T21:59:00,6.55@@2007-06-01T01:01:00,6.56@@2007-06-01T02:00:00,6.55@@2007-06-01T03:00:00,6.55@@2012-01-01T00:01:00,12.1@@2012-01-01T00:02:00,13.1@@";
+        String v = "2007-05-01T02:59:00.0,6.56@@2007-05-01T03:59:00.0,6.56@@2007-05-01T04:59:00.0,6.56@@2007-05-01T05:59:00.0,6.56@@2007-05-01T06:59:00.0,6.56@@"
+                +  "2007-05-01T07:59:00.0,6.56@@2007-05-01T08:59:00.0,6.56@@2007-05-01T09:59:00.0,6.56@@2007-05-01T10:59:00.0,6.56@@2007-05-01T11:59:00.0,6.56@@"
+                +  "2007-05-01T17:59:00.0,6.56@@2007-05-01T18:59:00.0,6.55@@2007-05-01T19:59:00.0,6.55@@2007-05-01T20:59:00.0,6.55@@2007-05-01T21:59:00.0,6.55@@"
+                +  "2007-06-01T01:01:00.0,6.56@@2007-06-01T02:00:00.0,6.55@@2007-06-01T03:00:00.0,6.55@@2012-01-01T00:01:00.0,12.1@@2012-01-01T00:02:00.0,13.1@@";
         expR.getDataArray().setValues(v);
         
         assertEquals(expR.getDataArray().getValues(),          obsR.getDataArray().getValues());

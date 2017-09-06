@@ -71,6 +71,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import org.geotoolkit.geometry.jts.transform.AbstractGeometryTransformer;
 import org.geotoolkit.geometry.jts.transform.GeometryCSTransformer;
+import org.geotoolkit.gml.xml.v321.ReferenceType;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.opengis.referencing.operation.TransformException;
@@ -237,7 +238,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 stmt.setNull(3, java.sql.Types.TIMESTAMP);
                 stmt.setNull(4, java.sql.Types.TIMESTAMP);
             }
-            final PhenomenonProperty phenomenon = (PhenomenonProperty)((AbstractObservation)observation).getPropertyObservedProperty();
+            final PhenomenonProperty phenomenon = getPropertyObservedProperty((AbstractObservation) observation);
             final String phenRef = writePhenomenon(phenomenon, c, false);
             stmt.setString(5, phenRef);
             
@@ -1217,6 +1218,59 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             stmtSQL.executeBatch();
 
         }
+    }
+
+    private PhenomenonProperty getPropertyObservedProperty(AbstractObservation obs) {
+        if (obs instanceof org.geotoolkit.observation.xml.v200.OMObservationType) {
+            org.geotoolkit.observation.xml.v200.OMObservationType obs200 = (org.geotoolkit.observation.xml.v200.OMObservationType) obs;
+            if (obs200.getObservedPropertyRef() != null) {
+                final Phenomenon phen = getObservedProperty(obs200.getObservedPropertyRef(), obs.getResult());
+                return new org.geotoolkit.observation.xml.v200.OMObservationType.InternalPhenomenonProperty(obs200.getObservedPropertyRef(), (org.geotoolkit.swe.xml.Phenomenon) phen);
+            }
+        } else {
+            return obs.getPropertyObservedProperty();
+        }
+        return null;
+    }
+
+    private Phenomenon getObservedProperty(ReferenceType obsRef, Object result) {
+        if (result instanceof DataArrayProperty) {
+            final List<String> fields = getFieldsFromResult((DataArrayProperty) result);
+            final List<InternalPhenomenon> phenomenons = new ArrayList<>();
+            for (String field : fields) {
+                phenomenons.add(new InternalPhenomenon(field));
+            }
+            return new org.geotoolkit.observation.xml.v200.OMObservationType.InternalCompositePhenomenon(obsRef.getHref(), phenomenons);
+        }
+        return new InternalPhenomenon(obsRef.getHref());
+    }
+
+    private List<String> getFieldsFromResult(final DataArrayProperty arrayProp) {
+        final List<String> fields = new ArrayList<>();
+        if (arrayProp.getDataArray() != null) {
+            final DataArray array = arrayProp.getDataArray();
+            if (array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) {
+                final DataRecord record = (DataRecord)array.getPropertyElementType().getAbstractRecord();
+                for (DataComponentProperty field : record.getField()) {
+                    if (field.getValue() != null) {
+                        fields.add(field.getValue().getDefinition());
+                    } else {
+                        fields.add(field.getName());
+                    }
+                }
+
+            } else if (array.getPropertyElementType().getAbstractRecord() instanceof SimpleDataRecord) {
+                final SimpleDataRecord record = (SimpleDataRecord)array.getPropertyElementType().getAbstractRecord();
+                for (AnyScalar field : record.getField()) {
+                    if (field.getValue() != null) {
+                        fields.add(field.getValue().getDefinition());
+                    } else {
+                        fields.add(field.getName());
+                    }
+                }
+            }
+        }
+        return fields;
     }
     
      /**
