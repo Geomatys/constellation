@@ -186,7 +186,7 @@
         <spring.version>4.0.6.RELEASE</spring.version>
         <spring-security.version>3.2.5.RELEASE</spring-security.version>
         <selenium.version>2.42.2</selenium.version>
-        <jackson.version>2.3.2</jackson.version>
+        <jackson.version>2.12.2</jackson.version>
         <joda.version>2.2</joda.version>
         <postgresql.version>9.3-1101-jdbc41</postgresql.version>
         <jooq.version>3.5.3</jooq.version>
