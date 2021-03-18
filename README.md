@@ -1,3 +1,5 @@
+#### :warning:This project moved to [Examind-community](https://github.com/Geomatys/examind-community) and this repository has been archived.
+
 # Constellation-SDI
 Constellation-SDI makes it possible to easily create a complete Spatial Data Infrastructure, from cataloging geographic
 resources to operate a platform of sensors that feeds back information in real time.
